@@ -6,6 +6,17 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		FE6FC02E2E756EAB007FA21D /* ios_todo-app-modern-tech-research.md in Resources */ = {isa = PBXBuildFile; fileRef = FE6FC02A2E756EAB007FA21D /* ios_todo-app-modern-tech-research.md */; };
+		FE6FC02F2E756EAB007FA21D /* tech-stack.md in Resources */ = {isa = PBXBuildFile; fileRef = FE6FC02B2E756EAB007FA21D /* tech-stack.md */; };
+		FE6FC0302E756EAB007FA21D /* feature-list.md in Resources */ = {isa = PBXBuildFile; fileRef = FE6FC0292E756EAB007FA21D /* feature-list.md */; };
+		FE6FC0312E756EAB007FA21D /* UI-specs.md in Resources */ = {isa = PBXBuildFile; fileRef = FE6FC02C2E756EAB007FA21D /* UI-specs.md */; };
+		FE6FC0352E7573A6007FA21D /* prd-prompt.md in Resources */ = {isa = PBXBuildFile; fileRef = FE6FC0342E7573A6007FA21D /* prd-prompt.md */; };
+		FE6FC04A2E757FF5007FA21D /* todoozies-prd.md in Resources */ = {isa = PBXBuildFile; fileRef = FE6FC0492E757FF5007FA21D /* todoozies-prd.md */; };
+		FE6FC04C2E7616F6007FA21D /* ios-todo-app-wireframes.md in Resources */ = {isa = PBXBuildFile; fileRef = FE6FC04B2E7616F6007FA21D /* ios-todo-app-wireframes.md */; };
+		FE6FC04E2E7639FB007FA21D /* todoozies-implementation-plan 2.md in Resources */ = {isa = PBXBuildFile; fileRef = FE6FC04D2E7639FB007FA21D /* todoozies-implementation-plan 2.md */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		FE6FC00C2E756E44007FA21D /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -27,6 +38,14 @@
 		FE6FBFFA2E756E44007FA21D /* ToDoozies.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ToDoozies.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		FE6FC00B2E756E44007FA21D /* ToDooziesTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ToDooziesTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		FE6FC0152E756E44007FA21D /* ToDooziesUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ToDooziesUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		FE6FC0292E756EAB007FA21D /* feature-list.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "feature-list.md"; sourceTree = "<group>"; };
+		FE6FC02A2E756EAB007FA21D /* ios_todo-app-modern-tech-research.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "ios_todo-app-modern-tech-research.md"; sourceTree = "<group>"; };
+		FE6FC02B2E756EAB007FA21D /* tech-stack.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "tech-stack.md"; sourceTree = "<group>"; };
+		FE6FC02C2E756EAB007FA21D /* UI-specs.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "UI-specs.md"; sourceTree = "<group>"; };
+		FE6FC0342E7573A6007FA21D /* prd-prompt.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "prd-prompt.md"; sourceTree = "<group>"; };
+		FE6FC0492E757FF5007FA21D /* todoozies-prd.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "todoozies-prd.md"; sourceTree = "<group>"; };
+		FE6FC04B2E7616F6007FA21D /* ios-todo-app-wireframes.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "ios-todo-app-wireframes.md"; sourceTree = "<group>"; };
+		FE6FC04D2E7639FB007FA21D /* todoozies-implementation-plan 2.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "todoozies-implementation-plan 2.md"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -92,6 +111,7 @@
 				FE6FC00E2E756E44007FA21D /* ToDooziesTests */,
 				FE6FC0182E756E44007FA21D /* ToDooziesUITests */,
 				FE6FBFFB2E756E44007FA21D /* Products */,
+				FE6FC02D2E756EAB007FA21D /* docs */,
 			);
 			sourceTree = "<group>";
 		};
@@ -103,6 +123,21 @@
 				FE6FC0152E756E44007FA21D /* ToDooziesUITests.xctest */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		FE6FC02D2E756EAB007FA21D /* docs */ = {
+			isa = PBXGroup;
+			children = (
+				FE6FC04B2E7616F6007FA21D /* ios-todo-app-wireframes.md */,
+				FE6FC0492E757FF5007FA21D /* todoozies-prd.md */,
+				FE6FC0342E7573A6007FA21D /* prd-prompt.md */,
+				FE6FC0292E756EAB007FA21D /* feature-list.md */,
+				FE6FC02A2E756EAB007FA21D /* ios_todo-app-modern-tech-research.md */,
+				FE6FC02B2E756EAB007FA21D /* tech-stack.md */,
+				FE6FC02C2E756EAB007FA21D /* UI-specs.md */,
+				FE6FC04D2E7639FB007FA21D /* todoozies-implementation-plan 2.md */,
+			);
+			path = docs;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -225,6 +260,14 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FE6FC04A2E757FF5007FA21D /* todoozies-prd.md in Resources */,
+				FE6FC04E2E7639FB007FA21D /* todoozies-implementation-plan 2.md in Resources */,
+				FE6FC02E2E756EAB007FA21D /* ios_todo-app-modern-tech-research.md in Resources */,
+				FE6FC02F2E756EAB007FA21D /* tech-stack.md in Resources */,
+				FE6FC0302E756EAB007FA21D /* feature-list.md in Resources */,
+				FE6FC0312E756EAB007FA21D /* UI-specs.md in Resources */,
+				FE6FC0352E7573A6007FA21D /* prd-prompt.md in Resources */,
+				FE6FC04C2E7616F6007FA21D /* ios-todo-app-wireframes.md in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -299,6 +342,7 @@
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -329,6 +373,7 @@
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
