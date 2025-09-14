@@ -7,6 +7,7 @@
 
 import SwiftUI
 import SwiftData
+import CloudKit
 
 @main
 struct ToDooziesApp: App {
@@ -14,7 +15,11 @@ struct ToDooziesApp: App {
         let schema = Schema([
             Item.self,
         ])
-        let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
+        let modelConfiguration = ModelConfiguration(
+            schema: schema,
+            isStoredInMemoryOnly: false,
+            cloudKitDatabase: .private("iCloud.dante.ToDoozies")
+        )
 
         do {
             return try ModelContainer(for: schema, configurations: [modelConfiguration])

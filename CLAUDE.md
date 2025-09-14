@@ -30,15 +30,16 @@ xcodebuild test -project ToDoozies.xcodeproj -scheme ToDoozies -destination 'pla
 ### Core Technologies
 - **SwiftUI**: Declarative UI framework
 - **SwiftData**: Core Data successor for data persistence
-- **CloudKit**: Planned for cross-device sync
+- **CloudKit**: Enabled for automatic cross-device sync
 - **Swift Testing**: Modern testing framework
 - **Model-View (MV)**: Architecture pattern
 
 ### Data Model
-- Uses SwiftData with `@Model` classes
+- Uses SwiftData with `@Model` classes integrated with CloudKit
 - `Models/Core/Item.swift`: Basic data model with timestamp (placeholder for full todo structure)
-- `ModelContainer` configured in `ToDooziesApp.swift`
-- Supports both in-memory and persistent storage
+- `ModelContainer` configured in `ToDooziesApp.swift` with CloudKit sync
+- Supports both local storage and automatic iCloud sync via private CloudKit database
+- CloudKit container: `iCloud.dante.ToDoozies`
 
 ### Project Structure
 The codebase follows an organized folder structure for maintainability and scalability:

@@ -22,8 +22,8 @@
   - [X] `../ToDooziesUITests` - UI tests
 
 ### Core Configuration
-- [ ] Enable SwiftData capability
-- [ ] Enable CloudKit capability
+- [X] Enable SwiftData capability
+- [X] Enable CloudKit capability
 - [ ] Configure app groups for widget data sharing
 - [ ] Set up Info.plist with required permissions descriptions
 - [ ] Import SF Symbols catalog
