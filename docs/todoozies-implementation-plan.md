@@ -3,12 +3,12 @@
 ## Project Setup & Foundation
 
 ### Environment Setup
-- [ ] Install Xcode 16+
-- [ ] Create new iOS project with SwiftUI interface
-- [ ] Set minimum deployment target to iOS 17.0
-- [ ] Configure project bundle identifier: `com.todoozies.app`
-- [ ] Set up Git repository
-- [ ] Configure `.gitignore` for iOS/Swift projects
+- [X] Install Xcode 16+
+- [X] Create new iOS project with SwiftUI interface
+- [X] Set minimum deployment target to iOS 17.6
+- [X] Configure project bundle identifier: `com.todoozies.app`
+- [X] Set up Git repository
+- [X] Configure `.gitignore` for iOS/Swift projects
 
 ### Project Structure
 - [ ] Create folder structure:
