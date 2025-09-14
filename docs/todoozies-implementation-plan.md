@@ -10,15 +10,16 @@
 - [X] Set up Git repository
 - [X] Configure `.gitignore` for iOS/Swift projects
 
-### Project Structure
-- [ ] Create folder structure:
-  - [ ] `/Models` - Data models and business logic
-  - [ ] `/Views` - SwiftUI views and components
-  - [ ] `/Features` - Feature modules (Tasks, Habits, Settings)
-  - [ ] `/Resources` - Assets, colors, fonts
-  - [ ] `/Extensions` - Swift extensions and utilities
-  - [ ] `/Services` - Network, storage, notification services
-  - [ ] `/Tests` - Unit and UI tests
+### Project Structures
+- [X] Create folder structure:
+  - [X] `/Models` - Data models and business logic
+  - [X] `/Views` - SwiftUI views and components
+  - [X] `/Features` - Feature modules (Tasks, Habits, Settings)
+  - [X] `/Resources` - Assets, colors, fonts
+  - [X] `/Extensions` - Swift extensions and utilities
+  - [X] `/Services` - Network, storage, notification services
+  - [X] `../ToDooziesTests` - tests
+  - [X] `../ToDooziesUITests` - UI tests
 
 ### Core Configuration
 - [ ] Enable SwiftData capability

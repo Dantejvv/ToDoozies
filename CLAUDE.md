@@ -36,18 +36,48 @@ xcodebuild test -project ToDoozies.xcodeproj -scheme ToDoozies -destination 'pla
 
 ### Data Model
 - Uses SwiftData with `@Model` classes
-- `Item.swift`: Basic data model with timestamp (placeholder for full todo structure)
+- `Models/Core/Item.swift`: Basic data model with timestamp (placeholder for full todo structure)
 - `ModelContainer` configured in `ToDooziesApp.swift`
 - Supports both in-memory and persistent storage
 
 ### Project Structure
-- `ToDoozies/`: Main app target
-  - `ToDooziesApp.swift`: Main app entry point with SwiftData configuration
-  - `ContentView.swift`: Primary UI view with navigation
-  - `Item.swift`: Data model classes
-- `ToDooziesTests/`: Unit tests
-- `ToDooziesUITests/`: UI automation tests
-- `docs/`: Project documentation including feature specs and technical plans
+The codebase follows an organized folder structure for maintainability and scalability:
+
+```
+ToDoozies/                           # Main app target
+├── Models/                          # Data models and business logic
+│   ├── Core/                       # Core data models (Item.swift)
+│   ├── Extensions/                 # Model extensions and computed properties
+│   └── Protocols/                  # Data protocol definitions
+├── Views/                          # SwiftUI views and components
+│   ├── Components/                 # Reusable UI components
+│   ├── Screens/                    # Main screen views (ContentView.swift)
+│   └── Modifiers/                  # Custom view modifiers
+├── Features/                       # Feature modules
+│   ├── Tasks/                      # Task-related functionality
+│   ├── Habits/                     # Habit tracking features
+│   └── Settings/                   # App settings and preferences
+├── Resources/                      # Assets, colors, fonts
+│   ├── Colors/                     # Color definitions and themes
+│   ├── Fonts/                      # Custom fonts
+│   └── Localization/               # String localization files
+├── Extensions/                     # Swift extensions and utilities
+│   ├── Foundation/                 # Foundation framework extensions
+│   ├── SwiftUI/                    # SwiftUI framework extensions
+│   └── Utilities/                  # General utility functions
+├── Services/                       # Network, storage, notification services
+│   ├── Data/                       # Data persistence and sync
+│   ├── Notifications/              # Push notifications and reminders
+│   └── Network/                    # API and network operations
+├── Assets.xcassets/                # App icons and images
+├── ToDooziesApp.swift              # App entry point with SwiftData configuration
+├── Info.plist                     # App configuration
+└── ToDoozies.entitlements          # App capabilities
+
+ToDooziesTests/                     # Unit tests
+ToDooziesUITests/                   # UI automation tests
+docs/                               # Project documentation including feature specs and technical plans
+```
 
 ### Key Features (Planned)
 - Regular and recurring tasks
