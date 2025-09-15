@@ -422,10 +422,9 @@ struct TestHelpers {
     }
 
     // Legacy method for backward compatibility
+    @MainActor
     static func createInMemoryModelContainer() throws -> ModelContainer {
-        return try Task { @MainActor in
-            try createIsolatedModelContainer()
-        }.value
+        return try createIsolatedModelContainer()
     }
 
     static func createTestDate(daysFromNow: Int) -> Date {
@@ -506,7 +505,7 @@ struct ToDooziesTests {
     }
 
     @Test func testHelpersWork() async throws {
-        let container = try TestHelpers.createInMemoryModelContainer()
+        let container = try await TestHelpers.createInMemoryModelContainer()
         // Test that container was created successfully
         #expect(true) // Container creation didn't throw, so it worked
 
