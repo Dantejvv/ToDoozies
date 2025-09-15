@@ -15,9 +15,13 @@ struct ToDooziesApp: App {
         let schema = Schema([
             Item.self,
         ])
+
+        // Configure shared container URL for app group
+        let appGroupURL = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: "group.dante.ToDoozies")
+        let databaseURL = appGroupURL?.appendingPathComponent("ToDoozies.sqlite") ?? URL.documentsDirectory.appendingPathComponent("ToDoozies.sqlite")
+
         let modelConfiguration = ModelConfiguration(
-            schema: schema,
-            isStoredInMemoryOnly: false,
+            url: databaseURL,
             cloudKitDatabase: .private("iCloud.dante.ToDoozies")
         )
 

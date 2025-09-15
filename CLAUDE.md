@@ -10,13 +10,17 @@ ToDoozies is an iOS todo application built with SwiftUI, SwiftData, and modern i
 ### Building and Running
 ```bash
 # Build the project
-xcodebuild -project ToDoozies.xcodeproj -scheme ToDoozies build
+xcodebuild -project ToDoozies.xcodeproj -scheme ToDoozies build -destination 'platform=iOS Simulator,name=iPhone 16'
 
 # Run unit tests
-xcodebuild test -project ToDoozies.xcodeproj -scheme ToDoozies -destination 'platform=iOS Simulator,name=iPhone 15'
+xcodebuild test -project ToDoozies.xcodeproj -scheme ToDoozies -destination 'platform=iOS Simulator,name=iPhone 16'
 
 # Run UI tests
-xcodebuild test -project ToDoozies.xcodeproj -scheme ToDoozies -destination 'platform=iOS Simulator,name=iPhone 15' -only-testing:ToDooziesUITests
+xcodebuild test -project ToDoozies.xcodeproj -scheme ToDoozies -destination 'platform=iOS Simulator,name=iPhone 16' -only-testing:ToDooziesUITests
+
+# Available simulator destinations (iOS 18.6):
+# - iPhone 16, iPhone 16 Plus, iPhone 16 Pro, iPhone 16 Pro Max
+# - iPad (A16), iPad Air 11-inch (M3), iPad Pro 11-inch (M4), iPad mini (A17 Pro)
 ```
 
 ### Testing Framework
@@ -37,9 +41,10 @@ xcodebuild test -project ToDoozies.xcodeproj -scheme ToDoozies -destination 'pla
 ### Data Model
 - Uses SwiftData with `@Model` classes integrated with CloudKit
 - `Models/Core/Item.swift`: Basic data model with timestamp (placeholder for full todo structure)
-- `ModelContainer` configured in `ToDooziesApp.swift` with CloudKit sync
+- `ModelContainer` configured in `ToDooziesApp.swift` with CloudKit sync and shared app group
 - Supports both local storage and automatic iCloud sync via private CloudKit database
 - CloudKit container: `iCloud.dante.ToDoozies`
+- App group: `group.dante.ToDoozies` for widget data sharing
 
 ### Project Structure
 The codebase follows an organized folder structure for maintainability and scalability:
@@ -93,5 +98,11 @@ docs/                               # Project documentation including feature sp
 - Minimum deployment: iOS 17.6
 - Supports iPhone and iPad (Universal)
 - Background modes enabled for remote notifications
+- App groups configured for widget data sharing (`group.dante.ToDoozies`)
+- Comprehensive permission descriptions in Info.plist for:
+  - Notifications, Siri & Shortcuts, Calendar, Reminders, Location, Speech Recognition
+- Custom SF Symbols catalog with ToDoozies-specific icons
+- App icons configured for light/dark/tinted modes with checklist theme
+- Launch screen with branded design
 - Uses SF Symbols for icons
 - Follows Apple's Human Interface Guidelines

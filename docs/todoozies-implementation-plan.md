@@ -24,10 +24,10 @@
 ### Core Configuration
 - [X] Enable SwiftData capability
 - [X] Enable CloudKit capability
-- [ ] Configure app groups for widget data sharing
-- [ ] Set up Info.plist with required permissions descriptions
-- [ ] Import SF Symbols catalog
-- [ ] Configure app icon and launch screen
+- [X] Configure app groups for widget data sharing
+- [X] Set up Info.plist with required permissions descriptions
+- [X] Import SF Symbols catalog
+- [X] Configure app icon and launch screen
 
 ## Phase 1: Core Data Layer
 

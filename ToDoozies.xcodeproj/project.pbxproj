@@ -16,6 +16,7 @@
 		FE6FC04C2E7616F6007FA21D /* ios-todo-app-wireframes.md in Resources */ = {isa = PBXBuildFile; fileRef = FE6FC04B2E7616F6007FA21D /* ios-todo-app-wireframes.md */; };
 		FE6FC0502E763B43007FA21D /* CLAUDE.md in Resources */ = {isa = PBXBuildFile; fileRef = FE6FC04F2E763B43007FA21D /* CLAUDE.md */; };
 		FE6FC0522E763BDA007FA21D /* todoozies-implementation-plan.md in Resources */ = {isa = PBXBuildFile; fileRef = FE6FC0512E763BDA007FA21D /* todoozies-implementation-plan.md */; };
+		FE6FC0722E776D5F007FA21D /* codebase-analysis-report.md in Resources */ = {isa = PBXBuildFile; fileRef = FE6FC0712E776D5F007FA21D /* codebase-analysis-report.md */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -48,6 +49,7 @@
 		FE6FC04B2E7616F6007FA21D /* ios-todo-app-wireframes.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "ios-todo-app-wireframes.md"; sourceTree = "<group>"; };
 		FE6FC04F2E763B43007FA21D /* CLAUDE.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = CLAUDE.md; sourceTree = "<group>"; };
 		FE6FC0512E763BDA007FA21D /* todoozies-implementation-plan.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "todoozies-implementation-plan.md"; sourceTree = "<group>"; };
+		FE6FC0712E776D5F007FA21D /* codebase-analysis-report.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "codebase-analysis-report.md"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -132,6 +134,7 @@
 			isa = PBXGroup;
 			children = (
 				FE6FC0512E763BDA007FA21D /* todoozies-implementation-plan.md */,
+				FE6FC0712E776D5F007FA21D /* codebase-analysis-report.md */,
 				FE6FC04B2E7616F6007FA21D /* ios-todo-app-wireframes.md */,
 				FE6FC0492E757FF5007FA21D /* todoozies-prd.md */,
 				FE6FC0342E7573A6007FA21D /* prd-prompt.md */,
@@ -263,6 +266,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FE6FC0722E776D5F007FA21D /* codebase-analysis-report.md in Resources */,
 				FE6FC04A2E757FF5007FA21D /* todoozies-prd.md in Resources */,
 				FE6FC0502E763B43007FA21D /* CLAUDE.md in Resources */,
 				FE6FC02E2E756EAB007FA21D /* ios_todo-app-modern-tech-research.md in Resources */,

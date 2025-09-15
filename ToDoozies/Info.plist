@@ -6,5 +6,44 @@
 	<array>
 		<string>remote-notification</string>
 	</array>
+
+	<!-- Notification Permissions -->
+	<key>NSUserNotificationsUsageDescription</key>
+	<string>ToDoozies needs notification access to remind you about tasks and celebrate habit streaks.</string>
+
+	<!-- Siri & Shortcuts -->
+	<key>NSSiriUsageDescription</key>
+	<string>Allow Siri to help you quickly create tasks and check your progress using voice commands.</string>
+
+	<!-- Calendar Integration -->
+	<key>NSCalendarsUsageDescription</key>
+	<string>ToDoozies can integrate with your calendar to import events as tasks and sync due dates.</string>
+
+	<!-- Reminders Import -->
+	<key>NSRemindersUsageDescription</key>
+	<string>Import your existing reminders to get started quickly with ToDoozies.</string>
+
+	<!-- Location-based Reminders -->
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Set location-based reminders to get notified about tasks when you arrive at specific places.</string>
+
+	<!-- Speech Recognition for Voice Input -->
+	<key>NSSpeechRecognitionUsageDescription</key>
+	<string>Use speech recognition to quickly add tasks and notes using your voice.</string>
+
+	<!-- Microphone for Voice Input -->
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Record voice notes and use speech-to-text for faster task creation.</string>
+
+	<!-- Launch Screen Configuration -->
+	<key>UILaunchScreen</key>
+	<dict>
+		<key>UIImageName</key>
+		<string>checkmark.circle.badge.questionmark</string>
+		<key>UIColorName</key>
+		<string>AccentColor</string>
+		<key>UILaunchScreenMininumTime</key>
+		<real>0.5</real>
+	</dict>
 </dict>
 </plist>

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+  <!-- Circle background -->
+  <circle cx="50" cy="50" r="40" stroke="currentColor" stroke-width="6" fill="none"/>
+  <!-- Flame shape -->
+  <path d="M50 70 C40 65, 35 55, 40 45 C42 40, 45 35, 50 30 C55 35, 58 40, 60 45 C65 55, 60 65, 50 70 Z" fill="currentColor"/>
+  <!-- Inner flame detail -->
+  <path d="M50 60 C45 58, 43 52, 46 48 C47 46, 49 44, 50 42 C51 44, 53 46, 54 48 C57 52, 55 58, 50 60 Z" fill="white" opacity="0.3"/>
+</svg>

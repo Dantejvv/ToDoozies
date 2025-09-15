@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background gradient -->
+  <defs>
+    <linearGradient id="backgroundGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#007AFF;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#5856D6;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="checkGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#34C759;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#30D158;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+
+  <!-- Background with rounded corners -->
+  <rect x="0" y="0" width="1024" height="1024" rx="180" fill="url(#backgroundGradient)"/>
+
+  <!-- Main checklist icon -->
+  <!-- Clipboard background -->
+  <rect x="256" y="200" width="512" height="624" rx="40" fill="white" opacity="0.95"/>
+
+  <!-- Clipboard clip -->
+  <rect x="412" y="120" width="200" height="120" rx="20" fill="white" opacity="0.9"/>
+  <rect x="432" y="140" width="160" height="80" rx="10" fill="url(#backgroundGradient)"/>
+
+  <!-- Checklist items -->
+  <!-- First item (completed) -->
+  <circle cx="320" cy="320" r="24" fill="url(#checkGradient)"/>
+  <path d="M308 320 L318 330 L336 312" stroke="white" stroke-width="6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="380" y="308" width="320" height="24" rx="12" fill="#E5E5E7"/>
+
+  <!-- Second item (completed) -->
+  <circle cx="320" cy="420" r="24" fill="url(#checkGradient)"/>
+  <path d="M308 420 L318 430 L336 412" stroke="white" stroke-width="6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="380" y="408" width="280" height="24" rx="12" fill="#E5E5E7"/>
+
+  <!-- Third item (pending) -->
+  <circle cx="320" cy="520" r="24" stroke="#D1D1D6" stroke-width="4" fill="none"/>
+  <rect x="380" y="508" width="360" height="24" rx="12" fill="#F2F2F7"/>
+
+  <!-- Fourth item (pending) -->
+  <circle cx="320" cy="620" r="24" stroke="#D1D1D6" stroke-width="4" fill="none"/>
+  <rect x="380" y="608" width="240" height="24" rx="12" fill="#F2F2F7"/>
+
+  <!-- Habit streak indicator -->
+  <circle cx="700" cy="320" r="32" fill="#FF9500"/>
+  <text x="700" y="330" font-family="SF Pro" font-size="24" font-weight="bold" text-anchor="middle" fill="white">7</text>
+
+  <!-- Flame icon for streak -->
+  <path d="M700 380 C685 375, 678 360, 685 345 C688 338, 693 330, 700 320 C707 330, 712 338, 715 345 C722 360, 715 375, 700 380 Z" fill="#FF3B30"/>
+</svg>
