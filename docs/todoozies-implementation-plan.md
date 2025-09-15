@@ -32,32 +32,32 @@
 ## Phase 1: Core Data Layer
 
 ### SwiftData Models
-- [ ] Create `Task` model with properties:
-  - [ ] id, title, description
-  - [ ] dueDate, priority, status
-  - [ ] completedDate, createdDate, modifiedDate
-- [ ] Create `RecurrenceRule` model
-- [ ] Create `Habit` model (extends Task)
-- [ ] Create `Subtask` model
-- [ ] Create `Category` model
-- [ ] Create `Attachment` model
-- [ ] Configure model relationships
+- [X] Create `Task` model with properties:
+  - [X] id, title, description
+  - [X] dueDate, priority, status
+  - [X] completedDate, createdDate, modifiedDate
+- [X] Create `RecurrenceRule` model
+- [X] Create `Habit` model (extends Task)
+- [X] Create `Subtask` model
+- [X] Create `Category` model
+- [X] Create `Attachment` model
+- [X] Configure model relationships
 
 ### Data Persistence
-- [ ] Set up SwiftData ModelContainer
-- [ ] Configure CloudKit integration
+- [X] Set up SwiftData ModelContainer
+- [X] Configure CloudKit integration
 - [ ] Implement data migration strategy
 - [ ] Create data access layer protocols
-- [ ] Implement CRUD operations for each model
+- [X] Implement CRUD operations for each model
 - [ ] Add conflict resolution logic
 
 ### Testing Foundation
-- [ ] Set up Swift Testing framework
-- [ ] Create test data factories
-- [ ] Write unit tests for models
-- [ ] Test CRUD operations
-- [ ] Test data relationships
-- [ ] Test sync conflict resolution
+- [X] Set up Swift Testing framework
+- [X] Create test data factories
+- [X] Write unit tests for models
+- [X] Test CRUD operations
+- [X] Test data relationships
+- [X] Test sync conflict resolution
 
 ## Phase 2: Core UI Implementation
 

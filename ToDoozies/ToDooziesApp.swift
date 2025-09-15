@@ -14,6 +14,12 @@ struct ToDooziesApp: App {
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([
             Item.self,
+            Task.self,
+            RecurrenceRule.self,
+            Category.self,
+            Subtask.self,
+            Attachment.self,
+            Habit.self,
         ])
 
         // Configure shared container URL for app group
