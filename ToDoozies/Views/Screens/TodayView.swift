@@ -23,7 +23,7 @@ struct TodayView: View {
     var body: some View {
         NavigationStack {
             ScrollView {
-                LazyVStack(spacing: 20) {
+                LazyVStack(spacing: .spacing5) {
                     // Header Section
                     headerSection
                         .accessibilityElement(children: .combine)
@@ -61,7 +61,7 @@ struct TodayView: View {
                             .accessibilityHint("Upcoming tasks for tomorrow")
                     }
                 }
-                .padding()
+                .spacingPadding(.spacing4)
             }
             .accessibilityLabel("Today's tasks and habits")
             .accessibilityHint("Swipe to navigate through your daily tasks and habits")
@@ -81,15 +81,16 @@ struct TodayView: View {
             .refreshable {
                 await viewModel.refresh()
             }
+            .navigationDestination(coordinator: container?.navigationCoordinator ?? NavigationCoordinator())
         }
     }
 
     // MARK: - Header Section
 
     private var headerSection: some View {
-        VStack(alignment: .leading, spacing: 12) {
+        VStack(alignment: .leading, spacing: .spacing3) {
             HStack {
-                VStack(alignment: .leading, spacing: 4) {
+                VStack(alignment: .leading, spacing: .spacing1) {
                     Text(viewModel.greetingText)
                         .font(.title2)
                         .fontWeight(.medium)
@@ -113,16 +114,14 @@ struct TodayView: View {
                 .font(.subheadline)
                 .foregroundColor(.secondary)
         }
-        .padding()
-        .background(Color(.systemBackground))
-        .cornerRadius(12)
-        .shadow(color: Color.black.opacity(0.1), radius: 4, x: 0, y: 2)
+        .spacingPadding(.spacing4)
+        .cardStyle()
     }
 
     // MARK: - Overdue Section
 
     private var overdueSection: some View {
-        VStack(alignment: .leading, spacing: 16) {
+        VStack(alignment: .leading, spacing: .spacing4) {
             sectionHeader(
                 title: "Overdue",
                 systemImage: "exclamationmark.triangle.fill",
@@ -140,16 +139,14 @@ struct TodayView: View {
                 }
             }
         }
-        .padding()
-        .background(Color(.systemBackground))
-        .cornerRadius(12)
-        .shadow(color: Color.black.opacity(0.1), radius: 4, x: 0, y: 2)
+        .spacingPadding(.spacing4)
+        .cardStyle()
     }
 
     // MARK: - Recurring Tasks Section
 
     private var recurringTasksSection: some View {
-        VStack(alignment: .leading, spacing: 16) {
+        VStack(alignment: .leading, spacing: .spacing4) {
             sectionHeader(
                 title: "Daily Habits",
                 systemImage: "flame.fill",
@@ -181,16 +178,14 @@ struct TodayView: View {
                 }
             }
         }
-        .padding()
-        .background(Color(.systemBackground))
-        .cornerRadius(12)
-        .shadow(color: Color.black.opacity(0.1), radius: 4, x: 0, y: 2)
+        .spacingPadding(.spacing4)
+        .cardStyle()
     }
 
     // MARK: - Today Tasks Section
 
     private var todayTasksSection: some View {
-        VStack(alignment: .leading, spacing: 16) {
+        VStack(alignment: .leading, spacing: .spacing4) {
             sectionHeader(
                 title: "Today's Tasks",
                 systemImage: "calendar",
@@ -216,16 +211,14 @@ struct TodayView: View {
                 }
             }
         }
-        .padding()
-        .background(Color(.systemBackground))
-        .cornerRadius(12)
-        .shadow(color: Color.black.opacity(0.1), radius: 4, x: 0, y: 2)
+        .spacingPadding(.spacing4)
+        .cardStyle()
     }
 
     // MARK: - Tomorrow Preview Section
 
     private var tomorrowPreviewSection: some View {
-        VStack(alignment: .leading, spacing: 16) {
+        VStack(alignment: .leading, spacing: .spacing4) {
             HStack {
                 sectionHeader(
                     title: "Tomorrow",
@@ -250,10 +243,8 @@ struct TodayView: View {
                 }
             }
         }
-        .padding()
-        .background(Color(.systemBackground))
-        .cornerRadius(12)
-        .shadow(color: Color.black.opacity(0.1), radius: 4, x: 0, y: 2)
+        .spacingPadding(.spacing4)
+        .cardStyle()
     }
 
     // MARK: - Helper Views
@@ -269,7 +260,7 @@ struct TodayView: View {
     }
 
     private func emptyStateView(title: String, subtitle: String, systemImage: String) -> some View {
-        VStack(spacing: 12) {
+        VStack(spacing: .spacing3) {
             Image(systemName: systemImage)
                 .font(.system(size: 40))
                 .foregroundColor(.secondary)
@@ -290,10 +281,6 @@ struct TodayView: View {
         Group {
             Button("Edit") {
                 container?.navigationCoordinator.showEditTask(task)
-            }
-
-            Button("Duplicate") {
-                // TODO: Implement task duplication
             }
 
             if task.isOverdue {
@@ -352,20 +339,21 @@ struct TaskRowView: View {
     let onEdit: () -> Void
 
     var body: some View {
-        HStack(spacing: 12) {
+        HStack(spacing: .spacing3) {
             // Completion button
-            Button(action: onComplete) {
-                Image(systemName: task.isCompleted ? "checkmark.circle.fill" : "circle")
-                    .font(.title3)
-                    .foregroundColor(task.isCompleted ? .green : .gray)
+            CompletionButton(
+                isCompleted: task.isCompleted,
+                style: .task,
+                accessibilityLabel: task.isCompleted ? "Mark incomplete" : "Mark complete"
+            ) {
+                if !isPreview {
+                    onComplete()
+                }
             }
             .disabled(isPreview)
-            .buttonStyle(PlainButtonStyle())
-            .accessibilityLabel(task.isCompleted ? "Mark incomplete" : "Mark complete")
-            .accessibilityHint(task.isCompleted ? "Double tap to mark task as incomplete" : "Double tap to complete this task")
 
             // Task content
-            VStack(alignment: .leading, spacing: 4) {
+            VStack(alignment: .leading, spacing: .spacing1) {
                 Text(task.title)
                     .font(.body)
                     .fontWeight(.medium)
@@ -413,7 +401,7 @@ struct TaskRowView: View {
             .accessibilityLabel("Task options")
             .accessibilityHint("Double tap to view task options and details")
         }
-        .padding(.vertical, 8)
+        .verticalSpacingPadding(.spacing2)
         .accessibilityElement(children: .combine)
         .accessibilityLabel(task.accessibilityLabel)
         .accessibilityValue(task.accessibilityValue)
@@ -427,22 +415,7 @@ struct TaskRowView: View {
     }
 
     private func priorityBadge(_ priority: Priority) -> some View {
-        Text(priority.displayName)
-            .font(.caption2)
-            .fontWeight(.medium)
-            .padding(.horizontal, 6)
-            .padding(.vertical, 2)
-            .background(priorityColor(priority).opacity(0.2))
-            .foregroundColor(priorityColor(priority))
-            .clipShape(Capsule())
-    }
-
-    private func priorityColor(_ priority: Priority) -> Color {
-        switch priority {
-        case .high: return .red
-        case .medium: return .orange
-        case .low: return .blue
-        }
+        PriorityBadge(priority: priority, size: .small)
     }
 }
 
@@ -454,23 +427,18 @@ struct HabitTaskRowView: View {
     let onEdit: () -> Void
 
     var body: some View {
-        HStack(spacing: 12) {
+        HStack(spacing: .spacing3) {
             // Completion button with flame icon for habits
-            Button(action: onComplete) {
-                ZStack {
-                    Circle()
-                        .fill(task.isCompleted ? Color.orange : Color.gray.opacity(0.3))
-                        .frame(width: 28, height: 28)
-
-                    Image(systemName: task.isCompleted ? "flame.fill" : "flame")
-                        .font(.caption)
-                        .foregroundColor(task.isCompleted ? .white : .gray)
-                }
+            CompletionButton(
+                isCompleted: task.isCompleted,
+                style: .habit,
+                accessibilityLabel: task.isCompleted ? "Mark incomplete" : "Mark complete"
+            ) {
+                onComplete()
             }
-            .buttonStyle(PlainButtonStyle())
 
             // Task content
-            VStack(alignment: .leading, spacing: 4) {
+            VStack(alignment: .leading, spacing: .spacing1) {
                 Text(task.title)
                     .font(.body)
                     .fontWeight(.medium)
@@ -492,7 +460,7 @@ struct HabitTaskRowView: View {
             }
             .buttonStyle(PlainButtonStyle())
         }
-        .padding(.vertical, 8)
+        .verticalSpacingPadding(.spacing2)
     }
 }
 

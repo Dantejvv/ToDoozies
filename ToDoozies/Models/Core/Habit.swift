@@ -22,7 +22,7 @@ final class Habit: @unchecked Sendable {
     var createdDate: Date = Date()
     var modifiedDate: Date = Date()
 
-    @Relationship(deleteRule: .nullify, inverse: \Task.habit)
+    @Relationship
     var baseTask: Task?
 
     init(

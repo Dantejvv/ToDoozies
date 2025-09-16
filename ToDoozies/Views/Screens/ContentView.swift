@@ -79,7 +79,6 @@ struct ContentView: View {
                 .accessibilityLabel("App settings")
                 .accessibilityHint("Configure app preferences and sync settings")
         }
-        .navigationDestination(coordinator: navigationCoordinator)
         .sheet(coordinator: navigationCoordinator)
         .alert("Error", isPresented: Binding(
             get: { appState.error != nil },
@@ -111,18 +110,18 @@ struct ContentView: View {
                     status: appState.syncStatus,
                     message: appState.syncStatusMessage
                 )
-                .padding(.horizontal)
-                .padding(.bottom, 100) // Above tab bar
+                .horizontalSpacingPadding(.spacing4)
+                .padding(.bottom) // Above tab bar
             }
         }
         .task {
             await container?.loadInitialData()
         }
-        .onChange(of: voiceOverEnabled) { enabled in
+        .onChange(of: voiceOverEnabled) { _, enabled in
             // Update app state when VoiceOver status changes
             appState.isVoiceOverActive = enabled
         }
-        .onChange(of: dynamicTypeSize) { newSize in
+        .onChange(of: dynamicTypeSize) { _,  newSize in
             // Handle dynamic type size changes if needed
             appState.currentDynamicTypeSize = newSize
         }
@@ -205,6 +204,7 @@ struct SettingsView: View {
                 }
             }
             .navigationTitle("Settings")
+            .navigationDestination(coordinator: container?.navigationCoordinator ?? NavigationCoordinator())
         }
     }
 }

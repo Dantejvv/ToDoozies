@@ -170,28 +170,6 @@ final class TasksViewModel {
         }
     }
 
-    func duplicateTask(_ task: Task) {
-        let duplicatedTask = Task(
-            title: "\(task.title) (Copy)",
-            description: task.taskDescription,
-            dueDate: task.dueDate,
-            priority: task.priority,
-            status: .notStarted
-        )
-        duplicatedTask.category = task.category
-
-        appState.addTask(duplicatedTask)
-
-        _Concurrency.Task {
-            do {
-                try await taskService.createTask(duplicatedTask)
-            } catch {
-                appState.removeTask(duplicatedTask) // Rollback on error
-                appState.setError(.dataSavingFailed(error.localizedDescription))
-            }
-        }
-    }
-
     func updateSearchText(_ text: String) {
         appState.searchText = text
     }

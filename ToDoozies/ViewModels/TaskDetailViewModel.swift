@@ -126,16 +126,6 @@ final class TaskDetailViewModel {
         navigationCoordinator.showEditTask(task)
     }
 
-    func duplicateTask() async {
-        isLoading = true
-        defer { isLoading = false }
-
-        do {
-            try await taskService.duplicateTask(task)
-        } catch {
-            errorMessage = "Failed to duplicate task: \(error.localizedDescription)"
-        }
-    }
 
     func deleteTask() async {
         isLoading = true

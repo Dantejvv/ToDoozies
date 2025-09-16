@@ -78,9 +78,6 @@ struct TaskDetailContentView: View {
                 }
 
                 Menu {
-                    Button("Duplicate") {
-                        _Concurrency.Task { await viewModel.duplicateTask() }
-                    }
 
                     Button("Delete", role: .destructive) {
                         viewModel.showDeleteAlert()

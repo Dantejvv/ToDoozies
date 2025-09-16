@@ -24,7 +24,6 @@ protocol TaskServiceProtocol {
     // Task completion methods
     func markTaskComplete(_ task: Task) async throws
     func markTaskIncomplete(_ task: Task) async throws
-    func duplicateTask(_ task: Task) async throws
 
     // Subtask methods
     func addSubtask(_ subtask: Subtask, to task: Task) async throws
@@ -212,33 +211,6 @@ final class TaskService: TaskServiceProtocol {
         try await updateTask(task)
     }
 
-    func duplicateTask(_ task: Task) async throws {
-        let duplicatedTask = Task(
-            title: "\(task.title) (Copy)",
-            description: task.taskDescription,
-            dueDate: task.dueDate,
-            priority: task.priority,
-            status: .notStarted
-        )
-
-        // Copy relationships
-        duplicatedTask.category = task.category
-        duplicatedTask.recurrenceRule = task.recurrenceRule
-
-        // Copy subtasks
-        if let subtasks = task.subtasks {
-            for subtask in subtasks {
-                let duplicatedSubtask = Subtask(
-                    title: subtask.title,
-                    order: subtask.order,
-                    parentTask: duplicatedTask
-                )
-                duplicatedTask.subtasks?.append(duplicatedSubtask)
-            }
-        }
-
-        try await createTask(duplicatedTask)
-    }
 
     func markTaskComplete(_ task: Task) async throws {
         task.markCompleted()

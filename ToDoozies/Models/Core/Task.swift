@@ -22,7 +22,7 @@ final class Task: @unchecked Sendable {
     var modifiedDate: Date = Date()
     var isRecurring: Bool = false
 
-    @Relationship(deleteRule: .nullify)
+    @Relationship(deleteRule: .nullify, inverse: \Category.tasks)
     var category: Category?
 
     @Relationship(deleteRule: .cascade, inverse: \Subtask.parentTask)
@@ -34,7 +34,7 @@ final class Task: @unchecked Sendable {
     @Relationship(deleteRule: .nullify, inverse: \RecurrenceRule.task)
     var recurrenceRule: RecurrenceRule?
 
-    @Relationship
+    @Relationship(deleteRule: .cascade, inverse: \Habit.baseTask)
     var habit: Habit?
 
     init(
@@ -54,6 +54,8 @@ final class Task: @unchecked Sendable {
         self.createdDate = Date()
         self.modifiedDate = Date()
         self.isRecurring = false
+        self.subtasks = nil
+        self.attachments = nil
     }
 
     func markCompleted() {

@@ -101,18 +101,18 @@
   - [X] Tap to complete
   - [X] Swipe gestures
   - [X] Long-press context menu
-  - [X] Batch operations (delete, duplicate)
+  - [X] Batch operations (delete, select all)
 
 ### Visual Design
 - [X] Implement Liquid Glass design system (card-based layout with shadows)
 - [X] Configure color scheme (60-30-10 rule) (system colors with accent)
 - [X] Set up typography scale (max 4 sizes, 2 weights)
-- [ ] Apply 8pt spacing grid system
-- [ ] Create reusable UI components:
-  - [ ] Custom buttons
-  - [ ] Task row cells
-  - [ ] Progress indicators
-  - [ ] Badge components
+- [X] Apply 8pt spacing grid system
+- [X] Create reusable UI components:
+  - [X] Custom buttons
+  - [X] Task row cells
+  - [X] Progress indicators
+  - [X] Badge components
 
 ### Accessibility Integration
 - [X] Add accessibility environment detection to core views
@@ -142,7 +142,7 @@
 - [X] Build streak tracking (DATA LAYER):
   - [X] Current streak calculation
   - [X] Best streak tracking
-  - [ ] Streak visualization (flame icon) - UI ONLY
+  - [X] Streak visualization (flame icon) - UI ONLY
   - [X] Protection days system
 - [X] Create habit statistics (DATA LAYER):
   - [X] Completion rates

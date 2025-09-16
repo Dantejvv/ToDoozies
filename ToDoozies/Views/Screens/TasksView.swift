@@ -63,6 +63,7 @@ struct TasksView: View {
             .onChange(of: searchText) { _, newValue in
                 viewModel.updateSearchText(newValue)
             }
+            .navigationDestination(coordinator: container?.navigationCoordinator ?? NavigationCoordinator())
         }
     }
 
@@ -79,8 +80,8 @@ struct TasksView: View {
                                 viewModel.updateSearchText(suggestion)
                             }
                             .font(.caption)
-                            .padding(.horizontal, 12)
-                            .padding(.vertical, 6)
+                            .horizontalSpacingPadding(.spacing3)
+                            .verticalSpacingPadding(.spacing2)
                             .background(Color.accentColor.opacity(0.1))
                             .foregroundColor(.accentColor)
                             .clipShape(Capsule())
@@ -99,7 +100,7 @@ struct TasksView: View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack {
                 ForEach(activeFilterChips, id: \.title) { chip in
-                    FilterChip(
+                    FilterBadge(
                         title: chip.title,
                         systemImage: chip.systemImage,
                         onRemove: chip.onRemove
@@ -162,11 +163,6 @@ struct TasksView: View {
                                 container?.navigationCoordinator.showEditTask(task)
                             }
                             .tint(.blue)
-
-                            Button("Duplicate") {
-                                viewModel.duplicateTask(task)
-                            }
-                            .tint(.green)
                         }
                         .contextMenu {
                             taskContextMenu(for: task)
@@ -181,14 +177,14 @@ struct TasksView: View {
     // MARK: - Empty State
 
     private var emptyStateView: some View {
-        VStack(spacing: 20) {
+        VStack(spacing: .spacing5) {
             Spacer()
 
             Image(systemName: viewModel.hasActiveFilters ? "magnifyingglass" : "checkmark.circle")
                 .font(.system(size: 60))
                 .foregroundColor(.secondary)
 
-            VStack(spacing: 8) {
+            VStack(spacing: .spacing2) {
                 Text(viewModel.hasActiveFilters ? "No matching tasks" : "No tasks yet")
                     .font(.title2)
                     .fontWeight(.semibold)
@@ -208,7 +204,7 @@ struct TasksView: View {
 
             Spacer()
         }
-        .padding()
+        .spacingPadding(.spacing4)
     }
 
     // MARK: - Sort Picker
@@ -247,10 +243,6 @@ struct TasksView: View {
 
             Button("Edit") {
                 container?.navigationCoordinator.showEditTask(task)
-            }
-
-            Button("Duplicate") {
-                viewModel.duplicateTask(task)
             }
 
             Divider()
@@ -325,12 +317,13 @@ struct TaskListRowView: View {
         Button(action: onTap) {
             HStack(spacing: 12) {
                 // Completion button
-                Button(action: onToggleComplete) {
-                    Image(systemName: task.isCompleted ? "checkmark.circle.fill" : "circle")
-                        .font(.title3)
-                        .foregroundColor(task.isCompleted ? .green : .gray)
+                CompletionButton(
+                    isCompleted: task.isCompleted,
+                    style: .task,
+                    accessibilityLabel: task.isCompleted ? "Mark incomplete" : "Mark complete"
+                ) {
+                    onToggleComplete()
                 }
-                .buttonStyle(PlainButtonStyle())
 
                 // Task content
                 VStack(alignment: .leading, spacing: 4) {
@@ -397,52 +390,11 @@ struct TaskListRowView: View {
     }
 
     private func priorityBadge(_ priority: Priority) -> some View {
-        Text(priority.displayName)
-            .font(.caption2)
-            .fontWeight(.medium)
-            .padding(.horizontal, 6)
-            .padding(.vertical, 2)
-            .background(priorityColor(priority).opacity(0.2))
-            .foregroundColor(priorityColor(priority))
-            .clipShape(Capsule())
-    }
-
-    private func priorityColor(_ priority: Priority) -> Color {
-        switch priority {
-        case .high: return .red
-        case .medium: return .orange
-        case .low: return .blue
-        }
+        PriorityBadge(priority: priority, size: .small)
     }
 }
 
-// MARK: - Filter Chip
-
-struct FilterChip: View {
-    let title: String
-    let systemImage: String
-    let onRemove: () -> Void
-
-    var body: some View {
-        HStack(spacing: 4) {
-            Image(systemName: systemImage)
-                .font(.caption2)
-
-            Text(title)
-                .font(.caption)
-
-            Button(action: onRemove) {
-                Image(systemName: "xmark")
-                    .font(.caption2)
-            }
-        }
-        .padding(.horizontal, 8)
-        .padding(.vertical, 4)
-        .background(Color.accentColor.opacity(0.1))
-        .foregroundColor(.accentColor)
-        .clipShape(Capsule())
-    }
-}
+// MARK: - Filter Chip (Legacy - use FilterBadge instead)
 
 struct FilterChipData {
     let title: String

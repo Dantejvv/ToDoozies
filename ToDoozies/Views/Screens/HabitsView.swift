@@ -23,7 +23,7 @@ struct HabitsView: View {
     var body: some View {
         NavigationStack {
             ScrollView {
-                LazyVStack(spacing: 20) {
+                LazyVStack(spacing: .spacing5) {
                     // Header with today's progress
                     todayProgressSection
 
@@ -44,7 +44,7 @@ struct HabitsView: View {
                         statisticsSection
                     }
                 }
-                .padding()
+                .spacingPadding(.spacing4)
             }
             .navigationTitle("Habits")
             .navigationBarTitleDisplayMode(.large)
@@ -65,13 +65,14 @@ struct HabitsView: View {
             .sheet(isPresented: $showingAddHabit) {
                 AddHabitView()
             }
+            .navigationDestination(coordinator: container?.navigationCoordinator ?? NavigationCoordinator())
         }
     }
 
     // MARK: - Today Progress Section
 
     private var todayProgressSection: some View {
-        VStack(alignment: .leading, spacing: 16) {
+        VStack(alignment: .leading, spacing: .spacing4) {
             HStack {
                 VStack(alignment: .leading, spacing: 4) {
                     Text("Today's Progress")
@@ -105,16 +106,14 @@ struct HabitsView: View {
                 }
             }
         }
-        .padding()
-        .background(Color(.systemBackground))
-        .cornerRadius(12)
-        .shadow(color: Color.black.opacity(0.1), radius: 4, x: 0, y: 2)
+        .spacingPadding(.spacing4)
+        .cardStyle()
     }
 
     // MARK: - Achievement Section
 
     private var achievementSection: some View {
-        VStack(alignment: .leading, spacing: 16) {
+        VStack(alignment: .leading, spacing: .spacing4) {
             HStack {
                 Image(systemName: "star.fill")
                     .foregroundColor(.yellow)
@@ -132,16 +131,14 @@ struct HabitsView: View {
                 .padding(.horizontal, 4)
             }
         }
-        .padding()
-        .background(Color(.systemBackground))
-        .cornerRadius(12)
-        .shadow(color: Color.black.opacity(0.1), radius: 4, x: 0, y: 2)
+        .spacingPadding(.spacing4)
+        .cardStyle()
     }
 
     // MARK: - Habits Section
 
     private var habitsSection: some View {
-        VStack(alignment: .leading, spacing: 16) {
+        VStack(alignment: .leading, spacing: .spacing4) {
             HStack {
                 Text("Your Habits")
                     .font(.headline)
@@ -158,10 +155,8 @@ struct HabitsView: View {
                 habitsListView
             }
         }
-        .padding()
-        .background(Color(.systemBackground))
-        .cornerRadius(12)
-        .shadow(color: Color.black.opacity(0.1), radius: 4, x: 0, y: 2)
+        .spacingPadding(.spacing4)
+        .cardStyle()
     }
 
     // MARK: - Habits List View
@@ -193,14 +188,14 @@ struct HabitsView: View {
             Text("Calendar view coming soon")
                 .font(.subheadline)
                 .foregroundColor(.secondary)
-                .padding()
+                .spacingPadding(.spacing4)
         }
     }
 
     // MARK: - Statistics Section
 
     private var statisticsSection: some View {
-        VStack(alignment: .leading, spacing: 16) {
+        VStack(alignment: .leading, spacing: .spacing4) {
             Text("Statistics")
                 .font(.headline)
                 .fontWeight(.semibold)
@@ -242,10 +237,8 @@ struct HabitsView: View {
                 )
             }
         }
-        .padding()
-        .background(Color(.systemBackground))
-        .cornerRadius(12)
-        .shadow(color: Color.black.opacity(0.1), radius: 4, x: 0, y: 2)
+        .spacingPadding(.spacing4)
+        .cardStyle()
     }
 
     // MARK: - Empty State
@@ -256,7 +249,7 @@ struct HabitsView: View {
                 .font(.system(size: 60))
                 .foregroundColor(.orange)
 
-            VStack(spacing: 8) {
+            VStack(spacing: .spacing2) {
                 Text("Start Building Habits")
                     .font(.title2)
                     .fontWeight(.semibold)
@@ -272,10 +265,8 @@ struct HabitsView: View {
             }
             .buttonStyle(.borderedProminent)
         }
-        .padding()
-        .background(Color(.systemBackground))
-        .cornerRadius(12)
-        .shadow(color: Color.black.opacity(0.1), radius: 4, x: 0, y: 2)
+        .spacingPadding(.spacing4)
+        .cardStyle()
     }
 
     // MARK: - Time Range Picker
@@ -349,16 +340,15 @@ struct TodayHabitCard: View {
 
     var body: some View {
         Button(action: onComplete) {
-            VStack(spacing: 8) {
-                ZStack {
-                    Circle()
-                        .fill(habit.isCompletedToday ? Color.orange : Color.gray.opacity(0.3))
-                        .frame(width: 40, height: 40)
-
-                    Image(systemName: habit.isCompletedToday ? "flame.fill" : "flame")
-                        .font(.title3)
-                        .foregroundColor(habit.isCompletedToday ? .white : .gray)
+            VStack(spacing: .spacing2) {
+                CompletionButton(
+                    isCompleted: habit.isCompletedToday,
+                    style: .habit,
+                    accessibilityLabel: habit.isCompletedToday ? "Mark incomplete" : "Mark complete"
+                ) {
+                    onComplete()
                 }
+                .scaleEffect(1.2)
 
                 VStack(spacing: 2) {
                     Text(habit.baseTask?.title ?? "Habit")
@@ -395,18 +385,13 @@ struct HabitRowView: View {
         Button(action: onTap) {
             HStack(spacing: 12) {
                 // Completion button
-                Button(action: onToggleComplete) {
-                    ZStack {
-                        Circle()
-                            .fill(habit.isCompletedToday ? Color.orange : Color.gray.opacity(0.3))
-                            .frame(width: 32, height: 32)
-
-                        Image(systemName: habit.isCompletedToday ? "flame.fill" : "flame")
-                            .font(.caption)
-                            .foregroundColor(habit.isCompletedToday ? .white : .gray)
-                    }
+                CompletionButton(
+                    isCompleted: habit.isCompletedToday,
+                    style: .habit,
+                    accessibilityLabel: habit.isCompletedToday ? "Mark incomplete" : "Mark complete"
+                ) {
+                    onToggleComplete()
                 }
-                .buttonStyle(PlainButtonStyle())
 
                 // Habit info
                 VStack(alignment: .leading, spacing: 4) {

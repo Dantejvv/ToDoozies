@@ -19,7 +19,7 @@ final class Category: @unchecked Sendable {
     var createdDate: Date = Date()
     var modifiedDate: Date = Date()
 
-    @Relationship(deleteRule: .nullify, inverse: \Task.category)
+    @Relationship
     var tasks: [Task]?
 
     init(
@@ -35,6 +35,7 @@ final class Category: @unchecked Sendable {
         self.order = order
         self.createdDate = Date()
         self.modifiedDate = Date()
+        self.tasks = []
     }
 
     func updateModifiedDate() {
