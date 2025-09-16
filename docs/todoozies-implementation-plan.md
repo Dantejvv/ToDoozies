@@ -83,7 +83,6 @@
   - [X] Streak overview dashboard
   - [X] Individual habit cards
   - [X] Basic statistics display
-  - [ ] Calendar heatmap (remaining UI component)
 
 ### Task Management
 - [X] Create `AddTaskView` (placeholder implemented):
