@@ -3,7 +3,7 @@
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
 ## Project Overview
-ToDoozies is an iOS todo application built with SwiftUI, SwiftData, and modern iOS frameworks. The app is designed to support both regular tasks and recurring habits with streak tracking.
+ToDoozies is an iOS todo application built with SwiftUI, SwiftData, and modern iOS frameworks. The app is designed to support both regular tasks and recurring habits with streak tracking and visualization.
 
 ## Development Commands
 
@@ -49,7 +49,7 @@ xcodebuild test -project ToDoozies.xcodeproj -scheme ToDoozies -destination 'pla
 - Uses SwiftData with `@Model` classes integrated with CloudKit
 - **Core Models**: Task, RecurrenceRule, Habit, Category, Subtask, Attachment
 - **Relationships**: Proper cascade/nullify delete rules configured
-- **Business Logic**: Streak tracking, recurrence patterns, progress calculation
+- **Business Logic**: Streak tracking and visualization, recurrence patterns, progress calculation
 - `ModelContainer` configured in `ToDooziesApp.swift` with CloudKit sync and shared app group
 - Supports both local storage and automatic iCloud sync via private CloudKit database
 - CloudKit container: `iCloud.dante.ToDoozies`
@@ -127,6 +127,13 @@ docs/                               # Project documentation including feature sp
 - **Accessibility-First Development**: All new UI components must include accessibility labels, hints, and actions
 - **AccessibilityHelpers.swift**: Use existing model extensions for consistent accessibility implementation
 - **VoiceOver Testing**: Test all new features with VoiceOver enabled during development
+
+### Streak System
+- **Core Functionality**: Tracks current and best streaks for habits
+- **Visualization**: Uses flame icons and `StreakBadge` components
+- **Protection Days**: 2 protection days per month to maintain streaks
+- **Accessibility**: Special VoiceOver announcements for milestone streaks (7, 30, 100 days)
+- **No Achievement System**: Focuses on simple streak tracking without complex systems
 
 ## IMPORTANT: MUST READ
 - **DO NOT attempt runtime testing**: I will manually do the runtime testing by compiling and interacting with the app through the simulator.

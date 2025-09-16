@@ -25,9 +25,7 @@ Streak tracking – monitor consistent completions
 Progress bar – % of daily recurring tasks done
 Streak badges – motivational icons
 Habit chains – calendar heatmap view
-Milestones – 7, 30, 100-day celebrations
 Missed-day forgiveness – grace/skip days
-Completion rewards – optional gamification
 
 ⚡ Smart Features
 Quick add with natural language

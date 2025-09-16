@@ -282,7 +282,6 @@ protocol NotificationServiceProtocol {
     func scheduleTaskReminder(for task: Task) async throws
     func cancelTaskReminder(for task: Task) async throws
     func scheduleHabitReminder(for habit: Habit) async throws
-    func sendStringNotification(_ achievement: String) async throws
 }
 
 final class NotificationService: NotificationServiceProtocol {
@@ -303,9 +302,6 @@ final class NotificationService: NotificationServiceProtocol {
         // TODO: Implement habit reminder scheduling
     }
 
-    func sendStringNotification(_ achievement: String) async throws {
-        // TODO: Implement achievement notification
-    }
 }
 
 // MARK: - Placeholder ViewModels

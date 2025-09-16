@@ -101,47 +101,6 @@ final class HabitsViewModel {
         }
     }
 
-    /// Achievement candidates (close to milestones)
-    var achievementCandidates: [HabitAchievement] {
-        var achievements: [HabitAchievement] = []
-
-        for habit in appState.habits {
-            // Check for streak milestones
-            let streakMilestones = [7, 14, 30, 50, 100, 365]
-            for milestone in streakMilestones {
-                if habit.currentStreak >= milestone - 2 && habit.currentStreak < milestone {
-                    let daysToGo = milestone - habit.currentStreak
-                    achievements.append(
-                        HabitAchievement(
-                            habit: habit,
-                            type: .streak(milestone),
-                            daysToAchieve: daysToGo,
-                            description: "\(daysToGo) more day\(daysToGo == 1 ? "" : "s") to reach \(milestone)-day streak"
-                        )
-                    )
-                }
-            }
-
-            // Check for perfect week/month potential
-            let calendar = Calendar.current
-            let weekStart = calendar.dateInterval(of: .weekOfYear, for: Date())?.start ?? Date()
-            let weekCompletions = habit.completionDatesInRange(from: weekStart, to: Date()).count
-            let daysInWeek = calendar.dateComponents([.day], from: weekStart, to: Date()).day ?? 0
-
-            if weekCompletions == daysInWeek && daysInWeek < 7 {
-                achievements.append(
-                    HabitAchievement(
-                        habit: habit,
-                        type: .perfectWeek,
-                        daysToAchieve: 7 - daysInWeek,
-                        description: "Perfect week possible!"
-                    )
-                )
-            }
-        }
-
-        return achievements.sorted { $0.daysToAchieve < $1.daysToAchieve }
-    }
 
     // MARK: - Actions
 
@@ -300,23 +259,3 @@ enum HabitTimeRange: String, CaseIterable {
     }
 }
 
-struct HabitAchievement {
-    let habit: Habit
-    let type: AchievementType
-    let daysToAchieve: Int
-    let description: String
-
-    enum AchievementType {
-        case streak(Int)
-        case perfectWeek
-        case perfectMonth
-
-        var iconName: String {
-            switch self {
-            case .streak(_): return "flame.fill"
-            case .perfectWeek: return "calendar.badge.checkmark"
-            case .perfectMonth: return "calendar.badge.checkmark"
-            }
-        }
-    }
-}

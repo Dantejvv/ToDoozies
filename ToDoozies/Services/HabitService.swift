@@ -71,31 +71,6 @@ enum HabitGrade: String, CaseIterable {
     }
 }
 
-struct Achievement {
-    let type: AchievementType
-    let title: String
-    let description: String
-    let habitId: UUID
-    let unlockedDate: Date
-}
-
-enum AchievementType {
-    case streak(Int)
-    case perfectWeek
-    case perfectMonth
-    case totalCompletions(Int)
-    case comeback
-
-    var iconName: String {
-        switch self {
-        case .streak(_): return "flame.fill"
-        case .perfectWeek: return "calendar.badge.checkmark"
-        case .perfectMonth: return "calendar.badge.checkmark"
-        case .totalCompletions(_): return "star.fill"
-        case .comeback: return "arrow.clockwise"
-        }
-    }
-}
 
 // MARK: - Habit Service Protocol
 
@@ -106,7 +81,6 @@ protocol HabitServiceProtocol {
     func deleteHabit(_ habit: Habit) async throws
     func getHabitStatistics(for habit: Habit) async throws -> HabitStatistics
     func getAllHabitStatistics() async throws -> [HabitStatistics]
-    func checkForAchievements(_ habit: Habit) async throws -> [Achievement]
 }
 
 // MARK: - Habit Service Implementation
@@ -190,12 +164,6 @@ final class HabitService: HabitServiceProtocol {
 
         try await updateHabit(habit)
 
-        // Check for achievements
-        let achievements = try await checkForAchievements(habit)
-        if !achievements.isEmpty {
-            // TODO: Trigger achievement notifications
-            await notifyAchievements(achievements, for: habit)
-        }
     }
 
     func markHabitIncomplete(_ habit: Habit, on date: Date = Date()) async throws {
@@ -281,77 +249,6 @@ final class HabitService: HabitServiceProtocol {
         return statistics.sorted { $0.currentStreak > $1.currentStreak }
     }
 
-    // MARK: - Achievement System
-
-    func checkForAchievements(_ habit: Habit) async throws -> [Achievement] {
-        var achievements: [Achievement] = []
-
-        // Streak milestones
-        let streakMilestones = [3, 7, 14, 30, 50, 100, 365, 1000]
-        for milestone in streakMilestones {
-            if habit.currentStreak == milestone {
-                achievements.append(Achievement(
-                    type: .streak(milestone),
-                    title: "\(milestone)-Day Streak!",
-                    description: "You've completed \(habit.baseTask?.title ?? "this habit") for \(milestone) consecutive days!",
-                    habitId: habit.id,
-                    unlockedDate: Date()
-                ))
-            }
-        }
-
-        // Perfect week achievement
-        if isCurrentWeekPerfect(habit) {
-            achievements.append(Achievement(
-                type: .perfectWeek,
-                title: "Perfect Week!",
-                description: "You completed \(habit.baseTask?.title ?? "this habit") every day this week!",
-                habitId: habit.id,
-                unlockedDate: Date()
-            ))
-        }
-
-        // Perfect month achievement
-        if isCurrentMonthPerfect(habit) {
-            achievements.append(Achievement(
-                type: .perfectMonth,
-                title: "Perfect Month!",
-                description: "You completed \(habit.baseTask?.title ?? "this habit") every day this month!",
-                habitId: habit.id,
-                unlockedDate: Date()
-            ))
-        }
-
-        // Total completion milestones
-        let completionMilestones = [10, 25, 50, 100, 250, 500, 1000]
-        for milestone in completionMilestones {
-            if habit.totalCompletions == milestone {
-                achievements.append(Achievement(
-                    type: .totalCompletions(milestone),
-                    title: "\(milestone) Completions!",
-                    description: "You've completed \(habit.baseTask?.title ?? "this habit") \(milestone) times!",
-                    habitId: habit.id,
-                    unlockedDate: Date()
-                ))
-            }
-        }
-
-        // Comeback achievement (returning after a break)
-        if habit.currentStreak == 1 && habit.bestStreak >= 7 {
-            let daysSinceLastCompletion = calculateDaysSinceLastCompletion(habit)
-            if daysSinceLastCompletion >= 7 {
-                achievements.append(Achievement(
-                    type: .comeback,
-                    title: "Welcome Back!",
-                    description: "Great to see you getting back into \(habit.baseTask?.title ?? "this habit")!",
-                    habitId: habit.id,
-                    unlockedDate: Date()
-                ))
-            }
-        }
-
-        return achievements
-    }
 
     // MARK: - Helper Methods
 
@@ -389,38 +286,5 @@ final class HabitService: HabitServiceProtocol {
         return Double(totalStreak) / Double(streaks.count)
     }
 
-    private func isCurrentWeekPerfect(_ habit: Habit) -> Bool {
-        let calendar = Calendar.current
-        let now = Date()
-        guard let weekInterval = calendar.dateInterval(of: .weekOfYear, for: now) else { return false }
-
-        let weekStart = weekInterval.start
-        let daysInWeek = calendar.dateComponents([.day], from: weekStart, to: now).day ?? 0
-
-        let completionsThisWeek = habit.completionDatesInRange(from: weekStart, to: now)
-        return completionsThisWeek.count == daysInWeek + 1 // +1 because we include today
-    }
-
-    private func isCurrentMonthPerfect(_ habit: Habit) -> Bool {
-        let calendar = Calendar.current
-        let now = Date()
-        guard let monthInterval = calendar.dateInterval(of: .month, for: now) else { return false }
-
-        let monthStart = monthInterval.start
-        let daysInMonth = calendar.dateComponents([.day], from: monthStart, to: now).day ?? 0
-
-        let completionsThisMonth = habit.completionDatesInRange(from: monthStart, to: now)
-        return completionsThisMonth.count == daysInMonth + 1 // +1 because we include today
-    }
-
-    private func calculateDaysSinceLastCompletion(_ habit: Habit) -> Int {
-        guard let lastCompletion = habit.completionDates.max() else { return 0 }
-        return Calendar.current.dateComponents([.day], from: lastCompletion, to: Date()).day ?? 0
-    }
-
-    private func notifyAchievements(_ achievements: [Achievement], for habit: Habit) async {
-        // TODO: Implement achievement notifications
-        // This would integrate with a NotificationService to show celebratory notifications
-    }
 }
 

@@ -27,10 +27,6 @@ struct HabitsView: View {
                     // Header with today's progress
                     todayProgressSection
 
-                    // Achievement candidates
-                    if !viewModel.achievementCandidates.isEmpty {
-                        achievementSection
-                    }
 
                     // Habits grid/list
                     if viewModel.displayedHabits.isEmpty {
@@ -110,30 +106,6 @@ struct HabitsView: View {
         .cardStyle()
     }
 
-    // MARK: - Achievement Section
-
-    private var achievementSection: some View {
-        VStack(alignment: .leading, spacing: .spacing4) {
-            HStack {
-                Image(systemName: "star.fill")
-                    .foregroundColor(.yellow)
-                Text("Almost There!")
-                    .font(.headline)
-                    .fontWeight(.semibold)
-            }
-
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 12) {
-                    ForEach(viewModel.achievementCandidates, id: \.habit.id) { achievement in
-                        AchievementCard(achievement: achievement)
-                    }
-                }
-                .padding(.horizontal, 4)
-            }
-        }
-        .spacingPadding(.spacing4)
-        .cardStyle()
-    }
 
     // MARK: - Habits Section
 
@@ -433,44 +405,6 @@ struct HabitRowView: View {
             .contentShape(Rectangle())
         }
         .buttonStyle(PlainButtonStyle())
-    }
-}
-
-// MARK: - Achievement Card
-
-struct AchievementCard: View {
-    let achievement: HabitAchievement
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            HStack {
-                Image(systemName: achievement.type.iconName)
-                    .foregroundColor(.yellow)
-
-                Text("\(achievement.daysToAchieve) days")
-                    .font(.caption)
-                    .fontWeight(.medium)
-                    .padding(.horizontal, 6)
-                    .padding(.vertical, 2)
-                    .background(Color.yellow.opacity(0.2))
-                    .foregroundColor(.yellow)
-                    .clipShape(Capsule())
-            }
-
-            Text(achievement.habit.baseTask?.title ?? "Habit")
-                .font(.caption)
-                .fontWeight(.medium)
-                .lineLimit(2)
-
-            Text(achievement.description)
-                .font(.caption2)
-                .foregroundColor(.secondary)
-                .lineLimit(2)
-        }
-        .frame(width: 120, height: 80)
-        .padding(8)
-        .background(Color(.secondarySystemBackground))
-        .cornerRadius(8)
     }
 }
 

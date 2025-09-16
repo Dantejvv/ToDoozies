@@ -34,7 +34,7 @@ This fragmentation forces users to maintain multiple applications, leading to:
 
 ### User Pain Points
 1. **Cognitive Load**: Managing tasks and habits in separate systems increases mental overhead
-2. **Motivation Decay**: Without visual progress indicators and achievement systems, users lose momentum
+2. **Motivation Decay**: Without visual progress indicators users lose momentum
 3. **Rigid Systems**: Most apps don't account for life's unpredictability (missed days, schedule changes)
 4. **Poor Integration**: Limited connection with iOS ecosystem features (widgets, Siri, Focus modes)
 5. **Data Silos**: Inability to see correlations between task completion and habit success
@@ -224,7 +224,7 @@ This fragmentation forces users to maintain multiple applications, leading to:
 
 **Acceptance Criteria**:
 - Streak calculations update at midnight user's timezone
-- Streak badge animates on milestone achievements
+- Streak badge indicators
 - Protection days clearly marked in calendar
 - Historical streak data preserved for analytics
 
@@ -247,23 +247,6 @@ This fragmentation forces users to maintain multiple applications, leading to:
 
 **User Story**:
 *As a habit builder, I want to see my completion patterns over time so that I can identify what's working and what needs adjustment.*
-
-#### 2.4 Achievement System
-**Functional Requirements**:
-- Milestone badges: 7, 30, 100, 365 days
-- Perfect week/month achievements
-- Category-specific achievements
-- Shareable achievement cards
-- Achievement notifications with celebration animations
-
-**Acceptance Criteria**:
-- Achievements unlock immediately upon qualification
-- Notification appears within 2 seconds of unlock
-- Achievement history permanently stored
-- Social sharing generates image within 3 seconds
-
-**User Story**:
-*As a goal-oriented user, I want to earn achievements for consistency so that I feel rewarded for my efforts.*
 
 ### 3. User Experience Features
 
@@ -414,7 +397,6 @@ This fragmentation forces users to maintain multiple applications, leading to:
    - Completion animation
    - Streak update if applicable
 4. **Progress Update**: Daily progress bar animates
-5. **Achievement Check**: Milestone notification if earned
 
 ### Flow 4: Reviewing Habit Progress
 1. **Habits Tab**: Navigate to dedicated habits section
@@ -534,23 +516,10 @@ Tab Bar (Bottom)
 - order: Int
 ```
 
-#### Achievement
-```
-- id: UUID
-- type: Enum (streak, completion, perfect)
-- name: String
-- description: String
-- iconName: String
-- unlockedDate: Date?
-- progress: Float
-- target: Int
-```
-
 ### Relationships
 - Task → Category: Many-to-One
 - Task → Subtask: One-to-Many
 - Task → Attachment: One-to-Many
-- User → Achievement: Many-to-Many
 - Task → RecurrenceRule: One-to-One
 
 ---
@@ -604,7 +573,7 @@ Tab Bar (Bottom)
   - Shortcut suggestions
 
 #### UserNotifications
-- **Purpose**: Reminders and achievements
+- **Purpose**: Reminders
 - **Implementation**:
   - Local notifications for tasks
   - Rich notifications with actions
@@ -702,58 +671,6 @@ Tab Bar (Bottom)
 - **Consistent Navigation**: Predictable patterns
 - **Error Prevention**: Confirmation for destructive actions
 
----
-
-## Launch Strategy
-
-### Phase 1: MVP (Weeks 1-6)
-**Core Features**:
-- Basic task creation and management
-- Simple recurring tasks
-- Basic streak tracking
-- SwiftData local storage
-- Light/dark theme support
-
-**Success Criteria**:
-- Functional task CRUD operations
-- Basic recurring task support
-- Local data persistence
-- Theme switching
-
-### Phase 2: Enhancement (Weeks 7-10)
-**Additional Features**:
-- CloudKit synchronization
-- Home screen widgets
-- Natural language parsing
-- Subtask support
-- Achievement system basics
-
-**Success Criteria**:
-- Cross-device sync working
-- Widget displaying correctly
-- 90% NLP accuracy
-- Achievement unlocks functioning
-
-### Phase 3: Polish (Weeks 11-12)
-**Final Features**:
-- Siri integration
-- Calendar integration
-- Advanced statistics
-- Notification intelligence
-- Performance optimization
-
-**Success Criteria**:
-- All features integrated
-- Performance targets met
-- Accessibility complete
-- App Store ready
-
-### Post-Launch Roadmap
-**Version 1.1** (Month 2):
-- Apple Watch app
-- Additional widget designs
-- Advanced filtering
-- Batch operations
 ---
 
 ## Risks & Mitigations

@@ -276,52 +276,6 @@ struct FilterBadge: View {
     }
 }
 
-// MARK: - Achievement Badge
-
-struct AchievementBadge: View {
-    let title: String
-    let subtitle: String?
-    let systemImage: String
-    let color: Color
-
-    init(
-        title: String,
-        subtitle: String? = nil,
-        systemImage: String,
-        color: Color = .yellow
-    ) {
-        self.title = title
-        self.subtitle = subtitle
-        self.systemImage = systemImage
-        self.color = color
-    }
-
-    var body: some View {
-        VStack(spacing: .spacing1) {
-            Image(systemName: systemImage)
-                .font(.title3)
-                .foregroundColor(color)
-
-            Text(title)
-                .font(.caption)
-                .fontWeight(.semibold)
-                .multilineTextAlignment(.center)
-
-            if let subtitle = subtitle {
-                Text(subtitle)
-                    .font(.caption2)
-                    .foregroundColor(.secondary)
-                    .multilineTextAlignment(.center)
-            }
-        }
-        .padding(.spacing3)
-        .background(color.opacity(0.1))
-        .cornerRadius(DesignSystem.CornerRadius.small)
-        .accessibilityElement(children: .combine)
-        .accessibilityLabel("Achievement: \(title)")
-        .accessibilityValue(subtitle ?? "")
-    }
-}
 
 // MARK: - Progress Badge
 
@@ -447,15 +401,6 @@ extension Color {
 
         FilterBadge(title: "High Priority", systemImage: "exclamationmark.triangle") { }
 
-        Text("Achievement Badge")
-            .font(.headline)
-
-        AchievementBadge(
-            title: "Week Warrior",
-            subtitle: "7 day streak",
-            systemImage: "star.fill",
-            color: .yellow
-        )
     }
     .spacingPadding(.spacing4)
 }

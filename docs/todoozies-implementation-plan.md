@@ -148,18 +148,6 @@
   - [X] Trend analysis
   - [X] Monthly/yearly views
 
-### Achievement System (UI FEATURES)
-- [ ] Design achievement data model (extends existing habit analytics)
-- [ ] Implement milestone detection UI:
-  - [ ] 7-day achievements
-  - [ ] 30-day achievements
-  - [ ] 100-day achievements
-  - [ ] Perfect week/month
-- [ ] Build achievement UI:
-  - [ ] Badge display
-  - [ ] Unlock animations
-  - [ ] Achievement gallery
-
 ### Calendar Integration (UI FEATURES)
 - [ ] Build calendar heatmap component (habit visualization)
 - [ ] Implement habit chain visualization
@@ -359,7 +347,6 @@
 ### Launch Requirements
 - [ ] Cross-device sync functioning
 - [ ] Widgets displaying correctly
-- [ ] Achievement system operational
 - [X] All accessibility standards met (WCAG AA)
 
 ## Notes
