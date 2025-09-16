@@ -272,6 +272,7 @@ enum AppTab: String, CaseIterable {
     case today = "today"
     case tasks = "tasks"
     case habits = "habits"
+    case calendar = "calendar"
     case settings = "settings"
 
     var title: String {
@@ -279,6 +280,7 @@ enum AppTab: String, CaseIterable {
         case .today: return "Today"
         case .tasks: return "Tasks"
         case .habits: return "Habits"
+        case .calendar: return "Calendar"
         case .settings: return "Settings"
         }
     }
@@ -288,6 +290,7 @@ enum AppTab: String, CaseIterable {
         case .today: return "sun.max"
         case .tasks: return "list.bullet"
         case .habits: return "flame"
+        case .calendar: return "calendar"
         case .settings: return "gear"
         }
     }

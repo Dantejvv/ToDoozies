@@ -69,6 +69,16 @@ struct ContentView: View {
                 }())
                 .accessibilityHint("Track your daily habits and streaks")
 
+            // Calendar Tab
+            CalendarTabView()
+                .tabItem {
+                    Image(systemName: AppTab.calendar.iconName)
+                    Text(AppTab.calendar.title)
+                }
+                .tag(AppTab.calendar)
+                .accessibilityLabel("Calendar view")
+                .accessibilityHint("View tasks and habits in calendar format with heatmaps and streak chains")
+
             // Settings Tab
             SettingsView()
                 .tabItem {

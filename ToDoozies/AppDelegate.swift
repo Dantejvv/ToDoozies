@@ -37,101 +37,58 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         print("Failed to register for remote notifications: \(error)")
     }
 
-    func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable: Any], fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
+    func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable: Any]) {
+        // Handle CloudKit remote notifications when app is active
+        guard UIApplication.shared.applicationState == .active else {
+            return
+        }
 
         // Check if this is a CloudKit notification
         if let notification = CKNotification(fromRemoteNotificationDictionary: userInfo) {
-            handleCloudKitNotification(notification, completionHandler: completionHandler)
-        } else {
-            completionHandler(.noData)
+            handleCloudKitNotification(notification)
         }
     }
 
-    private func handleCloudKitNotification(_ notification: CKNotification, completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
-
+    private func handleCloudKitNotification(_ notification: CKNotification) {
         switch notification.notificationType {
         case .database:
             if let databaseNotification = notification as? CKDatabaseNotification {
-                handleDatabaseNotification(databaseNotification, completionHandler: completionHandler)
-            } else {
-                completionHandler(.noData)
+                handleDatabaseNotification(databaseNotification)
             }
 
         case .query:
             if let queryNotification = notification as? CKQueryNotification {
-                handleQueryNotification(queryNotification, completionHandler: completionHandler)
-            } else {
-                completionHandler(.noData)
+                handleQueryNotification(queryNotification)
             }
 
         case .recordZone:
             if let recordZoneNotification = notification as? CKRecordZoneNotification {
-                handleRecordZoneNotification(recordZoneNotification, completionHandler: completionHandler)
-            } else {
-                completionHandler(.noData)
+                handleRecordZoneNotification(recordZoneNotification)
             }
 
         case .readNotification:
             print("Received read notification")
-            completionHandler(.noData)
 
         @unknown default:
             print("Unknown CloudKit notification type")
-            completionHandler(.noData)
         }
     }
 
-    private func handleDatabaseNotification(_ notification: CKDatabaseNotification, completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
-        print("Received database notification - triggering sync")
-
-        // Trigger a sync operation
-        ConcurrentTask {
-            await triggerBackgroundSync()
-            await MainActor.run {
-                completionHandler(.newData)
-            }
-        }
+    private func handleDatabaseNotification(_ notification: CKDatabaseNotification) {
+        print("Received database notification - data changed in CloudKit")
+        // CloudKit data changed - SwiftData will handle sync automatically when app is active
     }
 
-    private func handleQueryNotification(_ notification: CKQueryNotification, completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
+    private func handleQueryNotification(_ notification: CKQueryNotification) {
         print("Received query notification")
-
-        // Handle specific record type changes
-        ConcurrentTask {
-            await triggerBackgroundSync()
-            await MainActor.run {
-                completionHandler(.newData)
-            }
-        }
+        // Specific record type changes - SwiftData will handle sync automatically when app is active
     }
 
-    private func handleRecordZoneNotification(_ notification: CKRecordZoneNotification, completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
+    private func handleRecordZoneNotification(_ notification: CKRecordZoneNotification) {
         print("Received record zone notification")
-
-        // Handle zone-specific changes
-        ConcurrentTask {
-            await triggerBackgroundSync()
-            await MainActor.run {
-                completionHandler(.newData)
-            }
-        }
+        // Zone-specific changes - SwiftData will handle sync automatically when app is active
     }
 
-    private func triggerBackgroundSync() async {
-        // In a production app, you would:
-        // 1. Create a background task
-        // 2. Fetch the latest changes from CloudKit
-        // 3. Update your local SwiftData store
-        // 4. Notify the UI about changes
-
-        print("Background sync triggered")
-
-        // Simulate background sync work
-        try? await ConcurrentTask.sleep(nanoseconds: 2_000_000_000) // 2 seconds
-
-        // Post notification to update UI
-        NotificationCenter.default.post(name: .dataDidSyncFromBackground, object: nil)
-    }
 
     // MARK: - Local Notifications
 
@@ -210,7 +167,6 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
 // MARK: - Notification Names
 
 extension Notification.Name {
-    static let dataDidSyncFromBackground = Notification.Name("dataDidSyncFromBackground")
     static let navigateToTask = Notification.Name("navigateToTask")
     static let navigateToHabit = Notification.Name("navigateToHabit")
     static let showSyncStatus = Notification.Name("showSyncStatus")

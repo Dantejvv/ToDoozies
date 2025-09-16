@@ -183,6 +183,10 @@ final class HabitsViewModel {
         showingCalendarView.toggle()
     }
 
+    func showAddHabit() {
+        showingAddHabit = true
+    }
+
     // MARK: - Statistics Methods
 
     func getCompletionRate(for habit: Habit, in timeRange: HabitTimeRange) -> Double {

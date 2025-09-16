@@ -155,12 +155,129 @@ struct HabitsView: View {
     // MARK: - Habits Calendar View
 
     private var habitsCalendarView: some View {
-        VStack {
-            // TODO: Implement calendar heatmap view
-            Text("Calendar view coming soon")
-                .font(.subheadline)
+        VStack(spacing: .spacing4) {
+            if viewModel.displayedHabits.isEmpty {
+                emptyCalendarState
+            } else {
+                habitsCalendarContent
+            }
+        }
+    }
+
+    private var emptyCalendarState: some View {
+        VStack(spacing: .spacing4) {
+            Image(systemName: "calendar.badge.clock")
+                .font(.system(size: 48))
                 .foregroundColor(.secondary)
+
+            VStack(spacing: .spacing2) {
+                Text("No Habits to Display")
+                    .font(.headline)
+                    .fontWeight(.medium)
+
+                Text("Create habits to see their completion patterns in calendar view")
+                    .font(.subheadline)
+                    .foregroundColor(.secondary)
+                    .multilineTextAlignment(.center)
+            }
+
+            Button("Add Your First Habit") {
+                viewModel.showAddHabit()
+            }
+            .buttonStyle(.borderedProminent)
+        }
+        .spacingPadding(.spacing6)
+    }
+
+    private var habitsCalendarContent: some View {
+        LazyVStack(spacing: .spacing5) {
+            ForEach(viewModel.displayedHabits.prefix(3)) { habit in
+                VStack(spacing: .spacing3) {
+                    // Habit header
+                    HStack {
+                        VStack(alignment: .leading, spacing: .spacing1) {
+                            Text(habit.baseTask?.title ?? "Habit")
+                                .font(.headline)
+                                .fontWeight(.semibold)
+
+                            HStack(spacing: .spacing4) {
+                                Label("\(habit.currentStreak)", systemImage: "flame.fill")
+                                    .font(.caption)
+                                    .foregroundColor(.orange)
+
+                                Label("\(habit.totalCompletions) total", systemImage: "checkmark.circle.fill")
+                                    .font(.caption)
+                                    .foregroundColor(.green)
+                            }
+                        }
+
+                        Spacer()
+
+                        Button("View Details") {
+                            container?.navigationCoordinator.showHabitDetail(habit)
+                        }
+                        .font(.caption)
+                        .foregroundColor(.accentColor)
+                    }
+
+                    // Mini heatmap (last 30 days)
+                    miniHeatmapView(for: habit)
+                        .onTapGesture {
+                            // Navigate to full calendar view
+                            container?.navigationCoordinator.selectTab(.calendar)
+                        }
+                }
                 .spacingPadding(.spacing4)
+                .cardStyle()
+            }
+
+            // Show more button if there are more habits
+            if viewModel.displayedHabits.count > 3 {
+                Button("View All in Calendar") {
+                    container?.navigationCoordinator.selectTab(.calendar)
+                }
+                .foregroundColor(.accentColor)
+                .font(.subheadline)
+            }
+        }
+    }
+
+    private func miniHeatmapView(for habit: Habit) -> some View {
+        let calendar = Calendar.current
+        let today = Date()
+        let thirtyDaysAgo = calendar.date(byAdding: .day, value: -29, to: today) ?? today
+        let habitData = HabitCalendarData(habit: habit)
+
+        return VStack(spacing: .spacing2) {
+            HStack {
+                Text("Last 30 Days")
+                    .font(.caption2)
+                    .foregroundColor(.secondary)
+
+                Spacer()
+
+                let completedDays = (0..<30).count { i in
+                    guard let date = calendar.date(byAdding: .day, value: -i, to: today) else { return false }
+                    return habitData.isCompleted(on: date)
+                }
+
+                Text("\(completedDays)/30 days")
+                    .font(.caption2)
+                    .foregroundColor(.secondary)
+            }
+
+            LazyHGrid(rows: Array(repeating: GridItem(.flexible(), spacing: 2), count: 6), spacing: 2) {
+                ForEach(0..<30, id: \.self) { dayOffset in
+                    let date = calendar.date(byAdding: .day, value: -dayOffset, to: today) ?? today
+                    let isCompleted = habitData.isCompleted(on: date)
+                    let intensity = isCompleted ? habitData.completionIntensity(for: date) : 0.0
+
+                    RoundedRectangle(cornerRadius: 2)
+                        .fill(Color.habitIntensityColor(for: intensity))
+                        .frame(width: 12, height: 12)
+                        .accessibilityLabel("\(dayOffset == 0 ? "Today" : "\(dayOffset) days ago"): \(isCompleted ? "Completed" : "Not completed")")
+                }
+            }
         }
     }
 

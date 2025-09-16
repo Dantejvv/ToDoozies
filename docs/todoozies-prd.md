@@ -254,7 +254,6 @@ This fragmentation forces users to maintain multiple applications, leading to:
 **Functional Requirements**:
 - Full functionality without network connection
 - Local data storage with SwiftData
-- Background sync when connection restored
 - Conflict resolution for concurrent edits
 - Offline indicator in UI
 
@@ -550,16 +549,16 @@ Tab Bar (Bottom)
   - Shared data container
   - Background refresh handling
 
-#### EventKit
-- **Purpose**: Calendar integration
+#### ICS Export
+- **Purpose**: Basic calendar export functionality
 - **Implementation**:
-  - Create calendar events from tasks
-  - Import events as tasks
-  - Two-way sync option
+  - Export tasks as ICS calendar file
+  - Support standard iCalendar format
+  - Share via iOS share sheet
 - **Requirements**:
-  - Calendar permissions
-  - Event store access
-  - Conflict handling
+  - ICS file generation
+  - iOS sharing capabilities
+  - Standard calendar format compliance
 
 #### App Intents (Siri)
 - **Purpose**: Voice commands and shortcuts

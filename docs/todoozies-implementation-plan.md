@@ -149,18 +149,18 @@
   - [X] Monthly/yearly views
 
 ### Calendar Integration (UI FEATURES)
-- [ ] Build calendar heatmap component (habit visualization)
-- [ ] Implement habit chain visualization
-- [ ] Add calendar view for task overview
-- [ ] Create EventKit integration:
-  - [ ] Import calendar events
-  - [ ] Export tasks to calendar
+- [X] Build calendar heatmap component (habit visualization)
+- [X] Implement habit chain visualization
+- [X] Add calendar view for task overview
+- [X] Create ICS export functionality:
+  - [X] Generate ICS calendar files from tasks
+  - [X] Implement iOS share sheet integration
+  - [X] Add export options in settings
 
 ## Phase 4: User Experience Enhancements
 
 ### Offline Support
 - [X] Implement offline-first architecture
-- [ ] Configure background sync
 - [X] Add sync status indicators
 - [ ] Handle merge conflicts
 - [ ] Create offline mode UI feedback
@@ -180,7 +180,7 @@
   - [ ] Theme selection
   - [ ] Widget configuration
 - [ ] Build data management:
-  - [ ] Export functionality
+  - [ ] ICS export functionality
   - [ ] Import from Reminders
   - [ ] Cache management
   - [ ] Privacy settings

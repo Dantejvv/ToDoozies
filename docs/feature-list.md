@@ -31,8 +31,8 @@ Missed-day forgiveness – grace/skip days
 Quick add with natural language
 Themes & colors per task type
 Smart notifications
-Data export/import - backup and migration
-Calander integration - import/export events
+ICS calendar export - export tasks as calendar file
+Data backup/import - backup and migration
 
 ###FUTURE FEATURES DO NOT CONSIDER NOW###
 Future Features (possible)

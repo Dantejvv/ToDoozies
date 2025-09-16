@@ -62,31 +62,41 @@ The codebase follows an organized folder structure for maintainability and scala
 ToDoozies/                           # Main app target
 ├── Models/                          # Data models and business logic
 │   ├── Core/                       # Core data models (Task, Habit, Category, etc.)
+│   ├── Calendar/                   # Calendar data models and utilities
+│   ├── Export/                     # Export-related models (ICSEvent, etc.)
 │   ├── Extensions/                 # Model extensions and computed properties
 │   └── Protocols/                  # Data protocol definitions
 ├── Views/                          # SwiftUI views and components
 │   ├── Components/                 # Reusable UI components
-│   ├── Screens/                    # Main screen views (ContentView.swift)
+│   │   ├── Calendar/               # Calendar visualization components
+│   │   └── ...                     # Other UI components
+│   ├── Screens/                    # Main screen views (ContentView.swift, CalendarTabView.swift)
+│   ├── Export/                     # Export-related views
 │   └── Modifiers/                  # Custom view modifiers
+├── ViewModels/                     # View model layer for UI state management
+├── Navigation/                     # Navigation coordinator and routing
 ├── Features/                       # Feature modules
 │   ├── Tasks/                      # Task-related functionality
 │   ├── Habits/                     # Habit tracking features
 │   └── Settings/                   # App settings and preferences
-├── Resources/                      # Assets, colors, fonts
-│   ├── Colors/                     # Color definitions and themes
-│   ├── Fonts/                      # Custom fonts
-│   └── Localization/               # String localization files
 ├── Extensions/                     # Swift extensions and utilities
 │   ├── Foundation/                 # Foundation framework extensions
 │   ├── SwiftUI/                    # SwiftUI framework extensions
+│   ├── Resources/                  # Assets, colors, fonts, localization
+│   │   ├── Colors/                 # Color definitions and themes
+│   │   ├── Fonts/                  # Custom fonts
+│   │   └── Localization/           # String localization files
 │   ├── AccessibilityHelpers.swift # Accessibility model extensions and utilities
-│   └── Utilities/                  # General utility functions
+│   ├── DesignSystem.swift          # Design system constants and utilities
+│   └── TaskAliases.swift           # Type aliases and utilities
 ├── Services/                       # Network, storage, notification services
 │   ├── Data/                       # Data persistence and sync
+│   ├── Export/                     # Export services (ICS, etc.)
 │   ├── Notifications/              # Push notifications and reminders
 │   └── Network/                    # API and network operations
 ├── Assets.xcassets/                # App icons and images
 ├── ToDooziesApp.swift              # App entry point with SwiftData configuration
+├── AppDelegate.swift               # App delegate for lifecycle management
 ├── Info.plist                     # App configuration
 └── ToDoozies.entitlements          # App capabilities
 
@@ -98,7 +108,7 @@ docs/                               # Project documentation including feature sp
 ### iOS Configuration
 - Minimum deployment: iOS 17.6
 - Supports iPhone and iPad (Universal)
-- Background modes enabled for remote notifications
+- Foreground-only CloudKit sync (no background processing)
 - App groups configured for widget data sharing (`group.dante.ToDoozies`)
 - Comprehensive permission descriptions in Info.plist for:
   - Notifications, Siri & Shortcuts, Calendar, Reminders, Location, Speech Recognition
@@ -134,6 +144,18 @@ docs/                               # Project documentation including feature sp
 - **Protection Days**: 2 protection days per month to maintain streaks
 - **Accessibility**: Special VoiceOver announcements for milestone streaks (7, 30, 100 days)
 - **No Achievement System**: Focuses on simple streak tracking without complex systems
+
+### Calendar Integration
+- **Calendar Tab**: Dedicated calendar view with three visualization modes (✅ IMPLEMENTED)
+- **Habit Heatmap**: GitHub-style intensity visualization showing completion patterns over time (✅ IMPLEMENTED)
+- **Streak Chain**: Linear consecutive day visualization with flame indicators for active streaks (✅ IMPLEMENTED)
+- **Task Calendar**: Monthly calendar with task indicators, priority markers, and completion status (✅ IMPLEMENTED)
+- **Interactive Elements**: Date selection, month navigation, habit switching, time range selection (✅ IMPLEMENTED)
+- **Data Integration**: Full integration with existing Task and Habit models (✅ IMPLEMENTED)
+- **Accessibility**: Complete VoiceOver support with descriptive labels and navigation actions (✅ IMPLEMENTED)
+- **Design Consistency**: Follows established 8pt grid and card-based design system (✅ IMPLEMENTED)
+- **ICS Export**: Basic calendar export functionality with iOS share sheet integration (✅ IMPLEMENTED)
+- **Mini Calendar Views**: Integrated calendar previews within HabitsView (✅ IMPLEMENTED)
 
 ## IMPORTANT: MUST READ
 - **DO NOT attempt runtime testing**: I will manually do the runtime testing by compiling and interacting with the app through the simulator.
