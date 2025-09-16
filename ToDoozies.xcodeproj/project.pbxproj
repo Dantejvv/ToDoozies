@@ -7,16 +7,11 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		FE6FC02E2E756EAB007FA21D /* ios_todo-app-modern-tech-research.md in Resources */ = {isa = PBXBuildFile; fileRef = FE6FC02A2E756EAB007FA21D /* ios_todo-app-modern-tech-research.md */; };
 		FE6FC02F2E756EAB007FA21D /* tech-stack.md in Resources */ = {isa = PBXBuildFile; fileRef = FE6FC02B2E756EAB007FA21D /* tech-stack.md */; };
 		FE6FC0302E756EAB007FA21D /* feature-list.md in Resources */ = {isa = PBXBuildFile; fileRef = FE6FC0292E756EAB007FA21D /* feature-list.md */; };
-		FE6FC0312E756EAB007FA21D /* UI-specs.md in Resources */ = {isa = PBXBuildFile; fileRef = FE6FC02C2E756EAB007FA21D /* UI-specs.md */; };
-		FE6FC0352E7573A6007FA21D /* prd-prompt.md in Resources */ = {isa = PBXBuildFile; fileRef = FE6FC0342E7573A6007FA21D /* prd-prompt.md */; };
 		FE6FC04A2E757FF5007FA21D /* todoozies-prd.md in Resources */ = {isa = PBXBuildFile; fileRef = FE6FC0492E757FF5007FA21D /* todoozies-prd.md */; };
-		FE6FC04C2E7616F6007FA21D /* ios-todo-app-wireframes.md in Resources */ = {isa = PBXBuildFile; fileRef = FE6FC04B2E7616F6007FA21D /* ios-todo-app-wireframes.md */; };
 		FE6FC0502E763B43007FA21D /* CLAUDE.md in Resources */ = {isa = PBXBuildFile; fileRef = FE6FC04F2E763B43007FA21D /* CLAUDE.md */; };
 		FE6FC0522E763BDA007FA21D /* todoozies-implementation-plan.md in Resources */ = {isa = PBXBuildFile; fileRef = FE6FC0512E763BDA007FA21D /* todoozies-implementation-plan.md */; };
-		FE6FC0722E776D5F007FA21D /* codebase-analysis-report.md in Resources */ = {isa = PBXBuildFile; fileRef = FE6FC0712E776D5F007FA21D /* codebase-analysis-report.md */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -41,15 +36,10 @@
 		FE6FC00B2E756E44007FA21D /* ToDooziesTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ToDooziesTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		FE6FC0152E756E44007FA21D /* ToDooziesUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ToDooziesUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		FE6FC0292E756EAB007FA21D /* feature-list.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "feature-list.md"; sourceTree = "<group>"; };
-		FE6FC02A2E756EAB007FA21D /* ios_todo-app-modern-tech-research.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "ios_todo-app-modern-tech-research.md"; sourceTree = "<group>"; };
 		FE6FC02B2E756EAB007FA21D /* tech-stack.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "tech-stack.md"; sourceTree = "<group>"; };
-		FE6FC02C2E756EAB007FA21D /* UI-specs.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "UI-specs.md"; sourceTree = "<group>"; };
-		FE6FC0342E7573A6007FA21D /* prd-prompt.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "prd-prompt.md"; sourceTree = "<group>"; };
 		FE6FC0492E757FF5007FA21D /* todoozies-prd.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "todoozies-prd.md"; sourceTree = "<group>"; };
-		FE6FC04B2E7616F6007FA21D /* ios-todo-app-wireframes.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "ios-todo-app-wireframes.md"; sourceTree = "<group>"; };
 		FE6FC04F2E763B43007FA21D /* CLAUDE.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = CLAUDE.md; sourceTree = "<group>"; };
 		FE6FC0512E763BDA007FA21D /* todoozies-implementation-plan.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "todoozies-implementation-plan.md"; sourceTree = "<group>"; };
-		FE6FC0712E776D5F007FA21D /* codebase-analysis-report.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "codebase-analysis-report.md"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -134,14 +124,9 @@
 			isa = PBXGroup;
 			children = (
 				FE6FC0512E763BDA007FA21D /* todoozies-implementation-plan.md */,
-				FE6FC0712E776D5F007FA21D /* codebase-analysis-report.md */,
-				FE6FC04B2E7616F6007FA21D /* ios-todo-app-wireframes.md */,
 				FE6FC0492E757FF5007FA21D /* todoozies-prd.md */,
-				FE6FC0342E7573A6007FA21D /* prd-prompt.md */,
 				FE6FC0292E756EAB007FA21D /* feature-list.md */,
-				FE6FC02A2E756EAB007FA21D /* ios_todo-app-modern-tech-research.md */,
 				FE6FC02B2E756EAB007FA21D /* tech-stack.md */,
-				FE6FC02C2E756EAB007FA21D /* UI-specs.md */,
 			);
 			path = docs;
 			sourceTree = "<group>";
@@ -266,16 +251,11 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				FE6FC0722E776D5F007FA21D /* codebase-analysis-report.md in Resources */,
 				FE6FC04A2E757FF5007FA21D /* todoozies-prd.md in Resources */,
 				FE6FC0502E763B43007FA21D /* CLAUDE.md in Resources */,
-				FE6FC02E2E756EAB007FA21D /* ios_todo-app-modern-tech-research.md in Resources */,
 				FE6FC02F2E756EAB007FA21D /* tech-stack.md in Resources */,
 				FE6FC0302E756EAB007FA21D /* feature-list.md in Resources */,
 				FE6FC0522E763BDA007FA21D /* todoozies-implementation-plan.md in Resources */,
-				FE6FC0312E756EAB007FA21D /* UI-specs.md in Resources */,
-				FE6FC0352E7573A6007FA21D /* prd-prompt.md in Resources */,
-				FE6FC04C2E7616F6007FA21D /* ios-todo-app-wireframes.md in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

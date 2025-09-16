@@ -10,17 +10,17 @@ import SwiftData
 import CloudKit
 
 @Model
-final class Category {
-    var id: UUID
-    var name: String
-    var color: String
-    var icon: String
-    var order: Int
-    var createdDate: Date
-    var modifiedDate: Date
+final class Category: @unchecked Sendable {
+    var id: UUID = UUID()
+    var name: String = ""
+    var color: String = "#007AFF"
+    var icon: String = "list.bullet"
+    var order: Int = 0
+    var createdDate: Date = Date()
+    var modifiedDate: Date = Date()
 
     @Relationship(deleteRule: .nullify, inverse: \Task.category)
-    var tasks: [Task] = []
+    var tasks: [Task]?
 
     init(
         name: String,
@@ -42,11 +42,11 @@ final class Category {
     }
 
     var taskCount: Int {
-        tasks.count
+        tasks?.count ?? 0
     }
 
     var completedTaskCount: Int {
-        tasks.filter { $0.status.isCompleted }.count
+        tasks?.filter { $0.status.isCompleted }.count ?? 0
     }
 
     var completionPercentage: Double {

@@ -26,11 +26,13 @@ xcodebuild test -project ToDoozies.xcodeproj -scheme ToDoozies -destination 'pla
 ### Testing Framework
 - Uses Swift Testing framework (not XCTest)
 - Test files use `@Test` attributes and `#expect(...)` assertions
+- **IMPORTANT**: Tests that use SwiftData ModelContext require `@MainActor` annotation
 - **Comprehensive Test Coverage**: 70+ test methods across all models
 - **Test Data Factories**: Complete factory pattern for reliable test data
 - **CRUD Testing**: Full Create/Read/Update/Delete operation coverage
 - **Relationship Testing**: Bidirectional and cascade relationship verification
 - **Async Testing**: Modern async/await patterns with proper isolation
+- **Main Actor Isolation**: For SwiftData compatibility
 - Unit tests: `ToDooziesTests/ToDooziesTests.swift`
 - UI tests: `ToDooziesUITests/ToDooziesUITests.swift`
 
@@ -77,6 +79,7 @@ ToDoozies/                           # Main app target
 ├── Extensions/                     # Swift extensions and utilities
 │   ├── Foundation/                 # Foundation framework extensions
 │   ├── SwiftUI/                    # SwiftUI framework extensions
+│   ├── AccessibilityHelpers.swift # Accessibility model extensions and utilities
 │   └── Utilities/                  # General utility functions
 ├── Services/                       # Network, storage, notification services
 │   ├── Data/                       # Data persistence and sync
@@ -92,22 +95,6 @@ ToDooziesUITests/                   # UI automation tests
 docs/                               # Project documentation including feature specs and technical plans
 ```
 
-### Key Features
-**✅ Implemented (Phase 1 - Core Data Layer):**
-- SwiftData models with CloudKit integration
-- Task management with priority levels and due dates
-- Habit tracking with streak calculation and protection days
-- Recurring task patterns (daily, weekly, monthly, custom)
-- Subtasks and file attachments
-- Category organization
-- Comprehensive test coverage
-
-**🔄 Planned (Phase 2+ - UI Implementation):**
-- SwiftUI user interface
-- Natural language input
-- Widgets and notifications
-- Advanced UI features
-
 ### iOS Configuration
 - Minimum deployment: iOS 17.6
 - Supports iPhone and iPad (Universal)
@@ -121,41 +108,26 @@ docs/                               # Project documentation including feature sp
 - Uses SF Symbols for icons
 - Follows Apple's Human Interface Guidelines
 
-## Current Implementation Status
-
-### ✅ Phase 1: Core Data Layer (Complete)
-**SwiftData Models:**
-- `Task.swift`: Core task model with properties, relationships, and business logic
-- `RecurrenceRule.swift`: Complex recurrence patterns with next occurrence calculation
-- `Habit.swift`: Habit tracking with streak management and protection days
-- `Category.swift`: Task organization with progress tracking
-- `Subtask.swift`: Task breakdown with ordering and completion status
-- `Attachment.swift`: File attachments with type classification
-
-**Data Persistence:**
-- SwiftData ModelContainer with CloudKit integration
-- CRUD operations for all models
-- Relationship integrity (cascade/nullify delete rules)
-- In-memory testing with isolated containers
-
-**Testing Foundation:**
-- 70+ test methods using Swift Testing framework
-- Comprehensive test data factories for all models
-- CRUD operation testing with ModelContext
-- Relationship integrity and cascade deletion testing
-- Async testing patterns following 2024/2025 best practices
-
-### 🔄 Next Phase: Core UI Implementation
-Ready to begin Phase 2 with:
-- Model-View architecture setup
-- @Observable classes for shared state
-- SwiftUI views (TodayView, TaskListView, HabitsView)
-- Navigation coordinator
-- Liquid Glass design system implementation
+### Accessibility Features
+- **WCAG AA Compliant**: Full accessibility support implemented in Phase 2
+- **VoiceOver Support**: Complete navigation and interaction via VoiceOver
+- **Dynamic Type**: Supports all text sizes from XS to XXXL
+- **Accessibility Actions**: Task completion, editing, and navigation actions
+- **Environment Detection**: Automatic detection of VoiceOver and accessibility settings
+- **Accessibility Helpers**: Comprehensive utility extensions in `Extensions/AccessibilityHelpers.swift`
+- **Color Contrast**: System colors ensure WCAG AA contrast ratios
+- **Accessibility Testing**: Built-in testing framework for accessibility validation
 
 ## Development Notes
 - All models are CloudKit-ready with proper schema configuration
-- Test isolation ensures reliable, fast test execution
+- Test isolation ensures reliable, fast test execution with @MainActor patterns
 - Factory pattern provides realistic test data across all scenarios
 - Relationship testing verifies data integrity and cascade behavior
-- Ready for UI layer implementation with confidence in data layer stability
+- Swift Testing framework properly configured for SwiftData compatibility
+- **Accessibility-First Development**: All new UI components must include accessibility labels, hints, and actions
+- **AccessibilityHelpers.swift**: Use existing model extensions for consistent accessibility implementation
+- **VoiceOver Testing**: Test all new features with VoiceOver enabled during development
+
+## IMPORTANT: MUST READ
+- **DO NOT attempt runtime testing**: I will manually do the runtime testing by compiling and interacting with the app through the simulator.
+- **BEFORE IMPLEMENTING ANYTHING**: reference Context7 MCP server to get up to date documentation on ANYTHING that is a part of the implementation.

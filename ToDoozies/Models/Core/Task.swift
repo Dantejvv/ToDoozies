@@ -10,29 +10,32 @@ import SwiftData
 import CloudKit
 
 @Model
-final class Task {
-    var id: UUID
-    var title: String
+final class Task: @unchecked Sendable {
+    var id: UUID = UUID()
+    var title: String = ""
     var taskDescription: String?
     var dueDate: Date?
-    var priority: Priority
-    var status: TaskStatus
+    var priority: Priority = Priority.medium
+    var status: TaskStatus = TaskStatus.notStarted
     var completedDate: Date?
-    var createdDate: Date
-    var modifiedDate: Date
-    var isRecurring: Bool
+    var createdDate: Date = Date()
+    var modifiedDate: Date = Date()
+    var isRecurring: Bool = false
 
     @Relationship(deleteRule: .nullify)
     var category: Category?
 
     @Relationship(deleteRule: .cascade, inverse: \Subtask.parentTask)
-    var subtasks: [Subtask] = []
+    var subtasks: [Subtask]?
 
     @Relationship(deleteRule: .cascade, inverse: \Attachment.parentTask)
-    var attachments: [Attachment] = []
+    var attachments: [Attachment]?
 
-    @Relationship(deleteRule: .nullify)
+    @Relationship(deleteRule: .nullify, inverse: \RecurrenceRule.task)
     var recurrenceRule: RecurrenceRule?
+
+    @Relationship
+    var habit: Habit?
 
     init(
         title: String,
@@ -85,7 +88,7 @@ final class Task {
     }
 
     var subtaskProgress: Double {
-        guard !subtasks.isEmpty else { return 0.0 }
+        guard let subtasks = subtasks, !subtasks.isEmpty else { return 0.0 }
         let completedCount = subtasks.filter { $0.isComplete }.count
         return Double(completedCount) / Double(subtasks.count)
     }
@@ -95,24 +98,31 @@ final class Task {
     }
 
     func addSubtask(title: String) {
-        let subtask = Subtask(title: title, order: subtasks.count, parentTask: self)
-        subtasks.append(subtask)
+        if subtasks == nil {
+            subtasks = []
+        }
+        let currentCount = subtasks?.count ?? 0
+        let subtask = Subtask(title: title, order: currentCount, parentTask: self)
+        subtasks?.append(subtask)
         updateModifiedDate()
     }
 
     func removeSubtask(_ subtask: Subtask) {
-        subtasks.removeAll { $0.id == subtask.id }
+        subtasks?.removeAll { $0.id == subtask.id }
         updateModifiedDate()
     }
 
     func addAttachment(_ attachment: Attachment) {
-        attachments.append(attachment)
+        if attachments == nil {
+            attachments = []
+        }
+        attachments?.append(attachment)
         attachment.parentTask = self
         updateModifiedDate()
     }
 
     func removeAttachment(_ attachment: Attachment) {
-        attachments.removeAll { $0.id == attachment.id }
+        attachments?.removeAll { $0.id == attachment.id }
         updateModifiedDate()
     }
 }
@@ -156,5 +166,20 @@ enum TaskStatus: String, CaseIterable, Codable {
 
     var isCompleted: Bool {
         self == .complete
+    }
+}
+
+// MARK: - Preview Support
+
+extension Task {
+    static var preview: Task {
+        let task = Task(
+            title: "Sample Task",
+            description: "This is a sample task for preview purposes",
+            dueDate: Date().addingTimeInterval(86400), // Tomorrow
+            priority: .medium,
+            status: .notStarted
+        )
+        return task
     }
 }

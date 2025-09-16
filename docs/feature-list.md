@@ -8,13 +8,15 @@ Completion status – done or in progress
 Search & filter – find tasks fast
 Sorting – by date, priority, category
 Notes/attachments – add details or files or photos
+Batch operations - select multiple tasks for quick actions
 
 📱 User Experience
 Offline support
 Dark/light mode
-Widgets for quick view/add
+Widgets for quick view/add (including lock screen)
 Voice input
 Cross-device sync
+Focus mode integration
 
 🔁 Recurring & Habits
 Recurring tasks – daily, weekly, monthly, custom
@@ -30,70 +32,14 @@ Completion rewards – optional gamification
 ⚡ Smart Features
 Quick add with natural language
 Themes & colors per task type
+Smart notifications
+Data export/import - backup and migration
+Calander integration - import/export events
 
-ASCII Wireframes
-+----------------------------------+
-|            To-Do App             |
-+----------------------------------+
-
- 🔁 RECURRING TASKS (Today)
- ----------------------------------
- [ ] Morning Run       🔥 Streak: 7
- [ ] Read 20 min       🔥 Streak: 3
- [ ] Meditate          🔥 Streak: 12
- ----------------------------------
- Progress: [■■■■■----] 60%
-
- 📝 REGULAR TASKS
- ----------------------------------
- [ ] Finish design draft (Due 5 PM)
- [ ] Grocery shopping  (Tomorrow)
- [ ] Call mom          (No due date)
-
-
-
-+----------------------------------+
-|        Habits & Streaks          |
-+----------------------------------+
-
- 🔥 Streak Overview
- ----------------------------------
- Morning Run     7-day streak
- Read 20 min     3-day streak
- Meditate       12-day streak
-
- 📅 Habit Calendar
- ----------------------------------
- Mo Tu We Th Fr Sa Su
- ■  ■  □  ■  ■  □  ■
- ■  ■  ■  ■  □  ■  ■
- (■ = done, □ = missed)
-
- Milestones:
- 🏅 7 days ✅
- 🏅 30 days ⬜
- 🏅 100 days ⬜
-
-
-+----------------------------------+
-|           Add a Task             |
-+----------------------------------+
-
- Title: [____________________]
-
- Type:  ( ) Regular
-        (x) Recurring
-
- Repeat: [ Daily ⌄ ]
- Time:   [ 7:00 AM ⌄ ]
-
- Priority: [ Low ⌄ ]
- Notes:    [____________________]
- Files:    [ Attach ⌄ ]
- Add Subtask: [_________]
-    
- [ Cancel ]        [ Save Task ]
- 
- 
- 
- #### Need view task screen --> where subtasks, files, descriptions, etc will be
+###FUTURE FEATURES DO NOT CONSIDER NOW###
+Future Features (possible)
+Privacy-preserving usage analytics
+Rich Text support
+Apple Watch companion app
+Task templates
+Advanced filtering options

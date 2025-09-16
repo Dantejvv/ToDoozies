@@ -504,8 +504,8 @@ struct ToDooziesTests {
         #expect(habit.currentStreak == 0)
     }
 
-    @Test func testHelpersWork() async throws {
-        let container = try await TestHelpers.createInMemoryModelContainer()
+    @Test @MainActor func testHelpersWork() async throws {
+        let container = try TestHelpers.createInMemoryModelContainer()
         // Test that container was created successfully
         #expect(true) // Container creation didn't throw, so it worked
 
@@ -611,7 +611,7 @@ struct TaskModelTests {
         let task = TaskFactory.create(title: "Parent Task")
 
         // Initially no subtasks
-        #expect(task.subtasks.isEmpty)
+        #expect(task.subtasks?.isEmpty == true)
         #expect(task.subtaskProgress == 0.0)
 
         // Add subtasks
@@ -619,35 +619,38 @@ struct TaskModelTests {
         task.addSubtask(title: "Subtask 2")
         task.addSubtask(title: "Subtask 3")
 
-        #expect(task.subtasks.count == 3)
+        #expect(task.subtasks?.count == 3)
         #expect(task.subtaskProgress == 0.0) // None completed
 
         // Complete one subtask
-        task.subtasks[0].markCompleted()
+        task.subtasks?[0].markCompleted()
         #expect(task.subtaskProgress == 1.0/3.0)
 
         // Complete all subtasks
-        task.subtasks[1].markCompleted()
-        task.subtasks[2].markCompleted()
+        task.subtasks?[1].markCompleted()
+        task.subtasks?[2].markCompleted()
         #expect(task.subtaskProgress == 1.0)
     }
 
     @Test func taskSubtaskRemoval() async throws {
         let task = TaskFactory.createWithSubtasks(subtaskCount: 3)
-        let subtaskToRemove = task.subtasks.first!
+        guard let subtaskToRemove = task.subtasks?.first else {
+            #expect(Bool(false), "Should have subtasks")
+            return
+        }
 
-        #expect(task.subtasks.count == 3)
+        #expect(task.subtasks?.count == 3)
 
         task.removeSubtask(subtaskToRemove)
-        #expect(task.subtasks.count == 2)
-        #expect(!task.subtasks.contains { $0.id == subtaskToRemove.id })
+        #expect(task.subtasks?.count == 2)
+        #expect(!(task.subtasks?.contains { $0.id == subtaskToRemove.id } ?? false))
     }
 
     @Test func taskAttachmentManagement() async throws {
         let task = TaskFactory.create(title: "Task with Attachments")
 
         // Initially no attachments
-        #expect(task.attachments.isEmpty)
+        #expect(task.attachments?.isEmpty == true)
 
         // Add attachments
         let imageAttachment = AttachmentFactory.createImage()
@@ -656,7 +659,7 @@ struct TaskModelTests {
         task.addAttachment(imageAttachment)
         task.addAttachment(documentAttachment)
 
-        #expect(task.attachments.count == 2)
+        #expect(task.attachments?.count == 2)
         #expect(imageAttachment.parentTask === task)
         #expect(documentAttachment.parentTask === task)
     }
@@ -666,10 +669,10 @@ struct TaskModelTests {
         let attachment = AttachmentFactory.createImage()
 
         task.addAttachment(attachment)
-        #expect(task.attachments.count == 1)
+        #expect(task.attachments?.count == 1)
 
         task.removeAttachment(attachment)
-        #expect(task.attachments.isEmpty)
+        #expect(task.attachments?.isEmpty == true)
     }
 
     @Test func taskModifiedDateUpdate() async throws {
@@ -1167,7 +1170,7 @@ struct CategoryModelTests {
         #expect(category.color == "#FF5722")
         #expect(category.icon == "briefcase")
         #expect(category.order == 5)
-        #expect(category.tasks.isEmpty)
+        #expect(category.tasks?.isEmpty == true)
         #expect(category.taskCount == 0)
         #expect(category.completedTaskCount == 0)
         #expect(category.completionPercentage == 0.0)
@@ -1473,7 +1476,7 @@ struct AttachmentModelTests {
 
 struct CRUDOperationsTests {
 
-    @Test func taskCRUDOperations() async throws {
+    @Test @MainActor func taskCRUDOperations() async throws {
         try await TestHelpers.withTestContext { context in
             // Create
             let task = TaskFactory.create(title: "CRUD Test Task", priority: .high)
@@ -1514,7 +1517,7 @@ struct CRUDOperationsTests {
         }
     }
 
-    @Test func categoryCRUDOperations() async throws {
+    @Test @MainActor func categoryCRUDOperations() async throws {
         try await TestHelpers.withTestContext { context in
             // Create category with tasks
             let category = CategoryFactory.createWork()
@@ -1536,7 +1539,7 @@ struct CRUDOperationsTests {
 
             #expect(fetchedCategories.count == 1)
             let fetchedCategory = fetchedCategories.first!
-            #expect(fetchedCategory.tasks.count == 2)
+            #expect(fetchedCategory.tasks?.count == 2)
 
             // Update category
             fetchedCategory.name = "Updated Work"
@@ -1563,7 +1566,7 @@ struct CRUDOperationsTests {
         }
     }
 
-    @Test func habitCRUDOperations() async throws {
+    @Test @MainActor func habitCRUDOperations() async throws {
         try await TestHelpers.withTestContext { context in
             // Create habit with base task
             let baseTask = TaskFactory.create(title: "Meditation", isRecurring: true)
@@ -1609,7 +1612,7 @@ struct CRUDOperationsTests {
         }
     }
 
-    @Test func bulkOperations() async throws {
+    @Test @MainActor func bulkOperations() async throws {
         try await TestHelpers.withTestContext { context in
             // Create multiple tasks
             let taskCount = 100
@@ -1629,7 +1632,7 @@ struct CRUDOperationsTests {
             #expect(allTasks.count == taskCount)
 
             // Bulk update - mark all high priority tasks as completed
-            let highPriorityPredicate = #Predicate<ToDoozies.Task> { $0.priority == Priority.high }
+            let highPriorityPredicate = #Predicate<ToDoozies.Task> { $0.priority.rawValue == "high" }
             let highPriorityDescriptor = FetchDescriptor(predicate: highPriorityPredicate)
             let highPriorityTasks = try context.fetch(highPriorityDescriptor)
 
@@ -1639,7 +1642,7 @@ struct CRUDOperationsTests {
             try context.save()
 
             // Verify updates
-            let completedPredicate = #Predicate<ToDoozies.Task> { $0.status == TaskStatus.complete }
+            let completedPredicate = #Predicate<ToDoozies.Task> { $0.status.rawValue == "complete" }
             let completedDescriptor = FetchDescriptor(predicate: completedPredicate)
             let completedTasks = try context.fetch(completedDescriptor)
 
@@ -1663,7 +1666,7 @@ struct CRUDOperationsTests {
 
 struct RelationshipTests {
 
-    @Test func taskCategoryRelationship() async throws {
+    @Test @MainActor func taskCategoryRelationship() async throws {
         try await TestHelpers.withTestContext { context in
             let category = CategoryFactory.createWork()
             let task1 = TaskFactory.create(title: "Task 1")
@@ -1679,9 +1682,9 @@ struct RelationshipTests {
             try context.save()
 
             // Verify bidirectional relationship
-            #expect(category.tasks.count == 2)
-            #expect(category.tasks.contains { $0.id == task1.id })
-            #expect(category.tasks.contains { $0.id == task2.id })
+            #expect(category.tasks?.count == 2)
+            #expect(category.tasks?.contains { $0.id == task1.id } == true)
+            #expect(category.tasks?.contains { $0.id == task2.id } == true)
             #expect(task1.category?.id == category.id)
             #expect(task2.category?.id == category.id)
 
@@ -1694,7 +1697,7 @@ struct RelationshipTests {
         }
     }
 
-    @Test func taskSubtaskCascadeDelete() async throws {
+    @Test @MainActor func taskSubtaskCascadeDelete() async throws {
         try await TestHelpers.withTestContext { context in
             let task = TaskFactory.create(title: "Parent Task")
             let subtask1 = SubtaskFactory.create(title: "Subtask 1", parentTask: task)
@@ -1708,7 +1711,7 @@ struct RelationshipTests {
             try context.save()
 
             // Verify relationship
-            #expect(task.subtasks.count == 2)
+            #expect(task.subtasks?.count == 2)
             #expect(subtask1.parentTask?.id == task.id)
             #expect(subtask2.parentTask?.id == task.id)
 
@@ -1723,7 +1726,7 @@ struct RelationshipTests {
         }
     }
 
-    @Test func taskAttachmentCascadeDelete() async throws {
+    @Test @MainActor func taskAttachmentCascadeDelete() async throws {
         try await TestHelpers.withTestContext { context in
             let task = TaskFactory.create(title: "Task with Attachments")
             let attachment1 = AttachmentFactory.createImage()
@@ -1738,7 +1741,7 @@ struct RelationshipTests {
             try context.save()
 
             // Verify relationship
-            #expect(task.attachments.count == 2)
+            #expect(task.attachments?.count == 2)
             #expect(attachment1.parentTask?.id == task.id)
             #expect(attachment2.parentTask?.id == task.id)
 
@@ -1753,7 +1756,7 @@ struct RelationshipTests {
         }
     }
 
-    @Test func habitTaskRelationship() async throws {
+    @Test @MainActor func habitTaskRelationship() async throws {
         try await TestHelpers.withTestContext { context in
             let baseTask = TaskFactory.create(title: "Exercise", isRecurring: true)
             let habit = HabitFactory.create(baseTask: baseTask)
@@ -1780,7 +1783,7 @@ struct RelationshipTests {
         }
     }
 
-    @Test func complexRelationshipIntegrity() async throws {
+    @Test @MainActor func complexRelationshipIntegrity() async throws {
         try await TestHelpers.withTestContext { context in
             // Create complex object graph
             let category = CategoryFactory.createHealth()
@@ -1805,10 +1808,10 @@ struct RelationshipTests {
             try context.save()
 
             // Verify complete relationship graph
-            #expect(category.tasks.count == 1)
+            #expect(category.tasks?.count == 1)
             #expect(baseTask.category?.id == category.id)
-            #expect(baseTask.subtasks.count == 2)
-            #expect(baseTask.attachments.count == 1)
+            #expect(baseTask.subtasks?.count == 2)
+            #expect(baseTask.attachments?.count == 1)
             #expect(habit.baseTask?.id == baseTask.id)
             #expect(subtask1.parentTask?.id == baseTask.id)
             #expect(subtask2.parentTask?.id == baseTask.id)
@@ -1822,7 +1825,7 @@ struct RelationshipTests {
             let categoryDescriptor = FetchDescriptor<ToDoozies.Category>()
             let categories = try context.fetch(categoryDescriptor)
             #expect(categories.count == 1) // Category should remain
-            #expect(categories.first?.tasks.isEmpty == true) // But with no tasks
+            #expect(categories.first?.tasks?.isEmpty == true) // But with no tasks
 
             let habitDescriptor = FetchDescriptor<Habit>()
             let habits = try context.fetch(habitDescriptor)

@@ -10,14 +10,15 @@ import SwiftData
 import CloudKit
 
 @Model
-final class Subtask {
-    var id: UUID
-    var title: String
-    var isComplete: Bool
-    var order: Int
-    var createdDate: Date
-    var modifiedDate: Date
+final class Subtask: @unchecked Sendable {
+    var id: UUID = UUID()
+    var title: String = ""
+    var isComplete: Bool = false
+    var order: Int = 0
+    var createdDate: Date = Date()
+    var modifiedDate: Date = Date()
 
+    @Relationship
     var parentTask: Task?
 
     init(

@@ -10,19 +10,19 @@ import SwiftData
 import CloudKit
 
 @Model
-final class Habit {
-    var id: UUID
-    var currentStreak: Int
-    var bestStreak: Int
-    var totalCompletions: Int
-    var completionDates: [Date]
-    var protectionDaysUsed: Int
+final class Habit: @unchecked Sendable {
+    var id: UUID = UUID()
+    var currentStreak: Int = 0
+    var bestStreak: Int = 0
+    var totalCompletions: Int = 0
+    var completionDates: [Date] = []
+    var protectionDaysUsed: Int = 0
     var lastProtectionDate: Date?
     var targetCompletionsPerPeriod: Int?
-    var createdDate: Date
-    var modifiedDate: Date
+    var createdDate: Date = Date()
+    var modifiedDate: Date = Date()
 
-    @Relationship(deleteRule: .cascade)
+    @Relationship(deleteRule: .nullify, inverse: \Task.habit)
     var baseTask: Task?
 
     init(

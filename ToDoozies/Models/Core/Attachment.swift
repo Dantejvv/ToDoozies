@@ -11,18 +11,19 @@ import CloudKit
 import UniformTypeIdentifiers
 
 @Model
-final class Attachment {
-    var id: UUID
-    var fileName: String
-    var fileExtension: String
-    var mimeType: String
-    var fileSize: Int64
+final class Attachment: @unchecked Sendable {
+    var id: UUID = UUID()
+    var fileName: String = ""
+    var fileExtension: String = ""
+    var mimeType: String = ""
+    var fileSize: Int64 = 0
     var localURL: String?
     var cloudURL: String?
     var thumbnailData: Data?
-    var createdDate: Date
-    var modifiedDate: Date
+    var createdDate: Date = Date()
+    var modifiedDate: Date = Date()
 
+    @Relationship
     var parentTask: Task?
 
     init(

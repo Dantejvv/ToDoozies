@@ -10,16 +10,19 @@ import SwiftData
 import CloudKit
 
 @Model
-final class RecurrenceRule {
-    var id: UUID
-    var frequency: RecurrenceFrequency
-    var interval: Int
+final class RecurrenceRule: @unchecked Sendable {
+    var id: UUID = UUID()
+    var frequency: RecurrenceFrequency = RecurrenceFrequency.daily
+    var interval: Int = 1
     var daysOfWeek: [Int]?
     var dayOfMonth: Int?
     var endDate: Date?
-    var exceptions: [Date]
-    var createdDate: Date
-    var modifiedDate: Date
+    var exceptions: [Date] = []
+    var createdDate: Date = Date()
+    var modifiedDate: Date = Date()
+
+    @Relationship
+    var task: Task?
 
     init(
         frequency: RecurrenceFrequency,
