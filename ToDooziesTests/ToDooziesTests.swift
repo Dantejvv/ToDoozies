@@ -430,22 +430,56 @@ struct TestHelpers {
         let container = try createIsolatedModelContainer()
         let context = ModelContext(container)
 
-        // Ensure clean state for testing
+        // Enhanced clean state for testing
         context.autosaveEnabled = false
+
+        defer {
+            // ENHANCED: Comprehensive cleanup in defer block
+            context.rollback()
+            context.processPendingChanges()
+
+            // Clear any remaining objects to prevent leaks
+            do {
+                // Delete all objects from context
+                let taskDescriptor = FetchDescriptor<ToDoozies.Task>()
+                let tasks = try? context.fetch(taskDescriptor)
+                tasks?.forEach { context.delete($0) }
+
+                let habitDescriptor = FetchDescriptor<Habit>()
+                let habits = try? context.fetch(habitDescriptor)
+                habits?.forEach { context.delete($0) }
+
+                let categoryDescriptor = FetchDescriptor<ToDoozies.Category>()
+                let categories = try? context.fetch(categoryDescriptor)
+                categories?.forEach { context.delete($0) }
+
+                let subtaskDescriptor = FetchDescriptor<Subtask>()
+                let subtasks = try? context.fetch(subtaskDescriptor)
+                subtasks?.forEach { context.delete($0) }
+
+                let attachmentDescriptor = FetchDescriptor<Attachment>()
+                let attachments = try? context.fetch(attachmentDescriptor)
+                attachments?.forEach { context.delete($0) }
+
+                let ruleDescriptor = FetchDescriptor<RecurrenceRule>()
+                let rules = try? context.fetch(ruleDescriptor)
+                rules?.forEach { context.delete($0) }
+
+                try? context.save()
+            } catch {
+                // Ignore cleanup errors
+            }
+        }
 
         do {
             let result = try await test(context)
 
-            // Explicit cleanup - clear any pending changes
+            // Save any changes before cleanup
             try? context.save()
-
-            // Additional cleanup: clear the context
-            context.processPendingChanges()
 
             return result
         } catch {
-            // Ensure cleanup even on error
-            context.rollback()
+            // Error handling - defer block will handle cleanup
             throw error
         }
     }
@@ -505,7 +539,7 @@ struct TestHelpers {
 
 struct ToDooziesTests {
 
-    @Test func factoriesCreateValidObjects() async throws {
+    @Test @MainActor func factoriesCreateValidObjects() async throws {
         // Test that all factories create valid objects
         let task = TaskFactory.create()
         #expect(task.title == "Test Task")
@@ -553,6 +587,7 @@ struct ToDooziesTests {
 
 // MARK: - Task Model Tests
 
+@Suite(.serialized)
 struct TaskModelTests {
 
     @Test func taskCreation() async throws {
@@ -591,7 +626,7 @@ struct TaskModelTests {
         #expect(task.modifiedDate <= Date())
     }
 
-    @Test func taskMarkIncomplete() async throws {
+    @Test @MainActor func taskMarkIncomplete() async throws {
         let task = TaskFactory.createCompleted()
 
         // Initially completed
@@ -607,7 +642,7 @@ struct TaskModelTests {
         #expect(task.isCompleted == false)
     }
 
-    @Test func taskDueDateProperties() async throws {
+    @Test(.timeLimit(.minutes(1))) @MainActor func taskDueDateProperties() async throws {
         let calendar = Calendar.current
         let now = Date()
         let today = calendar.startOfDay(for: now)
@@ -638,7 +673,7 @@ struct TaskModelTests {
         #expect(completedOverdueTask.isOverdue == false)
     }
 
-    @Test func taskSubtaskManagement() async throws {
+    @Test(.timeLimit(.minutes(1))) @MainActor func taskSubtaskManagement() async throws {
         let task = TaskFactory.create(title: "Parent Task")
 
         // Initially no subtasks
@@ -663,7 +698,7 @@ struct TaskModelTests {
         #expect(task.subtaskProgress == 1.0)
     }
 
-    @Test func taskSubtaskRemoval() async throws {
+    @Test @MainActor func taskSubtaskRemoval() async throws {
         let task = TaskFactory.createWithSubtasks(subtaskCount: 3)
         guard let subtaskToRemove = task.subtasks?.first else {
             #expect(Bool(false), "Should have subtasks")
@@ -677,7 +712,7 @@ struct TaskModelTests {
         #expect(!(task.subtasks?.contains { $0.id == subtaskToRemove.id } ?? false))
     }
 
-    @Test func taskAttachmentManagement() async throws {
+    @Test(.timeLimit(.minutes(1))) @MainActor func taskAttachmentManagement() async throws {
         let task = TaskFactory.create(title: "Task with Attachments")
 
         // Initially no attachments
@@ -695,7 +730,7 @@ struct TaskModelTests {
         #expect(documentAttachment.parentTask === task)
     }
 
-    @Test func taskAttachmentRemoval() async throws {
+    @Test @MainActor func taskAttachmentRemoval() async throws {
         let task = TaskFactory.create(title: "Task with Attachments")
         let attachment = AttachmentFactory.createImage()
 
@@ -706,7 +741,7 @@ struct TaskModelTests {
         #expect(task.attachments?.isEmpty == true)
     }
 
-    @Test func taskModifiedDateUpdate() async throws {
+    @Test @MainActor func taskModifiedDateUpdate() async throws {
         let task = TaskFactory.create()
         let originalModifiedDate = task.modifiedDate
 
@@ -931,6 +966,7 @@ struct RecurrenceRuleModelTests {
 
 // MARK: - Habit Model Tests
 
+@Suite(.serialized)
 struct HabitModelTests {
 
     @Test func habitCreation() async throws {
@@ -1105,7 +1141,7 @@ struct HabitModelTests {
         #expect(weekCompletions.count == 2) // Yesterday and 3 days ago
     }
 
-    @Test func habitStreakOnSpecificDate() async throws {
+    @Test(.timeLimit(.minutes(1))) @MainActor func habitStreakOnSpecificDate() async throws {
         let habit = HabitFactory.createDailyMeditation()
         let calendar = Calendar.current
         let today = calendar.startOfDay(for: Date())
@@ -1153,7 +1189,7 @@ struct HabitModelTests {
         #expect(abs(monthlyRate - expectedRate) < 0.01)
     }
 
-    @Test func habitAnalytics() async throws {
+    @Test(.timeLimit(.minutes(1))) @MainActor func habitAnalytics() async throws {
         let habit = HabitFactory.createWithCurrentStreak(days: 10)
 
         // Verify analytics properties
@@ -1175,7 +1211,7 @@ struct HabitModelTests {
 
 struct CategoryModelTests {
 
-    @Test func categoryCreation() async throws {
+    @Test @MainActor func categoryCreation() async throws {
         let category = CategoryFactory.create(
             name: "Work Projects",
             color: "#FF5722",
@@ -1251,7 +1287,7 @@ struct CategoryModelTests {
         #expect(orders == [1, 2, 3, 4, 5])
     }
 
-    @Test func categoryModifiedDateUpdate() async throws {
+    @Test @MainActor func categoryModifiedDateUpdate() async throws {
         let category = CategoryFactory.create()
         let originalModifiedDate = category.modifiedDate
 
@@ -1268,7 +1304,7 @@ struct CategoryModelTests {
 
 struct SubtaskModelTests {
 
-    @Test func subtaskCreation() async throws {
+    @Test @MainActor func subtaskCreation() async throws {
         let task = TaskFactory.create(title: "Parent Task")
         let subtask = SubtaskFactory.create(
             title: "Complete subtask",
@@ -1285,7 +1321,7 @@ struct SubtaskModelTests {
         #expect(subtask.modifiedDate <= Date())
     }
 
-    @Test func subtaskCompletion() async throws {
+    @Test @MainActor func subtaskCompletion() async throws {
         let subtask = SubtaskFactory.create(title: "Test Subtask")
 
         // Initially incomplete
@@ -1307,7 +1343,7 @@ struct SubtaskModelTests {
         #expect(subtask.isComplete == false)
     }
 
-    @Test func subtaskOrdering() async throws {
+    @Test @MainActor func subtaskOrdering() async throws {
         let task = TaskFactory.create(title: "Parent Task")
         let subtasks = SubtaskFactory.createMultiple(count: 3, for: task)
 
@@ -1322,7 +1358,7 @@ struct SubtaskModelTests {
         }
     }
 
-    @Test func subtaskMixedCompletion() async throws {
+    @Test @MainActor func subtaskMixedCompletion() async throws {
         let task = TaskFactory.create(title: "Parent Task")
         let subtasks = SubtaskFactory.createMixed(totalCount: 5, completedCount: 3, for: task)
 
@@ -1335,7 +1371,7 @@ struct SubtaskModelTests {
         #expect(incompleteCount == 2)
     }
 
-    @Test func subtaskComparable() async throws {
+    @Test @MainActor func subtaskComparable() async throws {
         let task = TaskFactory.create(title: "Parent Task")
         let incompleteSubtask1 = SubtaskFactory.create(title: "Incomplete 1", order: 1, parentTask: task)
         let incompleteSubtask2 = SubtaskFactory.create(title: "Incomplete 2", order: 2, parentTask: task)
@@ -1349,7 +1385,7 @@ struct SubtaskModelTests {
         #expect(incompleteSubtask1 < incompleteSubtask2)
     }
 
-    @Test func subtaskModifiedDateUpdate() async throws {
+    @Test @MainActor func subtaskModifiedDateUpdate() async throws {
         let subtask = SubtaskFactory.create()
         let originalModifiedDate = subtask.modifiedDate
 
@@ -1366,7 +1402,7 @@ struct SubtaskModelTests {
 
 struct AttachmentModelTests {
 
-    @Test func attachmentCreation() async throws {
+    @Test @MainActor func attachmentCreation() async throws {
         let task = TaskFactory.create(title: "Task with Attachment")
         let attachment = AttachmentFactory.create(
             fileName: "report.pdf",
@@ -1387,7 +1423,7 @@ struct AttachmentModelTests {
         #expect(attachment.thumbnailData == nil)
     }
 
-    @Test func attachmentTypes() async throws {
+    @Test @MainActor func attachmentTypes() async throws {
         let imageAttachment = AttachmentFactory.createImage()
         #expect(imageAttachment.attachmentType == .image)
         #expect(imageAttachment.isImage == true)
@@ -1405,7 +1441,7 @@ struct AttachmentModelTests {
         #expect(videoAttachment.attachmentType == .video)
     }
 
-    @Test func attachmentTypeClassification() async throws {
+    @Test @MainActor func attachmentTypeClassification() async throws {
         // Test image types
         let jpegAttachment = AttachmentFactory.create(fileExtension: "jpg", mimeType: "image/jpeg")
         #expect(jpegAttachment.attachmentType == .image)
@@ -1433,7 +1469,7 @@ struct AttachmentModelTests {
         #expect(unknownAttachment.attachmentType == .other)
     }
 
-    @Test func attachmentDisplayProperties() async throws {
+    @Test @MainActor func attachmentDisplayProperties() async throws {
         let attachment = AttachmentFactory.create(
             fileName: "My Document.pdf",
             fileSize: 2048576 // 2MB
@@ -1448,7 +1484,7 @@ struct AttachmentModelTests {
         #expect(emptyNameAttachment.displayName == "Untitled")
     }
 
-    @Test func attachmentTypeIcons() async throws {
+    @Test @MainActor func attachmentTypeIcons() async throws {
         #expect(AttachmentType.image.iconName == "photo")
         #expect(AttachmentType.document.iconName == "doc.text")
         #expect(AttachmentType.audio.iconName == "music.note")
@@ -1456,7 +1492,7 @@ struct AttachmentModelTests {
         #expect(AttachmentType.other.iconName == "paperclip")
     }
 
-    @Test func attachmentTypeDisplayNames() async throws {
+    @Test @MainActor func attachmentTypeDisplayNames() async throws {
         #expect(AttachmentType.image.displayName == "Image")
         #expect(AttachmentType.document.displayName == "Document")
         #expect(AttachmentType.audio.displayName == "Audio")
@@ -1464,7 +1500,7 @@ struct AttachmentModelTests {
         #expect(AttachmentType.other.displayName == "File")
     }
 
-    @Test func attachmentMultipleForTask() async throws {
+    @Test @MainActor func attachmentMultipleForTask() async throws {
         let task = TaskFactory.create(title: "Task with Multiple Attachments")
         let attachments = AttachmentFactory.createMultiple(count: 3, for: task)
 
@@ -1476,7 +1512,7 @@ struct AttachmentModelTests {
         }
     }
 
-    @Test func attachmentModifiedDateUpdate() async throws {
+    @Test @MainActor func attachmentModifiedDateUpdate() async throws {
         let attachment = AttachmentFactory.create()
         let originalModifiedDate = attachment.modifiedDate
 
@@ -1584,26 +1620,30 @@ struct CRUDOperationsTests {
         }
     }
 
-    @Test @MainActor func habitCRUDOperations() async throws {
+    @Test(.timeLimit(.minutes(1))) @MainActor func habitCRUDOperations() async throws {
         try await TestHelpers.withTestContext { context in
-            // Create habit with base task
+            // FIXED: Create with proper sequencing and main actor isolation
             let baseTask = TaskFactory.create(title: "Meditation", isRecurring: true)
-            let habit = HabitFactory.create(baseTask: baseTask, targetCompletionsPerPeriod: 30)
 
+            // Insert and save task first
             context.insert(baseTask)
+            try context.save()
+
+            // Create habit with established task
+            let habit = HabitFactory.create(baseTask: baseTask, targetCompletionsPerPeriod: 30)
             context.insert(habit)
             try context.save()
 
-            // Read
+            // Read - ENHANCED with better error handling
             let habitDescriptor = FetchDescriptor<Habit>()
             let fetchedHabits = try context.fetch(habitDescriptor)
 
             #expect(fetchedHabits.count == 1)
-            #expect(fetchedHabits.first?.baseTask?.title == "Meditation")
-            #expect(fetchedHabits.first?.targetCompletionsPerPeriod == 30)
+            let fetchedHabit = try #require(fetchedHabits.first)
+            #expect(fetchedHabit.baseTask?.title == "Meditation")
+            #expect(fetchedHabit.targetCompletionsPerPeriod == 30)
 
             // Update habit
-            let fetchedHabit = fetchedHabits.first!
             fetchedHabit.currentStreak = 5
             fetchedHabit.bestStreak = 10
             fetchedHabit.totalCompletions = 25
@@ -1611,12 +1651,13 @@ struct CRUDOperationsTests {
 
             // Verify update
             let updatedHabits = try context.fetch(habitDescriptor)
-            #expect(updatedHabits.first?.currentStreak == 5)
-            #expect(updatedHabits.first?.bestStreak == 10)
-            #expect(updatedHabits.first?.totalCompletions == 25)
+            let updatedHabit = try #require(updatedHabits.first)
+            #expect(updatedHabit.currentStreak == 5)
+            #expect(updatedHabit.bestStreak == 10)
+            #expect(updatedHabit.totalCompletions == 25)
 
-            // Delete habit (should cascade delete base task)
-            context.delete(fetchedHabit)
+            // Delete habit (relationship should be nullified)
+            context.delete(updatedHabit)
             try context.save()
 
             // Verify deletion
@@ -1630,7 +1671,7 @@ struct CRUDOperationsTests {
         }
     }
 
-    @Test @MainActor func bulkOperations() async throws {
+    @Test(.timeLimit(.minutes(1))) @MainActor func bulkOperations() async throws {
         try await TestHelpers.withTestContext { context in
             // Create multiple tasks (reduced count for test stability)
             let taskCount = 10
@@ -1787,26 +1828,48 @@ struct RelationshipTests {
         }
     }
 
-    @Test @MainActor func habitTaskRelationship() async throws {
+    @Test(.timeLimit(.minutes(1))) @MainActor func habitTaskRelationship() async throws {
         try await TestHelpers.withTestContext { context in
+            // FIXED: Create objects with proper main actor isolation and sequencing
             let baseTask = TaskFactory.create(title: "Exercise", isRecurring: true)
-            let habit = HabitFactory.create(baseTask: baseTask)
 
+            // IMPORTANT: Insert and save task first to establish persistent identity
             context.insert(baseTask)
+            try context.save()
+
+            // Now create habit with established task
+            let habit = HabitFactory.create(baseTask: baseTask)
             context.insert(habit)
             try context.save()
 
-            // Verify relationship
-            #expect(habit.baseTask?.id == baseTask.id)
-            #expect(baseTask.isRecurring == true)
+            // ENHANCED: Verify relationships with proper fetching
+            // ENHANCED: Verify relationships with proper fetching
+            let allTasksDescriptor = FetchDescriptor<ToDoozies.Task>()
+            let allTasks = try context.fetch(allTasksDescriptor)
+            let fetchedTask = try #require(allTasks.first { $0.id == baseTask.id })
+
+            let allHabitsDescriptor = FetchDescriptor<Habit>()
+            let allHabits = try context.fetch(allHabitsDescriptor)
+            let fetchedHabit = try #require(allHabits.first { $0.id == habit.id })
+
+            #expect(fetchedHabit.baseTask?.id == fetchedTask.id)
+            #expect(fetchedTask.isRecurring == true)
+            #expect(fetchedTask.habit?.id == fetchedHabit.id)
 
             // Test habit completion affects base task
-            habit.markCompleted()
-            #expect(habit.baseTask?.isCompleted == true)
-
-            // Test habit deletion cascades to base task
-            context.delete(habit)
+            fetchedHabit.markCompleted()
             try context.save()
+            #expect(fetchedHabit.baseTask?.isCompleted == true)
+
+            // Test habit deletion (relationship should be nullified, not cascaded)
+            context.delete(fetchedHabit)
+            try context.save()
+
+            // Verify task still exists but habit relationship is cleared
+            let finalTasksDescriptor = FetchDescriptor<ToDoozies.Task>()
+            let finalTasks = try context.fetch(finalTasksDescriptor)
+            let remainingTask = try #require(finalTasks.first { $0.id == baseTask.id })
+            #expect(remainingTask.habit == nil)
 
             let taskDescriptor = FetchDescriptor<ToDoozies.Task>()
             let remainingTasks = try context.fetch(taskDescriptor)
