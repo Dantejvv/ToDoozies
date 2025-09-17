@@ -170,6 +170,36 @@ final class TasksViewModel {
         }
     }
 
+    // MARK: - Batch Operations
+
+    func batchCompleteTasks(_ taskIds: Set<UUID>) {
+        let tasksToComplete = appState.tasks.filter {
+            taskIds.contains($0.id) && !$0.isCompleted
+        }
+
+        for task in tasksToComplete {
+            completeTask(task)
+        }
+
+        // Announce to accessibility
+        if !tasksToComplete.isEmpty {
+            appState.announceToVoiceOver("Completed \(tasksToComplete.count) tasks")
+        }
+    }
+
+    func batchDeleteTasks(_ taskIds: Set<UUID>) {
+        let tasksToDelete = appState.tasks.filter { taskIds.contains($0.id) }
+
+        for task in tasksToDelete {
+            deleteTask(task)
+        }
+
+        // Announce to accessibility
+        if !tasksToDelete.isEmpty {
+            appState.announceToVoiceOver("Deleted \(tasksToDelete.count) tasks")
+        }
+    }
+
     func updateSearchText(_ text: String) {
         appState.searchText = text
     }

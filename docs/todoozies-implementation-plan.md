@@ -100,7 +100,7 @@
   - [X] Tap to complete
   - [X] Swipe gestures
   - [X] Long-press context menu
-  - [X] Batch operations (delete, select all)
+  - [X] Batch operations (multi-select, batch complete, batch delete with confirmation)
 
 ### Visual Design
 - [X] Implement Liquid Glass design system (card-based layout with shadows)
@@ -163,21 +163,16 @@
 - [X] Implement offline-first architecture
 - [X] Add sync status indicators
 - [ ] Handle merge conflicts
-- [ ] Create offline mode UI feedback
+- [X] Create offline mode UI feedback
 
 ### Theme System
 - [X] Implement light/dark mode support
-- [ ] Create theme manager
-- [ ] Add automatic theme switching
-- [ ] Build custom accent color system
-- [ ] Implement high contrast mode
 
 ### Settings
 - [ ] Create `SettingsView`:
   - [ ] Account management
   - [ ] Sync preferences
   - [ ] Notification settings
-  - [ ] Theme selection
   - [ ] Widget configuration
 - [ ] Build data management:
   - [ ] ICS export functionality
@@ -297,7 +292,7 @@
 - [ ] Apple Watch companion app
 - [ ] Additional widget designs
 - [ ] Advanced filtering options
-- [ ] Batch task operations
+- [X] Batch task operations
 - [ ] Task templates
 - [ ] Data backup options
 

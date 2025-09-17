@@ -9,38 +9,51 @@ import SwiftUI
 
 struct SyncStatusView: View {
     let status: SyncStatus
-    let message: String
+    let message: String?
+    let offlineMode: OfflineMode
+    let pendingChanges: Int
+    let connectionType: String?
+    let onRetry: () -> Void
 
     var body: some View {
-        HStack(spacing: 12) {
-            // Status icon
-            statusIcon
-                .foregroundColor(iconColor)
+        VStack(spacing: .spacing2) {
+            // Network status banner (always visible when offline)
+            if offlineMode != .online {
+                OfflineBanner(
+                    mode: offlineMode,
+                    pendingChanges: pendingChanges,
+                    connectionType: connectionType,
+                    onRetry: onRetry
+                )
+            }
 
-            // Status message
-            Text(message)
-                .font(.caption)
-                .foregroundColor(.primary)
-
-            Spacer()
-
-            // Dismiss button for error states
-            if case .failed = status {
-                Button(action: {
-                    // This could be handled by a closure passed in
-                }) {
-                    Image(systemName: "xmark.circle.fill")
-                        .foregroundColor(.secondary)
-                        .font(.caption)
-                }
+            // Sync progress (only when actively syncing)
+            if status == .syncing {
+                syncProgressView
             }
         }
-        .padding(.horizontal, 16)
-        .padding(.vertical, 8)
-        .background(backgroundColor)
-        .cornerRadius(8)
-        .shadow(color: .black.opacity(0.1), radius: 2, x: 0, y: 1)
-        .animation(.easeInOut(duration: 0.3), value: status)
+    }
+
+    private var syncProgressView: some View {
+        HStack(spacing: .spacing3) {
+            ProgressView()
+                .scaleEffect(0.8)
+
+            Text(message ?? "Syncing...")
+                .font(.caption)
+                .foregroundColor(.secondary)
+
+            Spacer()
+        }
+        .padding(.horizontal, .spacing4)
+        .padding(.vertical, .spacing2)
+        .background(
+            RoundedRectangle(cornerRadius: 8)
+                .fill(Color(.tertiarySystemBackground))
+        )
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("Sync in progress")
+        .accessibilityValue(message ?? "Syncing")
     }
 
     @ViewBuilder
@@ -203,21 +216,33 @@ struct InteractiveSyncStatusView: View {
 
 // MARK: - Previews
 
-#Preview("Sync Status View - Syncing") {
+#Preview("Enhanced Sync Status View") {
     VStack(spacing: 20) {
         SyncStatusView(
             status: .syncing,
-            message: "Syncing your data..."
+            message: "Syncing your data...",
+            offlineMode: .online,
+            pendingChanges: 0,
+            connectionType: "WiFi",
+            onRetry: {}
         )
 
         SyncStatusView(
-            status: .synced,
-            message: "Last synced 2 minutes ago"
+            status: .unknown,
+            message: nil,
+            offlineMode: .offline,
+            pendingChanges: 5,
+            connectionType: nil,
+            onRetry: {}
         )
 
         SyncStatusView(
-            status: .failed("Network error"),
-            message: "Failed to sync: Network connection unavailable"
+            status: .syncing,
+            message: "Uploading changes...",
+            offlineMode: .reconnecting,
+            pendingChanges: 2,
+            connectionType: nil,
+            onRetry: {}
         )
 
         InteractiveSyncStatusView(

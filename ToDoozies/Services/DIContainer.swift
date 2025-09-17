@@ -8,6 +8,8 @@
 import Foundation
 import SwiftData
 import SwiftUI
+import Combine
+import Network
 
 // MARK: - ModelContext Preview Extension
 extension ModelContext {
@@ -48,6 +50,10 @@ final class DIContainer {
     private(set) var categoryService: CategoryServiceProtocol
     private(set) var notificationService: NotificationServiceProtocol
     private(set) var cloudKitSyncService: CloudKitSyncService
+    private(set) var networkMonitor: NetworkMonitor
+
+    // MARK: - Combine Support
+    private var cancellables = Set<AnyCancellable>()
 
     // MARK: - ViewModels
     private(set) lazy var todayViewModel: TodayViewModel = TodayViewModel(
@@ -77,13 +83,26 @@ final class DIContainer {
         self.navigationCoordinator = NavigationCoordinator()
 
         // Initialize services
-        self.taskService = TaskService(modelContext: modelContext, appState: appState)
-        self.habitService = HabitService(modelContext: modelContext, appState: appState)
+        let taskService = TaskService(modelContext: modelContext, appState: appState)
+        let habitService = HabitService(modelContext: modelContext, appState: appState)
+
+        self.taskService = taskService
+        self.habitService = habitService
         self.categoryService = CategoryService(modelContext: modelContext, appState: appState)
         self.notificationService = NotificationService()
         self.cloudKitSyncService = CloudKitSyncService(appState: appState)
+        self.networkMonitor = NetworkMonitor()
+
+        // Set back-references for offline tracking
+        if let taskService = self.taskService as? TaskService {
+            taskService.diContainer = self
+        }
+        if let habitService = self.habitService as? HabitService {
+            habitService.diContainer = self
+        }
 
         // ViewModels are initialized lazily when first accessed
+        setupNetworkMonitoring()
     }
 
     // MARK: - Factory Methods
@@ -188,6 +207,68 @@ final class DIContainer {
         // Perform any necessary cleanup
         // Cancel ongoing tasks, save state, etc.
         cloudKitSyncService.stopMonitoring()
+        networkMonitor.stopMonitoring()
+        cancellables.removeAll()
+    }
+
+    // MARK: - Network Monitoring
+
+    private func setupNetworkMonitoring() {
+        // Monitor network connectivity changes
+        networkMonitor.$isConnected
+            .removeDuplicates()
+            .sink { [weak self] isConnected in
+                self?.handleNetworkChange(isConnected: isConnected)
+            }
+            .store(in: &cancellables)
+
+        // Monitor connection type changes for better user feedback
+        networkMonitor.$connectionType
+            .removeDuplicates()
+            .sink { [weak self] connectionType in
+                self?.handleConnectionTypeChange(connectionType)
+            }
+            .store(in: &cancellables)
+    }
+
+    private func handleNetworkChange(isConnected: Bool) {
+        if isConnected {
+            // Network came back online
+            appState.setOfflineMode(.reconnecting)
+
+            // Attempt to sync when coming back online
+            ConcurrentTask {
+                do {
+                    await cloudKitSyncService.forcSync()
+                    appState.setOfflineMode(.online)
+                    appState.clearPendingChanges()
+                } catch {
+                    // Sync failed, but we're connected - might be a server issue
+                    appState.setOfflineMode(.online)
+                    print("Sync failed after reconnection: \(error)")
+                }
+            }
+        } else {
+            // Network went offline
+            appState.setOfflineMode(.offline)
+        }
+    }
+
+    private func handleConnectionTypeChange(_ connectionType: NWInterface.InterfaceType?) {
+        // This could be used for more sophisticated handling
+        // e.g., warn users on expensive cellular connections
+        if connectionType == .cellular && networkMonitor.isExpensive {
+            // Could show a warning about data usage
+            print("Using cellular connection - may be expensive")
+        }
+    }
+
+    // MARK: - Offline Change Tracking
+
+    func trackOfflineChange() {
+        if !networkMonitor.isConnected {
+            appState.incrementPendingChanges()
+        }
     }
 }
 

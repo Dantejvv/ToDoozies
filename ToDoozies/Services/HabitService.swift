@@ -89,6 +89,7 @@ protocol HabitServiceProtocol {
 final class HabitService: HabitServiceProtocol {
     private let modelContext: ModelContext
     private let appState: AppState
+    weak var diContainer: DIContainer?
 
     init(modelContext: ModelContext, appState: AppState) {
         self.modelContext = modelContext
@@ -127,6 +128,9 @@ final class HabitService: HabitServiceProtocol {
             // Update app state
             appState.addHabit(habit)
 
+            // Track offline change
+            trackOfflineChange()
+
         } catch {
             throw AppError.dataSavingFailed("Failed to create habit: \(error.localizedDescription)")
         }
@@ -136,6 +140,9 @@ final class HabitService: HabitServiceProtocol {
         do {
             habit.updateModifiedDate()
             try modelContext.save()
+
+            // Track offline change
+            trackOfflineChange()
         } catch {
             throw AppError.dataSavingFailed("Failed to update habit: \(error.localizedDescription)")
         }
@@ -148,6 +155,9 @@ final class HabitService: HabitServiceProtocol {
 
             // Remove from app state
             appState.removeHabit(habit)
+
+            // Track offline change
+            trackOfflineChange()
 
         } catch {
             throw AppError.dataSavingFailed("Failed to delete habit: \(error.localizedDescription)")
@@ -163,7 +173,6 @@ final class HabitService: HabitServiceProtocol {
         habit.baseTask?.markCompleted()
 
         try await updateHabit(habit)
-
     }
 
     func markHabitIncomplete(_ habit: Habit, on date: Date = Date()) async throws {
@@ -286,5 +295,10 @@ final class HabitService: HabitServiceProtocol {
         return Double(totalStreak) / Double(streaks.count)
     }
 
+    // MARK: - Offline Change Tracking
+
+    private func trackOfflineChange() {
+        diContainer?.trackOfflineChange()
+    }
 }
 

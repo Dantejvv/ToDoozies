@@ -270,18 +270,15 @@ This fragmentation forces users to maintain multiple applications, leading to:
 **Functional Requirements**:
 - System-synchronized dark/light mode
 - Liquid Glass design language (iOS 17+)
-- Custom accent colors per task category
-- High contrast accessibility mode
 - Reduced motion option
 
 **Acceptance Criteria**:
-- Theme changes apply instantly
-- Color selections meet WCAG AA standards
+- System light/dark mode follows iOS settings automatically
+- All colors meet WCAG AA standards
 - Animations respect system reduced motion setting
-- Theme preferences sync across devices
 
 **User Story**:
-*As a night owl, I want automatic dark mode so that the app is comfortable to use in low light conditions.*
+*As a user, I want the app to respect my iOS theme preference so that it integrates seamlessly with my device's appearance.*
 
 #### 3.3 Widget System
 **Functional Requirements**:

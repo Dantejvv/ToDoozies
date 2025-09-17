@@ -27,6 +27,11 @@ final class AppState {
     var lastSyncDate: Date?
     var syncStatus: SyncStatus = .unknown
 
+    // MARK: - Offline State
+    var offlineMode: OfflineMode = .online
+    var showOfflineToast: Bool = false
+    var pendingChangesCount: Int = 0
+
     // MARK: - Filters and Search
     var searchText: String = ""
 
@@ -245,6 +250,27 @@ final class AppState {
         self.isSyncEnabled = enabled
     }
 
+    // MARK: - Offline Mode Management
+
+    func setOfflineMode(_ mode: OfflineMode) {
+        offlineMode = mode
+        if mode == .offline && !showOfflineToast {
+            showOfflineToast = true
+        }
+    }
+
+    func incrementPendingChanges() {
+        pendingChangesCount += 1
+    }
+
+    func clearPendingChanges() {
+        pendingChangesCount = 0
+    }
+
+    func dismissOfflineToast() {
+        showOfflineToast = false
+    }
+
     var syncStatusMessage: String {
         switch syncStatus {
         case .unknown:
@@ -348,4 +374,34 @@ enum SyncStatus: Equatable {
     case synced
     case failed(String)
     case disabled
+}
+
+enum OfflineMode: Equatable {
+    case online
+    case offline
+    case reconnecting
+
+    var message: String {
+        switch self {
+        case .online: return "Online"
+        case .offline: return "Offline - Changes saved locally"
+        case .reconnecting: return "Reconnecting..."
+        }
+    }
+
+    var systemImage: String {
+        switch self {
+        case .online: return "wifi"
+        case .offline: return "wifi.slash"
+        case .reconnecting: return "wifi.exclamationmark"
+        }
+    }
+
+    var color: Color {
+        switch self {
+        case .online: return .green
+        case .offline: return .orange
+        case .reconnecting: return .yellow
+        }
+    }
 }

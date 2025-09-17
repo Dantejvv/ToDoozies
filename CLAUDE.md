@@ -128,6 +128,27 @@ docs/                               # Project documentation including feature sp
 - **Color Contrast**: System colors ensure WCAG AA contrast ratios
 - **Accessibility Testing**: Built-in testing framework for accessibility validation
 
+### Batch Operations System
+- **Multi-Task Selection**: ✅ IMPLEMENTED - Users can select multiple tasks in edit mode
+- **Custom Edit Button**: Uses custom implementation instead of SwiftUI's EditButton for reliable state management
+- **Task Model Hashable Conformance**: Tasks conform to Hashable protocol for List selection support
+- **Toolbar Integration**: Dynamic toolbar buttons that appear/disappear based on edit mode and selection state
+- **Selection Management**:
+  - Select All: Selects all visible tasks in current view
+  - Deselect All: Clears all task selections
+  - Individual Selection: Tap tasks to toggle selection state
+- **Batch Actions**:
+  - Batch Complete: Mark multiple selected tasks as complete
+  - Batch Delete: Delete multiple selected tasks with confirmation dialog
+- **UI Components**:
+  - Top toolbar: Edit/Done button, Select All/Deselect All buttons
+  - Bottom toolbar: Complete X, X selected count, Delete X buttons
+- **Implementation Location**: `Views/Screens/TasksView.swift`
+- **Key Technical Details**:
+  - Uses `@State private var isEditingTasks` for custom edit mode management
+  - List environment set to `.editMode(.active)` when in selection mode for multi-selection support
+  - Task selection state managed via `@State private var selectedTasks = Set<UUID>()`
+
 ## Development Notes
 - All models are CloudKit-ready with proper schema configuration
 - Test isolation ensures reliable, fast test execution with @MainActor patterns
@@ -156,6 +177,17 @@ docs/                               # Project documentation including feature sp
 - **Design Consistency**: Follows established 8pt grid and card-based design system (✅ IMPLEMENTED)
 - **ICS Export**: Basic calendar export functionality with iOS share sheet integration (✅ IMPLEMENTED)
 - **Mini Calendar Views**: Integrated calendar previews within HabitsView (✅ IMPLEMENTED)
+
+### Offline Mode UI Feedback
+- **NetworkMonitor Service**: Real-time connectivity detection using Apple's Network framework (✅ IMPLEMENTED)
+- **OfflineToast Component**: Temporary notifications for connectivity state changes with auto-dismiss (✅ IMPLEMENTED)
+- **OfflineBanner Component**: Persistent banner showing offline status and pending changes count (✅ IMPLEMENTED)
+- **Enhanced SyncStatusView**: Combined sync progress and offline status display (✅ IMPLEMENTED)
+- **Pending Changes Tracking**: Automatic counting of local modifications when offline (✅ IMPLEMENTED)
+- **Manual Retry Functionality**: User-initiated sync attempts when connectivity returns (✅ IMPLEMENTED)
+- **Progressive UI Feedback**: Toast → Banner → Persistent status indicator pattern (✅ IMPLEMENTED)
+- **Accessibility Integration**: Full VoiceOver support with descriptive offline status announcements (✅ IMPLEMENTED)
+- **Service Integration**: TaskService and HabitService automatically track offline changes (✅ IMPLEMENTED)
 
 ## IMPORTANT: MUST READ
 - **DO NOT attempt runtime testing**: I will manually do the runtime testing by compiling and interacting with the app through the simulator.

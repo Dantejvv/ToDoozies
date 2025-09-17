@@ -10,8 +10,12 @@ import SwiftData
 
 struct TasksView: View {
     @Environment(\.diContainer) private var container
+    @Environment(\.editMode) private var editMode
     @State private var showingFilters = false
     @State private var searchText = ""
+    @State private var selectedTasks = Set<UUID>()
+    @State private var showingBatchDeleteConfirmation = false
+    @State private var isEditingTasks = false
 
     private var viewModel: TasksViewModel {
         container?.tasksViewModel ?? TasksViewModel(
@@ -40,19 +44,6 @@ struct TasksView: View {
             }
             .navigationTitle("Tasks")
             .navigationBarTitleDisplayMode(.large)
-            .toolbar {
-                ToolbarItemGroup(placement: .primaryAction) {
-                    Button(action: { showingFilters = true }) {
-                        Image(systemName: viewModel.hasActiveFilters ? "line.3.horizontal.decrease.circle.fill" : "line.3.horizontal.decrease.circle")
-                    }
-
-                    Button(action: {
-                        container?.navigationCoordinator.showAddTask()
-                    }) {
-                        Image(systemName: "plus")
-                    }
-                }
-            }
             .refreshable {
                 await viewModel.refresh()
             }
@@ -64,6 +55,82 @@ struct TasksView: View {
                 viewModel.updateSearchText(newValue)
             }
             .navigationDestination(coordinator: container?.navigationCoordinator ?? NavigationCoordinator())
+            .toolbar {
+                // Leading toolbar - Edit button
+                ToolbarItemGroup(placement: .navigationBarLeading) {
+                    Button(isEditingTasks ? "Done" : "Edit") {
+                        isEditingTasks.toggle()
+                        if !isEditingTasks {
+                            selectedTasks.removeAll()
+                        }
+                    }
+                }
+
+                // Trailing toolbar - Selection buttons or normal buttons
+                ToolbarItemGroup(placement: .navigationBarTrailing) {
+                    if isEditingTasks {
+                        if selectedTasks.isEmpty {
+                            Button("Select All") {
+                                selectAllVisibleTasks()
+                            }
+                            .font(.caption)
+                        } else {
+                            Button("Deselect All") {
+                                selectedTasks.removeAll()
+                            }
+                            .font(.caption)
+                        }
+                    } else {
+                        Button(action: { showingFilters = true }) {
+                            Image(systemName: viewModel.hasActiveFilters ? "line.3.horizontal.decrease.circle.fill" : "line.3.horizontal.decrease.circle")
+                        }
+
+                        Button(action: {
+                            container?.navigationCoordinator.showAddTask()
+                        }) {
+                            Image(systemName: "plus")
+                        }
+                    }
+                }
+
+                // Bottom toolbar - Batch action buttons
+                ToolbarItemGroup(placement: .bottomBar) {
+                    if isEditingTasks {
+                        Button("Complete \(selectedTasks.count)") {
+                            viewModel.batchCompleteTasks(selectedTasks)
+                            selectedTasks.removeAll()
+                        }
+                        .disabled(selectedTasks.isEmpty)
+
+                        Spacer()
+
+                        Text("\(selectedTasks.count) selected")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+
+                        Spacer()
+
+                        Button("Delete \(selectedTasks.count)", role: .destructive) {
+                            showingBatchDeleteConfirmation = true
+                        }
+                        .disabled(selectedTasks.isEmpty)
+                    }
+                }
+            }
+            .confirmationDialog(
+                "Delete \(selectedTasks.count) tasks",
+                isPresented: $showingBatchDeleteConfirmation,
+                titleVisibility: .visible
+            ) {
+                Button("Delete \(selectedTasks.count) Tasks", role: .destructive) {
+                    viewModel.batchDeleteTasks(selectedTasks)
+                    selectedTasks.removeAll()
+                }
+
+                Button("Cancel", role: .cancel) { }
+            } message: {
+                Text("This action cannot be undone.")
+            }
         }
     }
 
@@ -124,7 +191,7 @@ struct TasksView: View {
     // MARK: - Tasks List
 
     private var tasksList: some View {
-        List {
+        List(selection: $selectedTasks) {
             // Task count summary
             Section {
                 HStack {
@@ -141,18 +208,24 @@ struct TasksView: View {
                 .padding(.vertical, 8)
             }
 
-            // Task sections
+            // Task sections - simplified selection
             ForEach(viewModel.taskSections, id: \.title) { section in
                 Section(section.title) {
-                    ForEach(section.tasks) { task in
+                    ForEach(section.tasks, id: \.id) { task in
                         TaskListRowView(task: task) {
                             if task.isCompleted {
                                 viewModel.uncompleteTask(task)
                             } else {
                                 viewModel.completeTask(task)
                             }
-                        } onTap: {
-                            container?.navigationCoordinator.showTaskDetail(task)
+                        } onEdit: {
+                            container?.navigationCoordinator.showEditTask(task)
+                        }
+                        .tag(task.id)  // Explicitly tag with the task ID
+                        .onTapGesture {
+                            if !isEditingTasks {
+                                container?.navigationCoordinator.showTaskDetail(task)
+                            }
                         }
                         .swipeActions(edge: .trailing) {
                             Button("Delete", role: .destructive) {
@@ -172,6 +245,7 @@ struct TasksView: View {
             }
         }
         .listStyle(PlainListStyle())
+        .environment(\.editMode, .constant(isEditingTasks ? .active : .inactive))
     }
 
     // MARK: - Empty State
@@ -304,6 +378,13 @@ struct TasksView: View {
 
         return chips
     }
+
+    // MARK: - Selection Helpers
+
+    private func selectAllVisibleTasks() {
+        let visibleTaskIds = Set(viewModel.displayedTasks.map { $0.id })
+        selectedTasks = visibleTaskIds
+    }
 }
 
 // MARK: - Task List Row View
@@ -311,82 +392,87 @@ struct TasksView: View {
 struct TaskListRowView: View {
     let task: Task
     let onToggleComplete: () -> Void
-    let onTap: () -> Void
+    let onEdit: () -> Void
 
     var body: some View {
-        Button(action: onTap) {
-            HStack(spacing: 12) {
-                // Completion button
-                CompletionButton(
-                    isCompleted: task.isCompleted,
-                    style: .task,
-                    accessibilityLabel: task.isCompleted ? "Mark incomplete" : "Mark complete"
-                ) {
-                    onToggleComplete()
-                }
-
-                // Task content
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(task.title)
-                        .font(.body)
-                        .fontWeight(.medium)
-                        .strikethrough(task.isCompleted)
-                        .foregroundColor(task.isCompleted ? .secondary : .primary)
-                        .multilineTextAlignment(.leading)
-
-                    if let description = task.taskDescription, !description.isEmpty {
-                        Text(description)
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                            .lineLimit(2)
-                    }
-
-                    // Metadata row
-                    HStack {
-                        // Due date
-                        if let dueDate = task.dueDate {
-                            HStack(spacing: 2) {
-                                Image(systemName: "calendar")
-                                Text(dueDate, style: task.isDueToday ? .time : .date)
-                            }
-                            .font(.caption)
-                            .foregroundColor(task.isOverdue ? .red : .secondary)
-                        }
-
-                        // Category
-                        if let category = task.category {
-                            HStack(spacing: 2) {
-                                Image(systemName: "folder")
-                                Text(category.name)
-                            }
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                        }
-
-                        Spacer()
-
-                        // Priority badge
-                        if task.priority != .medium {
-                            priorityBadge(task.priority)
-                        }
-
-                        // Subtasks indicator
-                        if let subtasks = task.subtasks, !subtasks.isEmpty {
-                            HStack(spacing: 2) {
-                                Image(systemName: "checklist")
-                                Text("\(subtasks.filter { $0.isComplete }.count)/\(subtasks.count)")
-                            }
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                        }
-                    }
-                }
-
-                Spacer(minLength: 0)
+        HStack(spacing: 12) {
+            // Completion button
+            CompletionButton(
+                isCompleted: task.isCompleted,
+                style: .task,
+                accessibilityLabel: task.isCompleted ? "Mark incomplete" : "Mark complete"
+            ) {
+                onToggleComplete()
             }
-            .contentShape(Rectangle())
+
+            // Task content
+            VStack(alignment: .leading, spacing: 4) {
+                Text(task.title)
+                    .font(.body)
+                    .fontWeight(.medium)
+                    .strikethrough(task.isCompleted)
+                    .foregroundColor(task.isCompleted ? .secondary : .primary)
+                    .multilineTextAlignment(.leading)
+
+                if let description = task.taskDescription, !description.isEmpty {
+                    Text(description)
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                        .lineLimit(2)
+                }
+
+                // Metadata row
+                HStack {
+                    // Due date
+                    if let dueDate = task.dueDate {
+                        HStack(spacing: 2) {
+                            Image(systemName: "calendar")
+                            Text(dueDate, style: task.isDueToday ? .time : .date)
+                        }
+                        .font(.caption)
+                        .foregroundColor(task.isOverdue ? .red : .secondary)
+                    }
+
+                    // Category
+                    if let category = task.category {
+                        HStack(spacing: 2) {
+                            Image(systemName: "folder")
+                            Text(category.name)
+                        }
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                    }
+
+                    Spacer()
+
+                    // Priority badge
+                    if task.priority != .medium {
+                        priorityBadge(task.priority)
+                    }
+
+                    // Subtasks indicator
+                    if let subtasks = task.subtasks, !subtasks.isEmpty {
+                        HStack(spacing: 2) {
+                            Image(systemName: "checklist")
+                            Text("\(subtasks.filter { $0.isComplete }.count)/\(subtasks.count)")
+                        }
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                    }
+                }
+            }
+
+            Spacer(minLength: 0)
+
+            // Options button
+            Button(action: onEdit) {
+                Image(systemName: "ellipsis")
+                    .foregroundColor(.secondary)
+            }
+            .buttonStyle(PlainButtonStyle())
+            .accessibilityLabel("Task options")
+            .accessibilityHint("Double tap to view task options and details")
         }
-        .buttonStyle(PlainButtonStyle())
     }
 
     private func priorityBadge(_ priority: Priority) -> some View {

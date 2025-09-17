@@ -14,6 +14,8 @@ struct ContentView: View {
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
+    @State private var offlineToast: ToastItem?
+
     private var navigationCoordinator: NavigationCoordinator {
         container?.navigationCoordinator ?? NavigationCoordinator()
     }
@@ -112,18 +114,40 @@ struct ContentView: View {
                 Text(error.localizedDescription)
             }
         }
+        .overlay(alignment: .top) {
+            // Offline toast notification (shows at top)
+            if appState.showOfflineToast && appState.offlineMode == .offline {
+                OfflineToast(
+                    mode: appState.offlineMode,
+                    isVisible: appState.showOfflineToast,
+                    onDismiss: {
+                        appState.dismissOfflineToast()
+                    }
+                )
+                .padding(.top, 8) // Below status bar
+                .zIndex(1000) // Ensure it appears above all other content
+            }
+        }
         .overlay(alignment: .bottom) {
-            // Show sync status bar when appropriate
-            if appState.syncStatus == .syncing ||
-               (appState.syncStatus != .synced && appState.syncStatus != .unknown) {
+            // Enhanced sync status with offline indicator
+            if appState.syncStatus == .syncing || appState.offlineMode != .online {
                 SyncStatusView(
                     status: appState.syncStatus,
-                    message: appState.syncStatusMessage
+                    message: appState.syncStatusMessage,
+                    offlineMode: appState.offlineMode,
+                    pendingChanges: appState.pendingChangesCount,
+                    connectionType: container?.networkMonitor.connectionDescription,
+                    onRetry: {
+                        ConcurrentTask {
+                            await container?.cloudKitSyncService.forcSync()
+                        }
+                    }
                 )
                 .horizontalSpacingPadding(.spacing4)
                 .padding(.bottom) // Above tab bar
             }
         }
+        .toast($offlineToast)
         .task {
             await container?.loadInitialData()
         }
@@ -134,6 +158,19 @@ struct ContentView: View {
         .onChange(of: dynamicTypeSize) { _,  newSize in
             // Handle dynamic type size changes if needed
             appState.currentDynamicTypeSize = newSize
+        }
+        .onChange(of: appState.offlineMode) { oldMode, newMode in
+            // Show toast when transitioning to/from offline
+            if oldMode != newMode {
+                switch newMode {
+                case .offline:
+                    offlineToast = ToastItem(mode: .offline, duration: 5.0)
+                case .online where oldMode == .offline || oldMode == .reconnecting:
+                    offlineToast = ToastItem(mode: .online, duration: 3.0)
+                default:
+                    break
+                }
+            }
         }
     }
 }

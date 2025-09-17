@@ -129,6 +129,18 @@ final class Task: @unchecked Sendable {
     }
 }
 
+// MARK: - Hashable Conformance
+
+extension Task: Hashable {
+    static func == (lhs: Task, rhs: Task) -> Bool {
+        lhs.id == rhs.id
+    }
+
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
+    }
+}
+
 // MARK: - Priority Enum
 enum Priority: String, CaseIterable, Codable {
     case low = "low"

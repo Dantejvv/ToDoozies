@@ -42,6 +42,7 @@ protocol TaskServiceProtocol {
 final class TaskService: TaskServiceProtocol {
     private let modelContext: ModelContext
     private let appState: AppState
+    weak var diContainer: DIContainer?
 
     init(modelContext: ModelContext, appState: AppState) {
         self.modelContext = modelContext
@@ -70,6 +71,9 @@ final class TaskService: TaskServiceProtocol {
             // Update app state
             appState.addTask(task)
 
+            // Track offline change
+            trackOfflineChange()
+
             // Schedule notifications if needed
             await scheduleNotificationIfNeeded(for: task)
 
@@ -96,6 +100,9 @@ final class TaskService: TaskServiceProtocol {
             task.updateModifiedDate()
             try modelContext.save()
 
+            // Track offline change
+            trackOfflineChange()
+
             // Update notifications
             await updateNotificationIfNeeded(for: task)
 
@@ -111,6 +118,9 @@ final class TaskService: TaskServiceProtocol {
 
             // Remove from app state
             appState.removeTask(task)
+
+            // Track offline change
+            trackOfflineChange()
 
             // Cancel notifications
             await cancelNotificationIfNeeded(for: task)
@@ -367,6 +377,12 @@ final class TaskService: TaskServiceProtocol {
     private func cancelNotificationIfNeeded(for task: Task) async {
         // TODO: Implement notification cancellation
         // This would integrate with a NotificationService
+    }
+
+    // MARK: - Offline Change Tracking
+
+    private func trackOfflineChange() {
+        diContainer?.trackOfflineChange()
     }
 }
 
