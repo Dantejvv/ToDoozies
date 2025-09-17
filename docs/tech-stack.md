@@ -9,6 +9,8 @@ CloudKit
 Foundation
 UIKit (App Lifecycle & Accessibility)
 UniformTypeIdentifiers
+Combine (Reactive Programming)
+Network (Connectivity Monitoring)
 
 ## Testing Frameworks
 Swift Testing

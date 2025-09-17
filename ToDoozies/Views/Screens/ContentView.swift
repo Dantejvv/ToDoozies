@@ -16,12 +16,23 @@ struct ContentView: View {
 
     @State private var offlineToast: ToastItem?
 
+    // Theme management
+    @AppStorage("selectedColorScheme") private var selectedColorScheme: String = "system"
+
     private var navigationCoordinator: NavigationCoordinator {
         container?.navigationCoordinator ?? NavigationCoordinator()
     }
 
     private var appState: AppState {
         container?.appState ?? AppState()
+    }
+
+    private var preferredColorScheme: ColorScheme? {
+        switch selectedColorScheme {
+        case "light": return .light
+        case "dark": return .dark
+        default: return nil // system
+        }
     }
 
     var body: some View {
@@ -172,6 +183,7 @@ struct ContentView: View {
                 }
             }
         }
+        .preferredColorScheme(preferredColorScheme)
     }
 }
 
@@ -179,6 +191,26 @@ struct ContentView: View {
 
 struct SettingsView: View {
     @Environment(\.diContainer) private var container
+    @Environment(\.colorScheme) private var currentColorScheme
+
+    // Theme preferences
+    @AppStorage("selectedColorScheme") private var selectedColorScheme: String = "system"
+
+    // Notification preferences
+    @AppStorage("showCompletionCelebrations") private var showCompletionCelebrations = true
+    @AppStorage("quietHoursEnabled") private var quietHoursEnabled = false
+
+    // Sync preferences
+    @AppStorage("autoSyncOnLaunch") private var autoSyncOnLaunch = true
+
+    // Accessibility preferences
+    @AppStorage("announceCompletions") private var announceCompletions = true
+    @AppStorage("reduceAnimations") private var reduceAnimations = false
+
+    // Services
+    @State private var notificationService = NotificationPermissionService()
+    @State private var themeManager = ThemeManager()
+    @State private var showingExportOptions = false
 
     private var appState: AppState {
         container?.appState ?? AppState()
@@ -190,68 +222,318 @@ struct SettingsView: View {
 
     var body: some View {
         NavigationStack {
-            List {
-                // Sync Section
-                Section("iCloud Sync") {
-                    HStack {
-                        Image(systemName: appState.isSyncEnabled ? "icloud.fill" : "icloud.slash")
-                            .foregroundColor(appState.isSyncEnabled ? .blue : .gray)
+            Form {
+                // App Appearance Section
+                appearanceSection
 
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text("iCloud Sync")
-                            Text(appState.syncStatusMessage)
-                                .font(.caption)
-                                .foregroundColor(.secondary)
-                        }
+                // iCloud Sync Section
+                iCloudSyncSection
 
-                        Spacer()
+                // Notification Settings Section
+                notificationSection
 
-                        if appState.syncStatus == .syncing {
-                            ProgressView()
-                                .scaleEffect(0.8)
-                        }
-                    }
+                // Data Management Section
+                dataManagementSection
 
-                    if appState.isSyncEnabled {
-                        Button("Sync Now") {
-                            ConcurrentTask {
-                                await cloudKitService?.forcSync()
-                            }
-                        }
-                        .disabled(appState.syncStatus == .syncing)
-                    }
-                }
+                // Accessibility Section
+                accessibilitySection
 
-                Section("App") {
-                    HStack {
-                        Image(systemName: "bell")
-                        Text("Notifications")
-                        Spacer()
-                        Image(systemName: "chevron.right")
-                            .foregroundColor(.secondary)
-                    }
-
-                    HStack {
-                        Image(systemName: "folder")
-                        Text("Categories")
-                        Spacer()
-                        Image(systemName: "chevron.right")
-                            .foregroundColor(.secondary)
-                    }
-                }
-
-                Section("About") {
-                    HStack {
-                        Image(systemName: "info.circle")
-                        Text("About ToDoozies")
-                        Spacer()
-                        Image(systemName: "chevron.right")
-                            .foregroundColor(.secondary)
-                    }
-                }
+                // About Section
+                aboutSection
             }
             .navigationTitle("Settings")
-            .navigationDestination(coordinator: container?.navigationCoordinator ?? NavigationCoordinator())
+            .task {
+                await notificationService.checkAuthorizationStatus()
+            }
+            .sheet(isPresented: $showingExportOptions) {
+                ExportOptionsView(
+                    tasks: appState.tasks,
+                    habits: appState.habits
+                )
+            }
+        }
+    }
+
+    // MARK: - View Sections
+
+    private var appearanceSection: some View {
+        Section("Appearance") {
+            HStack {
+                Image(systemName: AppTheme(rawValue: selectedColorScheme)?.systemImage ?? "gearshape")
+                    .foregroundColor(.accentColor)
+
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Theme")
+                    Text(themeManager.themeDescription(for: EnvironmentValues()))
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
+
+                Spacer()
+
+                Picker("Theme", selection: $selectedColorScheme) {
+                    ForEach(AppTheme.allCases, id: \.rawValue) { theme in
+                        Text(theme.displayName).tag(theme.rawValue)
+                    }
+                }
+                .pickerStyle(.menu)
+            }
+            .accessibilityLabel("App theme")
+            .accessibilityValue(AppTheme(rawValue: selectedColorScheme)?.displayName ?? "System")
+            .accessibilityHint("Changes the app's color scheme")
+        }
+    }
+
+    private var iCloudSyncSection: some View {
+        Section("iCloud Sync") {
+            HStack {
+                Image(systemName: appState.isSyncEnabled ? "icloud.fill" : "icloud.slash")
+                    .foregroundColor(appState.isSyncEnabled ? .blue : .gray)
+
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("iCloud Sync")
+                    Text(appState.syncStatusMessage)
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
+
+                Spacer()
+
+                if appState.syncStatus == .syncing {
+                    ProgressView()
+                        .scaleEffect(0.8)
+                }
+            }
+            .accessibilityLabel("iCloud sync status")
+            .accessibilityValue(appState.syncStatusMessage)
+
+            if appState.isSyncEnabled {
+                Button("Sync Now") {
+                    ConcurrentTask {
+                        await cloudKitService?.forcSync()
+                    }
+                }
+                .disabled(appState.syncStatus == .syncing)
+                .accessibilityLabel("Manually sync data")
+            }
+
+            Toggle("Auto-sync on app launch", isOn: $autoSyncOnLaunch)
+                .accessibilityLabel("Automatically sync when app starts")
+        }
+    }
+
+    private var notificationSection: some View {
+        Section("Notifications") {
+            HStack {
+                Image(systemName: notificationService.statusSystemImage)
+                    .foregroundColor(notificationService.statusColor)
+
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Notification Permission")
+                    Text(notificationService.statusDescription)
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+
+                Spacer()
+
+                if notificationService.canRequestPermission {
+                    Button("Enable") {
+                        ConcurrentTask {
+                            await notificationService.requestPermission()
+                        }
+                    }
+                    .buttonStyle(.borderless)
+                    .disabled(notificationService.isLoading)
+                } else if notificationService.needsSettingsAccess {
+                    Button("Settings") {
+                        notificationService.openAppSettings()
+                    }
+                    .buttonStyle(.borderless)
+                }
+            }
+            .accessibilityLabel("Notification permission")
+            .accessibilityValue(notificationService.statusDisplayName)
+
+            if notificationService.authorizationStatus == .authorized {
+                Toggle("Completion celebrations", isOn: $showCompletionCelebrations)
+                    .accessibilityLabel("Show celebrations when completing tasks")
+
+                Toggle("Quiet hours", isOn: $quietHoursEnabled)
+                    .accessibilityLabel("Enable quiet hours for notifications")
+            }
+        }
+    }
+
+    private var dataManagementSection: some View {
+        Section("Data Management") {
+            Button {
+                showingExportOptions = true
+            } label: {
+                HStack {
+                    Image(systemName: "square.and.arrow.up")
+                        .foregroundColor(.accentColor)
+
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Export Calendar")
+                            .foregroundColor(.primary)
+                        Text("Export tasks and habits as ICS file")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
+
+                    Spacer()
+
+                    Image(systemName: "chevron.right")
+                        .foregroundColor(.secondary)
+                }
+            }
+            .accessibilityLabel("Export data")
+            .accessibilityHint("Export tasks and habits as calendar file")
+
+            HStack {
+                Image(systemName: "internaldrive")
+                    .foregroundColor(.secondary)
+
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("App Data")
+                    Text("\(appState.tasks.count) tasks, \(appState.habits.count) habits")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
+
+                Spacer()
+            }
+            .accessibilityLabel("App data summary")
+            .accessibilityValue("\(appState.tasks.count) tasks, \(appState.habits.count) habits")
+
+            if appState.offlineMode != .online {
+                HStack {
+                    Image(systemName: "wifi.slash")
+                        .foregroundColor(.orange)
+
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Offline Changes")
+                        Text("\(appState.pendingChangesCount) pending changes")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
+
+                    Spacer()
+                }
+                .accessibilityLabel("Offline status")
+                .accessibilityValue("\(appState.pendingChangesCount) pending changes")
+            }
+        }
+    }
+
+    private var accessibilitySection: some View {
+        Section("Accessibility") {
+            Toggle("Announce completions", isOn: $announceCompletions)
+                .accessibilityLabel("Announce task completions to VoiceOver")
+                .onChange(of: announceCompletions) { _, newValue in
+                    appState.shouldAnnounceCompletions = newValue
+                }
+
+            Toggle("Reduce animations", isOn: $reduceAnimations)
+                .accessibilityLabel("Reduce motion and animations")
+
+            HStack {
+                Image(systemName: "textformat.size")
+                    .foregroundColor(.secondary)
+
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Text Size")
+                    Text(appState.currentDynamicTypeSize.description)
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
+
+                Spacer()
+
+                Text("System")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            }
+            .accessibilityLabel("Text size setting")
+            .accessibilityValue("Controlled by system settings")
+        }
+    }
+
+    private var aboutSection: some View {
+        Section("About") {
+            HStack {
+                Image(systemName: "info.circle")
+                    .foregroundColor(.accentColor)
+
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("ToDoozies")
+                    Text("Version \(appVersion)")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
+
+                Spacer()
+            }
+            .accessibilityLabel("App information")
+            .accessibilityValue("ToDoozies version \(appVersion)")
+
+            HStack {
+                Image(systemName: "hand.raised")
+                    .foregroundColor(.secondary)
+
+                Text("Privacy Policy")
+
+                Spacer()
+
+                Image(systemName: "chevron.right")
+                    .foregroundColor(.secondary)
+            }
+            .accessibilityLabel("Privacy policy")
+            .accessibilityHint("Opens privacy policy")
+
+            HStack {
+                Image(systemName: "questionmark.circle")
+                    .foregroundColor(.secondary)
+
+                Text("Support")
+
+                Spacer()
+
+                Image(systemName: "chevron.right")
+                    .foregroundColor(.secondary)
+            }
+            .accessibilityLabel("Support and help")
+            .accessibilityHint("Get help and support")
+        }
+    }
+
+    // MARK: - Helpers
+
+    private var appVersion: String {
+        Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0"
+    }
+}
+
+// MARK: - Extensions
+
+extension DynamicTypeSize {
+    var description: String {
+        switch self {
+        case .xSmall: return "Extra Small"
+        case .small: return "Small"
+        case .medium: return "Medium"
+        case .large: return "Large"
+        case .xLarge: return "Extra Large"
+        case .xxLarge: return "Extra Extra Large"
+        case .xxxLarge: return "Extra Extra Extra Large"
+        case .accessibility1: return "Accessibility 1"
+        case .accessibility2: return "Accessibility 2"
+        case .accessibility3: return "Accessibility 3"
+        case .accessibility4: return "Accessibility 4"
+        case .accessibility5: return "Accessibility 5"
+        @unknown default: return "Unknown"
         }
     }
 }

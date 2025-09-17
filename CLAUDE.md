@@ -189,6 +189,17 @@ docs/                               # Project documentation including feature sp
 - **Accessibility Integration**: Full VoiceOver support with descriptive offline status announcements (✅ IMPLEMENTED)
 - **Service Integration**: TaskService and HabitService automatically track offline changes (✅ IMPLEMENTED)
 
+### Settings & User Preferences
+- **App Appearance**: Theme selector (System/Light/Dark) with @AppStorage persistence and real-time switching (✅ IMPLEMENTED)
+- **Enhanced iCloud Sync**: Expanded sync status display with auto-sync preferences and manual retry (✅ IMPLEMENTED)
+- **Notification Management**: UNUserNotificationCenter permission handling, status display, and basic preferences (✅ IMPLEMENTED)
+- **Data Management**: Direct access to ICS export, app data summary, and offline status display (✅ IMPLEMENTED)
+- **Accessibility Preferences**: VoiceOver announcements, reduce animations, and Dynamic Type size display (✅ IMPLEMENTED)
+- **App Information**: Version display, privacy policy, and support links (✅ IMPLEMENTED)
+- **Persistent Storage**: @AppStorage integration for all user preferences with automatic UI updates (✅ IMPLEMENTED)
+- **Theme Manager Service**: Centralized theme management with ColorScheme handling (✅ IMPLEMENTED)
+- **Notification Permission Service**: Comprehensive permission state management with system integration (✅ IMPLEMENTED)
+
 ## IMPORTANT: MUST READ
 - **DO NOT attempt runtime testing**: I will manually do the runtime testing by compiling and interacting with the app through the simulator.
 - **BEFORE IMPLEMENTING ANYTHING**: reference Context7 MCP server to get up to date documentation on ANYTHING that is a part of the implementation.
