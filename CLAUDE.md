@@ -69,6 +69,8 @@ ToDoozies/                           # Main app target
 ├── Views/                          # SwiftUI views and components
 │   ├── Components/                 # Reusable UI components
 │   │   ├── AttachmentViews.swift   # File attachment UI components
+│   │   ├── CategoryPickerView.swift # Unified category selection component with search and filtering
+│   │   ├── RecurrencePickerView.swift # Comprehensive recurrence pattern picker with live preview
 │   │   ├── Calendar/               # Calendar visualization components
 │   │   └── ...                     # Other UI components
 │   ├── Screens/                    # Main screen views (ContentView.swift, CalendarTabView.swift)
@@ -184,6 +186,20 @@ docs/                               # Project documentation including feature sp
 - **ICS Export**: Basic calendar export functionality with iOS share sheet integration (✅ IMPLEMENTED)
 - **Mini Calendar Views**: Integrated calendar previews within HabitsView (✅ IMPLEMENTED)
 
+### Picker Components System
+- **CategoryPickerView**: Unified category selection component with search functionality (✅ IMPLEMENTED)
+- **RecurrencePickerView**: Comprehensive recurrence pattern picker with progressive disclosure (✅ IMPLEMENTED)
+- **Multi-Section Design**: Frequency selection, interval configuration, weekday/monthly options (✅ IMPLEMENTED)
+- **Real-Time Validation**: Live form validation with user-friendly error messages (✅ IMPLEMENTED)
+- **Live Preview**: Shows next occurrence dates for recurrence patterns (✅ IMPLEMENTED)
+- **Search & Filter**: Category picker includes real-time search and filtering (✅ IMPLEMENTED)
+- **Accessibility**: Complete VoiceOver support with descriptive labels and interaction hints (✅ IMPLEMENTED)
+- **Design Consistency**: Follows established SwiftUI patterns and 8pt grid system (✅ IMPLEMENTED)
+
+### Recently Completed Features (September 2025)
+- **Picker Components System**: Complete implementation of CategoryPickerView and RecurrencePickerView (✅ IMPLEMENTED)
+- **Text Size Settings Navigation**: Interactive button to open iOS system settings for Dynamic Type adjustment (✅ IMPLEMENTED)
+
 ### Offline Mode UI Feedback
 - **NetworkMonitor Service**: Real-time connectivity detection using Apple's Network framework (✅ IMPLEMENTED)
 - **OfflineToast Component**: Temporary notifications for connectivity state changes with auto-dismiss (✅ IMPLEMENTED)
@@ -202,6 +218,7 @@ docs/                               # Project documentation including feature sp
 - **Data Management**: Direct access to ICS export, app data summary, and offline status display (✅ IMPLEMENTED)
 - **Accessibility Preferences**: VoiceOver announcements, reduce animations, and Dynamic Type size display (✅ IMPLEMENTED)
 - **App Information**: Version display, privacy policy, and support links (✅ IMPLEMENTED)
+- **Interactive Settings Navigation**: Text Size setting with direct iOS Settings navigation (✅ IMPLEMENTED)
 - **Persistent Storage**: @AppStorage integration for all user preferences with automatic UI updates (✅ IMPLEMENTED)
 - **Theme Manager Service**: Centralized theme management with ColorScheme handling (✅ IMPLEMENTED)
 - **Notification Permission Service**: Comprehensive permission state management with system integration (✅ IMPLEMENTED)

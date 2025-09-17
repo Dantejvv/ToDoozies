@@ -81,13 +81,7 @@ struct AddHabitFormView: View {
                 }
             }
             .sheet(isPresented: $viewModel.showingCategoryPicker) {
-                CategoryPickerSheet(
-                    selectedCategory: viewModel.selectedCategory,
-                    categories: viewModel.availableCategories,
-                    onSelection: { category in
-                        viewModel.selectCategory(category)
-                    }
-                )
+                CategoryPickerView(selectedCategory: $viewModel.selectedCategory)
             }
         }
     }
@@ -186,72 +180,8 @@ struct AddHabitFormView: View {
     }
 }
 
-// MARK: - Category Picker Sheet
-
-struct CategoryPickerSheet: View {
-    let selectedCategory: Category?
-    let categories: [Category]
-    let onSelection: (Category?) -> Void
-
-    @Environment(\.dismiss) private var dismiss
-
-    var body: some View {
-        NavigationStack {
-            List {
-                Section {
-                    Button(action: {
-                        onSelection(nil)
-                        dismiss()
-                    }) {
-                        HStack {
-                            Text("No Category")
-                                .foregroundColor(.primary)
-
-                            Spacer()
-
-                            if selectedCategory == nil {
-                                Image(systemName: "checkmark")
-                                    .foregroundColor(.accentColor)
-                            }
-                        }
-                    }
-                }
-
-                if !categories.isEmpty {
-                    Section("Categories") {
-                        ForEach(categories, id: \.id) { category in
-                            Button(action: {
-                                onSelection(category)
-                                dismiss()
-                            }) {
-                                HStack {
-                                    CategoryBadge(category: category)
-
-                                    Spacer()
-
-                                    if selectedCategory?.id == category.id {
-                                        Image(systemName: "checkmark")
-                                            .foregroundColor(.accentColor)
-                                    }
-                                }
-                            }
-                            .foregroundColor(.primary)
-                        }
-                    }
-                }
-            }
-            .navigationTitle("Select Category")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button("Done") {
-                        dismiss()
-                    }
-                }
-            }
-        }
-    }
-}
+// MARK: - CategoryPickerSheet Removed
+// Now using unified CategoryPickerView component
 
 // MARK: - Preview
 

@@ -84,13 +84,7 @@ struct EditHabitFormView: View {
                 }
             }
             .sheet(isPresented: $viewModel.showingCategoryPicker) {
-                CategoryPickerSheet(
-                    selectedCategory: viewModel.selectedCategory,
-                    categories: viewModel.availableCategories,
-                    onSelection: { category in
-                        viewModel.selectCategory(category)
-                    }
-                )
+                CategoryPickerView(selectedCategory: $viewModel.selectedCategory)
             }
         }
     }

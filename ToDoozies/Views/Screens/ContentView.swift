@@ -439,25 +439,36 @@ struct SettingsView: View {
             Toggle("Reduce animations", isOn: $reduceAnimations)
                 .accessibilityLabel("Reduce motion and animations")
 
-            HStack {
-                Image(systemName: "textformat.size")
-                    .foregroundColor(.secondary)
-
-                VStack(alignment: .leading, spacing: 2) {
-                    Text("Text Size")
-                    Text(appState.currentDynamicTypeSize.description)
-                        .font(.caption)
+            Button(action: {
+                openSystemSettings()
+            }) {
+                HStack {
+                    Image(systemName: "textformat.size")
                         .foregroundColor(.secondary)
+
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Text Size")
+                        Text(appState.currentDynamicTypeSize.description)
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
+
+                    Spacer()
+
+                    HStack(spacing: 4) {
+                        Text("iOS Settings")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+
+                        Image(systemName: "arrow.up.right")
+                            .font(.caption2)
+                            .foregroundColor(.secondary)
+                    }
                 }
-
-                Spacer()
-
-                Text("System")
-                    .font(.caption)
-                    .foregroundColor(.secondary)
             }
+            .buttonStyle(.plain)
             .accessibilityLabel("Text size setting")
-            .accessibilityValue("Controlled by system settings")
+            .accessibilityHint("Opens iOS Settings to change text size")
         }
     }
 
@@ -513,6 +524,12 @@ struct SettingsView: View {
 
     private var appVersion: String {
         Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0"
+    }
+
+    private func openSystemSettings() {
+        if let settingsUrl = URL(string: UIApplication.openSettingsURLString) {
+            UIApplication.shared.open(settingsUrl)
+        }
     }
 }
 

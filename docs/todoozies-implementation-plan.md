@@ -246,6 +246,7 @@
 - [X] Data Management: ICS export integration, app data summary, offline status
 - [X] Accessibility Preferences: VoiceOver announcements, reduce animations, Dynamic Type display
 - [X] App Information: Version display, privacy/support links
+- [X] Interactive Settings: Text Size navigation to iOS system settings using UIApplication.openSettingsURLString
 - [X] Settings Infrastructure:
 - [X] @AppStorage Integration: Persistent user preferences with automatic UI updates
 - [X] ThemeManager Service: Centralized theme management with real-time switching
@@ -266,12 +267,13 @@
 - [X] Local Notification Infrastructure: Full notification presentation and response handling
 - [X] Deep Linking Support: Notification routing for tasks, habits, and sync updates with NotificationCenter integration
 
-### Features to Finish
-- [ ] Recurrence Pattern picker
-- [ ] Category Pattern picker
+### Recently Completed Features
+- [X] **Recurrence Pattern picker** - Complete implementation with frequency selection, interval configuration, weekday/monthly options, and live preview
+- [X] **Category Pattern picker** - Unified CategoryPickerView component with search, filtering, and accessibility support
+- [X] **Text Size Settings Navigation** - Interactive iOS Settings navigation for Dynamic Type accessibility preferences
 - [ ] Adjust on complete logic --> remove it from views
-- [ ] What does the Text Size in settings do?
-- [ ] what do the notification settings do? 
+- [X] ~~What does the Text Size in settings do?~~ → Now provides navigation to iOS Settings
+- [ ] what do the notification settings do?
 - [ ] Fix "0 out of x task completed" misalignment in tasks view
 - [ ] Readjust Today view
 
@@ -447,10 +449,10 @@
 ## Implementation Analysis Summary (Updated September 2025)
 
 ### Actual Codebase Status
-- **Total Swift Files**: 52 files with comprehensive architecture
+- **Total Swift Files**: 54 files with comprehensive architecture (added CategoryPickerView, RecurrencePickerView, and settings navigation)
 - **Core Architecture**: Complete dependency injection system with proper service layer
 - **Data Layer**: Full SwiftData + CloudKit implementation with fallback mechanisms
-- **UI Layer**: 24 view files covering all major functionality including complete habit management
+- **UI Layer**: 26 view files covering all major functionality including complete habit management and unified picker components
 - **Services**: 8 service files handling business logic, networking, and notifications
 - **Testing**: Comprehensive unit test suite with factory pattern and proper isolation
 
@@ -463,6 +465,9 @@
 - Complete calendar integration with three visualization modes
 - Complete habit management with interactive statistics and calendar integration
 - Shared validation system preventing code duplication across view models
+- **Unified picker components** with comprehensive CategoryPickerView and RecurrencePickerView implementations
+- **Progressive UI patterns** with real-time validation, live previews, and search functionality
+- **System integration patterns** with iOS Settings navigation and Dynamic Type awareness
 
 ### Next Priority Areas
 1. **Widget Development**: WidgetKit extension and lock screen widgets

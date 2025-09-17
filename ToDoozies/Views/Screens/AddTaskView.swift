@@ -270,57 +270,8 @@ struct SmartDateField: View {
     }
 }
 
-// MARK: - Category Picker View (Placeholder)
-
-struct CategoryPickerView: View {
-    @Binding var selectedCategory: Category?
-    @Environment(\.dismiss) private var dismiss
-
-    var body: some View {
-        NavigationStack {
-            List {
-                Text("Category Picker")
-                Text("To be implemented")
-            }
-            .navigationTitle("Select Category")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") {
-                        dismiss()
-                    }
-                }
-            }
-        }
-    }
-}
-
-// MARK: - Recurrence Picker View (Placeholder)
-
-struct RecurrencePickerView: View {
-    @Binding var recurrenceRule: RecurrenceRule?
-    @Environment(\.dismiss) private var dismiss
-
-    var body: some View {
-        NavigationStack {
-            List {
-                Text("Recurrence Picker")
-                Text("To be implemented")
-            }
-            .navigationTitle("Recurrence Pattern")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") {
-                        dismiss()
-                    }
-                }
-            }
-        }
-    }
-}
-
-// Color extension moved to Badges.swift to avoid duplication
+// MARK: - Placeholder Views Removed
+// CategoryPickerView and RecurrencePickerView are now implemented as separate components
 
 // MARK: - Preview
 
