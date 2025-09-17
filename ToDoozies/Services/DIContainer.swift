@@ -48,6 +48,7 @@ final class DIContainer {
     private(set) var taskService: TaskServiceProtocol
     private(set) var habitService: HabitServiceProtocol
     private(set) var categoryService: CategoryServiceProtocol
+    private(set) var attachmentService: AttachmentServiceProtocol
     private(set) var notificationService: NotificationServiceProtocol
     private(set) var cloudKitSyncService: CloudKitSyncService
     private(set) var networkMonitor: NetworkMonitor
@@ -85,10 +86,12 @@ final class DIContainer {
         // Initialize services
         let taskService = TaskService(modelContext: modelContext, appState: appState)
         let habitService = HabitService(modelContext: modelContext, appState: appState)
+        let attachmentService = AttachmentService(modelContext: modelContext, appState: appState)
 
         self.taskService = taskService
         self.habitService = habitService
         self.categoryService = CategoryService(modelContext: modelContext, appState: appState)
+        self.attachmentService = attachmentService
         self.notificationService = NotificationService()
         self.cloudKitSyncService = CloudKitSyncService(appState: appState)
         self.networkMonitor = NetworkMonitor()
@@ -99,6 +102,9 @@ final class DIContainer {
         }
         if let habitService = self.habitService as? HabitService {
             habitService.diContainer = self
+        }
+        if let attachmentService = self.attachmentService as? AttachmentService {
+            attachmentService.diContainer = self
         }
 
         // ViewModels are initialized lazily when first accessed
@@ -112,6 +118,7 @@ final class DIContainer {
             appState: appState,
             taskService: taskService,
             categoryService: categoryService,
+            attachmentService: attachmentService,
             navigationCoordinator: navigationCoordinator
         )
     }
@@ -141,6 +148,7 @@ final class DIContainer {
             task: task,
             appState: appState,
             taskService: taskService,
+            attachmentService: attachmentService,
             navigationCoordinator: navigationCoordinator
         )
     }
@@ -390,14 +398,8 @@ final class NotificationService: NotificationServiceProtocol {
 // These are placeholder classes that will be implemented later
 
 
-class AddHabitViewModel: ObservableObject {
-    init(appState: AppState, habitService: HabitServiceProtocol, taskService: TaskServiceProtocol, categoryService: CategoryServiceProtocol, navigationCoordinator: NavigationCoordinator) {}
-}
 
 
-class HabitDetailViewModel: ObservableObject {
-    init(habit: Habit, appState: AppState, habitService: HabitServiceProtocol, navigationCoordinator: NavigationCoordinator) {}
-}
 
 class SettingsViewModel: ObservableObject {
     init(appState: AppState, notificationService: NotificationServiceProtocol, navigationCoordinator: NavigationCoordinator) {}

@@ -614,36 +614,6 @@ struct StreakVisualization: View {
     }
 }
 
-// MARK: - Add Habit View Placeholder
-
-struct AddHabitView: View {
-    @Environment(\.dismiss) private var dismiss
-
-    var body: some View {
-        NavigationStack {
-            VStack {
-                Text("Add Habit View")
-                    .font(.title)
-                Text("This will be implemented in the next phase")
-                    .foregroundColor(.secondary)
-            }
-            .navigationTitle("Add Habit")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") {
-                        dismiss()
-                    }
-                }
-                ToolbarItem(placement: .confirmationAction) {
-                    Button("Save") {
-                        dismiss()
-                    }
-                }
-            }
-        }
-    }
-}
 
 // MARK: - Preview
 

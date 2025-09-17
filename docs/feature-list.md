@@ -55,7 +55,6 @@ Best streak tracking and analytics ✅
 ⚡ Smart Features
 Quick add with natural language ❌ NOT IMPLEMENTED (basic form exists)
 Themes & colors per task type ❌ NOT IMPLEMENTED (app-wide themes only)
-Smart notifications ❌ NOT IMPLEMENTED (basic notifications exist)
 ICS calendar export - export tasks as calendar file ✅
 Complete notification infrastructure ✅
 CloudKit remote notifications ✅
@@ -80,9 +79,7 @@ Privacy-preserving usage analytics ❌
 Rich Text support ❌
 Apple Watch companion app ❌
 Task templates ❌
-Advanced filtering options (basic filtering exists) ❌
 Widget development (WidgetKit extension) ❌
 Siri Shortcuts integration ❌
 Natural language processing for task creation ❌
-Smart notification timing based on user patterns ❌
 Per-task theming and custom colors ❌

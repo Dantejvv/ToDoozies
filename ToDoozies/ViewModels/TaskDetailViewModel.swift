@@ -8,6 +8,7 @@
 import Foundation
 import Observation
 import SwiftData
+import UniformTypeIdentifiers
 
 @Observable
 final class TaskDetailViewModel {
@@ -31,6 +32,7 @@ final class TaskDetailViewModel {
     // MARK: - Services
     private let appState: AppState
     private let taskService: TaskServiceProtocol
+    private let attachmentService: AttachmentServiceProtocol
     private let navigationCoordinator: NavigationCoordinator
 
     // MARK: - Computed Properties
@@ -97,11 +99,13 @@ final class TaskDetailViewModel {
         task: Task,
         appState: AppState,
         taskService: TaskServiceProtocol,
+        attachmentService: AttachmentServiceProtocol,
         navigationCoordinator: NavigationCoordinator
     ) {
         self.task = task
         self.appState = appState
         self.taskService = taskService
+        self.attachmentService = attachmentService
         self.navigationCoordinator = navigationCoordinator
     }
 
@@ -270,6 +274,56 @@ final class TaskDetailViewModel {
 
     func showAttachmentPicker() {
         showingAttachmentPicker = true
+    }
+
+    // MARK: - Attachment Management
+
+    func handleFilePickerResult(_ result: Result<[URL], Error>) {
+        _Concurrency.Task { @MainActor in
+            switch result {
+            case .success(let urls):
+                await addAttachments(from: urls)
+            case .failure(let error):
+                errorMessage = "Failed to select files: \(error.localizedDescription)"
+            }
+        }
+    }
+
+    func addAttachments(from urls: [URL]) async {
+        isLoading = true
+        defer { isLoading = false }
+
+        for url in urls {
+            do {
+                _ = try await attachmentService.createAttachment(from: url, for: task)
+            } catch {
+                errorMessage = "Failed to add attachment: \(error.localizedDescription)"
+                break
+            }
+        }
+    }
+
+    func deleteAttachment(_ attachment: Attachment) async {
+        isLoading = true
+        defer { isLoading = false }
+
+        do {
+            try await attachmentService.deleteAttachment(attachment)
+        } catch {
+            errorMessage = "Failed to delete attachment: \(error.localizedDescription)"
+        }
+    }
+
+    var supportedContentTypes: [UTType] {
+        attachmentService.getSupportedContentTypes()
+    }
+
+    var hasAttachments: Bool {
+        !(task.attachments?.isEmpty ?? true)
+    }
+
+    var attachments: [Attachment] {
+        task.attachments ?? []
     }
 }
 

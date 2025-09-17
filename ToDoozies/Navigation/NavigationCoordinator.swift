@@ -107,7 +107,7 @@ final class NavigationCoordinator {
         switch host {
         case "task":
             if let taskIdString = components.queryItems?.first(where: { $0.name == "id" })?.value,
-               let taskId = UUID(uuidString: taskIdString) {
+               let _ = UUID(uuidString: taskIdString) {
                 // Find task and navigate to it
                 // This would typically involve a lookup from your data source
                 // For now, we'll just navigate to the tasks tab
@@ -116,7 +116,7 @@ final class NavigationCoordinator {
 
         case "habit":
             if let habitIdString = components.queryItems?.first(where: { $0.name == "id" })?.value,
-               let habitId = UUID(uuidString: habitIdString) {
+               let _ = UUID(uuidString: habitIdString) {
                 // Find habit and navigate to it
                 selectedTab = .habits
             }
@@ -286,16 +286,13 @@ extension View {
             EditTaskView(task: task)
 
         case .addHabit:
-            Text("Add Habit View")
-                .navigationTitle(destination.title)
+            AddHabitView()
 
         case .habitDetail(let habit):
-            Text("Habit Detail View for: \(habit.baseTask?.title ?? "Unknown")")
-                .navigationTitle(destination.title)
+            HabitDetailView(habit: habit)
 
         case .editHabit(let habit):
-            Text("Edit Habit View for: \(habit.baseTask?.title ?? "Unknown")")
-                .navigationTitle(destination.title)
+            EditHabitView(habit: habit)
 
         case .categories:
             Text("Categories View")

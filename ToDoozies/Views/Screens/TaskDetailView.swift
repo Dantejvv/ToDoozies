@@ -424,30 +424,24 @@ struct TaskDetailContentView: View {
     // MARK: - Attachments Section
 
     private var attachmentsSection: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            HStack {
-                Text("Attachments")
-                    .font(.headline)
-                    .fontWeight(.medium)
-
-                Spacer()
-
-                Button(action: {
-                    viewModel.showAttachmentPicker()
-                }) {
-                    Image(systemName: "plus.circle.fill")
-                        .foregroundColor(.blue)
-                }
-                .disabled(true) // Placeholder for now
+        CompactAttachmentListView(
+            attachments: viewModel.attachments,
+            onDelete: { attachment in
+                _Concurrency.Task { await viewModel.deleteAttachment(attachment) }
+            },
+            onAdd: {
+                viewModel.showAttachmentPicker()
+            },
+            onTap: { attachment in
+                // TODO: Show attachment preview
             }
-
-            Text("Coming soon")
-                .font(.subheadline)
-                .foregroundColor(.secondary)
-                .frame(maxWidth: .infinity)
-                .padding()
-                .background(Color(.systemGray6))
-                .clipShape(RoundedRectangle(cornerRadius: 8))
+        )
+        .fileImporter(
+            isPresented: $viewModel.showingAttachmentPicker,
+            allowedContentTypes: viewModel.supportedContentTypes,
+            allowsMultipleSelection: true
+        ) { result in
+            viewModel.handleFilePickerResult(result)
         }
     }
 

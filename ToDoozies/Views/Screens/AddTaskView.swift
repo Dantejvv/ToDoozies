@@ -189,10 +189,28 @@ struct AddTaskFormView: View {
 
     private var attachmentsSection: some View {
         Section("Attachments") {
+            // Add attachment button
             Button(action: { viewModel.showingAttachmentPicker = true }) {
-                Label("Add Attachment", systemImage: "paperclip")
+                Label("Add Files", systemImage: "paperclip")
             }
-            .disabled(true) // Placeholder for now
+
+            // Show selected attachments
+            if !viewModel.selectedAttachments.isEmpty {
+                ForEach(viewModel.selectedAttachments, id: \.id) { attachment in
+                    AttachmentRowView(
+                        attachment: attachment,
+                        onDelete: { viewModel.removeAttachment(attachment) },
+                        onTap: { /* Preview not needed in add view */ }
+                    )
+                }
+            }
+        }
+        .fileImporter(
+            isPresented: $viewModel.showingAttachmentPicker,
+            allowedContentTypes: viewModel.supportedContentTypes,
+            allowsMultipleSelection: true
+        ) { result in
+            viewModel.handleFilePickerResult(result)
         }
     }
 

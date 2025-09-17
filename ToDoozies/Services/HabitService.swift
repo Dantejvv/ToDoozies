@@ -79,6 +79,9 @@ protocol HabitServiceProtocol {
     func createHabit(_ habit: Habit) async throws
     func updateHabit(_ habit: Habit) async throws
     func deleteHabit(_ habit: Habit) async throws
+    func markHabitCompleted(_ habit: Habit, on date: Date) async throws
+    func markHabitIncomplete(_ habit: Habit, on date: Date) async throws
+    func useProtectionDay(for habit: Habit, on date: Date) async throws -> Bool
     func getHabitStatistics(for habit: Habit) async throws -> HabitStatistics
     func getAllHabitStatistics() async throws -> [HabitStatistics]
 }

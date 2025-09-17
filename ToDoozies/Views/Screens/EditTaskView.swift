@@ -63,11 +63,6 @@ struct EditTaskFormView: View {
             .navigationTitle("Edit Task")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar(content: {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") {
-                        viewModel.cancel()
-                    }
-                }
 
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Save") {

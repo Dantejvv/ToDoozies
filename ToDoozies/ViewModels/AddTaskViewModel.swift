@@ -7,6 +7,7 @@
 
 import Foundation
 import Observation
+import UniformTypeIdentifiers
 
 @Observable
 final class AddTaskViewModel {
@@ -20,6 +21,7 @@ final class AddTaskViewModel {
     var selectedCategory: Category?
     var isRecurring: Bool = false
     var recurrenceRule: RecurrenceRule?
+    var selectedAttachments: [Attachment] = []
 
     // MARK: - Validation State
     var validationErrors: [ValidationError] = []
@@ -36,6 +38,7 @@ final class AddTaskViewModel {
     // MARK: - Services
     private let taskService: TaskServiceProtocol
     private let categoryService: CategoryServiceProtocol
+    private let attachmentService: AttachmentServiceProtocol
     private let navigationCoordinator: NavigationCoordinator
     private let appState: AppState
 
@@ -44,11 +47,13 @@ final class AddTaskViewModel {
         appState: AppState,
         taskService: TaskServiceProtocol,
         categoryService: CategoryServiceProtocol,
+        attachmentService: AttachmentServiceProtocol,
         navigationCoordinator: NavigationCoordinator
     ) {
         self.appState = appState
         self.taskService = taskService
         self.categoryService = categoryService
+        self.attachmentService = attachmentService
         self.navigationCoordinator = navigationCoordinator
 
         // Set default category to first available
@@ -70,6 +75,12 @@ final class AddTaskViewModel {
             let task = createTaskFromForm()
             try await taskService.createTask(task)
 
+            // Add attachments to the task
+            for attachment in selectedAttachments {
+                attachment.parentTask = task
+                task.addAttachment(attachment)
+            }
+
             // If creating a habit, also create the habit record
             if isRecurring {
                 try await createHabitFromTask(task)
@@ -85,6 +96,54 @@ final class AddTaskViewModel {
 
     func cancel() {
         navigationCoordinator.dismissSheet()
+    }
+
+    // MARK: - Attachment Management
+
+    func handleFilePickerResult(_ result: Result<[URL], Error>) {
+        _Concurrency.Task { @MainActor in
+            switch result {
+            case .success(let urls):
+                await addAttachments(from: urls)
+            case .failure(let error):
+                appState.setError(.dataSavingFailed("Failed to select files: \(error.localizedDescription)"))
+            }
+        }
+    }
+
+    func addAttachments(from urls: [URL]) async {
+        isLoading = true
+        defer { isLoading = false }
+
+        for url in urls {
+            do {
+                // Create a temporary task for attachment creation
+                let tempTask = createTaskFromForm()
+                let attachment = try await attachmentService.createAttachment(from: url, for: tempTask)
+                selectedAttachments.append(attachment)
+            } catch {
+                appState.setError(.dataSavingFailed("Failed to add attachment: \(error.localizedDescription)"))
+                break
+            }
+        }
+    }
+
+    func removeAttachment(_ attachment: Attachment) {
+        selectedAttachments.removeAll { $0.id == attachment.id }
+
+        // Delete the attachment file
+        _Concurrency.Task {
+            do {
+                try await attachmentService.deleteAttachment(attachment)
+            } catch {
+                // Log error but don't show to user as the attachment is already removed from UI
+                print("Failed to delete attachment file: \(error)")
+            }
+        }
+    }
+
+    var supportedContentTypes: [UTType] {
+        attachmentService.getSupportedContentTypes()
     }
 
     // MARK: - Validation
@@ -154,33 +213,6 @@ final class AddTaskViewModel {
     }
 }
 
-// MARK: - Validation Error Types
-
-enum ValidationError: LocalizedError, Equatable {
-    case titleRequired
-    case titleTooLong(maxLength: Int)
-    case invalidDateFormat(input: String)
-    case pastDateNotAllowed
-    case categoryRequired
-    case custom(String)
-
-    var errorDescription: String? {
-        switch self {
-        case .titleRequired:
-            return "Task title is required"
-        case .titleTooLong(let maxLength):
-            return "Title must be \(maxLength) characters or less"
-        case .invalidDateFormat(let input):
-            return "Could not understand date format: '\(input)'"
-        case .pastDateNotAllowed:
-            return "Due date cannot be in the past"
-        case .categoryRequired:
-            return "Please select a category"
-        case .custom(let message):
-            return message
-        }
-    }
-}
 
 // MARK: - Natural Language Date Parser
 

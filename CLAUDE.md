@@ -68,6 +68,7 @@ ToDoozies/                           # Main app target
 │   └── Protocols/                  # Data protocol definitions
 ├── Views/                          # SwiftUI views and components
 │   ├── Components/                 # Reusable UI components
+│   │   ├── AttachmentViews.swift   # File attachment UI components
 │   │   ├── Calendar/               # Calendar visualization components
 │   │   └── ...                     # Other UI components
 │   ├── Screens/                    # Main screen views (ContentView.swift, CalendarTabView.swift)
@@ -90,10 +91,15 @@ ToDoozies/                           # Main app target
 │   ├── DesignSystem.swift          # Design system constants and utilities
 │   └── TaskAliases.swift           # Type aliases and utilities
 ├── Services/                       # Network, storage, notification services
-│   ├── Data/                       # Data persistence and sync
-│   ├── Export/                     # Export services (ICS, etc.)
-│   ├── Notifications/              # Push notifications and reminders
-│   └── Network/                    # API and network operations
+│   ├── AttachmentService.swift     # File attachment management and storage
+│   ├── CloudKitSyncService.swift   # CloudKit synchronization
+│   ├── DIContainer.swift           # Dependency injection container
+│   ├── HabitService.swift          # Habit tracking business logic
+│   ├── NetworkMonitor.swift        # Network connectivity monitoring
+│   ├── NotificationPermissionService.swift # Notification permissions
+│   ├── TaskService.swift           # Task management business logic
+│   ├── ThemeManager.swift          # App theming and appearance
+│   └── Export/                     # Export services (ICS, etc.)
 ├── Assets.xcassets/                # App icons and images
 ├── ToDooziesApp.swift              # App entry point with SwiftData configuration
 ├── AppDelegate.swift               # App delegate for lifecycle management
@@ -199,6 +205,37 @@ docs/                               # Project documentation including feature sp
 - **Persistent Storage**: @AppStorage integration for all user preferences with automatic UI updates (✅ IMPLEMENTED)
 - **Theme Manager Service**: Centralized theme management with ColorScheme handling (✅ IMPLEMENTED)
 - **Notification Permission Service**: Comprehensive permission state management with system integration (✅ IMPLEMENTED)
+
+### Attachment System
+- **Data Model**: Complete SwiftData model with CloudKit integration (Attachment.swift)
+- **Service Layer**: Full AttachmentService with file management, thumbnail generation, and validation
+- **UI Components**: Complete attachment management in AddTaskView and TaskDetailView
+- **File Picker**: SwiftUI fileImporter integration with multi-file selection
+- **File Types**: Images (PNG, JPEG, HEIC, GIF), Documents (PDF, TXT, RTF), Audio (MP3, WAV), Video (MP4, MOV), Office files
+- **Storage**: App sandbox structure (`Documents/Attachments/{taskId}/`) with CloudKit sync
+- **Features**: Thumbnail generation, file size validation, security-scoped resource handling
+- **File Size Limits**: Images (25MB), Documents (50MB), Audio/Video (100MB)
+- **Status**: ✅ FULLY IMPLEMENTED
+
+### Habit Management System
+- **Habit Details Page**: Complete habit detail view with comprehensive statistics and interaction (✅ IMPLEMENTED)
+- **Core Components**:
+  - **HabitDetailView**: Rich interactive UI with statistics dashboard, calendar, and management actions
+  - **HabitDetailViewModel**: Modern @Observable implementation with full habit tracking capabilities
+  - **AddHabitView/ViewModel**: Complete habit creation flow with form validation and category selection
+  - **EditHabitView/ViewModel**: Full habit editing functionality with change detection and validation
+- **Interactive Features**:
+  - **Statistics Dashboard**: Current/best streak, completion rate, weekly averages, monthly progress
+  - **Monthly Calendar**: Interactive tap-to-toggle completion dates with visual indicators
+  - **Protection Days**: 2 protection days per month system with usage tracking and availability display
+  - **Streak Visualization**: StreakBadge components with flame icons for current and best streaks
+- **Navigation Integration**: Seamless routing through NavigationCoordinator from HabitsView → HabitDetail → EditHabit
+- **Service Layer**: Enhanced HabitServiceProtocol with completion tracking, protection day usage, and CRUD operations
+- **Accessibility**: Complete VoiceOver support with descriptive labels, values, and interaction hints
+- **Data Integrity**: Robust delete confirmation with clear consequences explanation for habit and associated task data
+- **UI/UX Consistency**: Follows established design system with 8pt grid, card layouts, and consistent color schemes
+- **Validation System**: Shared ValidationError enum across all view models for consistent form validation
+- **Status**: ✅ FULLY IMPLEMENTED
 
 ## IMPORTANT: MUST READ
 - **DO NOT attempt runtime testing**: I will manually do the runtime testing by compiling and interacting with the app through the simulator.
