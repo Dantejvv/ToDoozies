@@ -54,14 +54,17 @@ struct TasksView: View {
             }
             .sheet(isPresented: $showingAddTask) {
                 NavigationStack {
-                    AddTaskView(dismissAction: { showingAddTask = false })
-                        .toolbar {
-                            ToolbarItem(placement: .cancellationAction) {
-                                Button("Cancel") {
-                                    showingAddTask = false
-                                }
+                    AddTaskView(
+                        dismissAction: { showingAddTask = false },
+                        allowedTaskTypes: [.oneTime, .recurring]
+                    )
+                    .toolbar {
+                        ToolbarItem(placement: .cancellationAction) {
+                            Button("Cancel") {
+                                showingAddTask = false
                             }
                         }
+                    }
                 }
             }
             .searchable(text: $searchText, prompt: "Search tasks...")

@@ -56,7 +56,7 @@ struct EditTaskFormView: View {
                 scheduleSection
 
                 // Recurrence section (if recurring)
-                if viewModel.isRecurring {
+                if viewModel.taskType.requiresRecurrence {
                     recurrenceSection
                 }
 
@@ -150,16 +150,22 @@ struct EditTaskFormView: View {
 
     private var taskTypeSection: some View {
         Section("Task Type") {
-            Picker("Type", selection: $viewModel.isRecurring) {
-                Label("Regular Task", systemImage: "checkmark.circle")
-                    .tag(false)
-                Label("Recurring Habit", systemImage: "repeat.circle")
-                    .tag(true)
+            Picker("Type", selection: $viewModel.taskType) {
+                ForEach(TaskType.allCases, id: \.self) { taskType in
+                    Label(taskType.displayName, systemImage: taskType.systemImage)
+                        .tag(taskType)
+                }
             }
-            .pickerStyle(.segmented)
-            .onChange(of: viewModel.isRecurring) { _, _ in
+            .pickerStyle(.menu)
+            .onChange(of: viewModel.taskType) { _, _ in
                 viewModel.validateForm()
             }
+
+            // Show description for selected task type
+            Text(viewModel.taskType.description)
+                .font(.caption)
+                .foregroundColor(.secondary)
+                .padding(.top, 4)
         }
     }
 

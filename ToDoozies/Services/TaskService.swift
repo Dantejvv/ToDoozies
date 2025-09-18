@@ -21,6 +21,13 @@ protocol TaskServiceProtocol {
     func getOverdueTasks() async throws -> [Task]
     func bulkUpdateTasks(_ tasks: [Task]) async throws
 
+    // TaskType filtering methods
+    func getTasksByType(_ taskType: TaskType) async throws -> [Task]
+    func getOneTimeTasks() async throws -> [Task]
+    func getRecurringTasks() async throws -> [Task]
+    func getHabitTasks() async throws -> [Task]
+    func getTasksForTasksTab() async throws -> [Task]
+
     // Task completion methods
     func markTaskComplete(_ task: Task) async throws
     func markTaskIncomplete(_ task: Task) async throws
@@ -193,6 +200,53 @@ final class TaskService: TaskServiceProtocol {
         }
     }
 
+    // MARK: - TaskType Filtering
+
+    func getTasksByType(_ taskType: TaskType) async throws -> [Task] {
+        do {
+            let descriptor = FetchDescriptor<Task>(
+                sortBy: [SortDescriptor(\.modifiedDate, order: .reverse)]
+            )
+            let allTasks = try modelContext.fetch(descriptor)
+
+            // Filter in Swift code since SwiftData predicates have issues with enums
+            return allTasks.filter { task in
+                task.taskType == taskType
+            }
+        } catch {
+            throw AppError.dataLoadingFailed("Failed to get tasks by type: \(error.localizedDescription)")
+        }
+    }
+
+    func getOneTimeTasks() async throws -> [Task] {
+        return try await getTasksByType(.oneTime)
+    }
+
+    func getRecurringTasks() async throws -> [Task] {
+        return try await getTasksByType(.recurring)
+    }
+
+    func getHabitTasks() async throws -> [Task] {
+        return try await getTasksByType(.habit)
+    }
+
+    func getTasksForTasksTab() async throws -> [Task] {
+        // Tasks tab should show one-time tasks and recurring task instances
+        do {
+            let descriptor = FetchDescriptor<Task>(
+                sortBy: [SortDescriptor(\.dueDate), SortDescriptor(\.modifiedDate, order: .reverse)]
+            )
+            let allTasks = try modelContext.fetch(descriptor)
+
+            // Filter in Swift code since SwiftData predicates have issues with enums
+            return allTasks.filter { task in
+                task.taskType == .oneTime || task.taskType == .recurring
+            }
+        } catch {
+            throw AppError.dataLoadingFailed("Failed to get tasks for Tasks tab: \(error.localizedDescription)")
+        }
+    }
+
     func bulkUpdateTasks(_ tasks: [Task]) async throws {
         do {
             for task in tasks {
@@ -309,7 +363,7 @@ final class TaskService: TaskServiceProtocol {
     // MARK: - Recurring Task Support
 
     func generateRecurringTaskInstance(_ baseTask: Task, for date: Date) async throws -> Task? {
-        guard baseTask.isRecurring,
+        guard baseTask.taskType == .recurring,
               let recurrenceRule = baseTask.recurrenceRule,
               recurrenceRule.isValidOccurrence(date: date) else {
             return nil
@@ -317,7 +371,7 @@ final class TaskService: TaskServiceProtocol {
 
         // Check if instance already exists for this date
         let existingTasks = try await getTasksForDate(date)
-        if existingTasks.contains(where: { $0.title == baseTask.title && $0.isRecurring }) {
+        if existingTasks.contains(where: { $0.title == baseTask.title && $0.taskType == .recurring }) {
             return nil
         }
 
@@ -330,7 +384,7 @@ final class TaskService: TaskServiceProtocol {
             status: .notStarted
         )
 
-        instanceTask.isRecurring = true
+        instanceTask.taskType = .recurring
         instanceTask.category = baseTask.category
 
         try await createTask(instanceTask)

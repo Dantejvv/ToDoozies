@@ -13,9 +13,11 @@ struct AddTaskView: View {
     @Environment(\.diContainer) private var diContainer
     @State private var viewModel: AddTaskViewModel?
     let dismissAction: (() -> Void)?
+    let allowedTaskTypes: [TaskType]
 
-    init(dismissAction: (() -> Void)? = nil) {
+    init(dismissAction: (() -> Void)? = nil, allowedTaskTypes: [TaskType] = TaskType.allCases) {
         self.dismissAction = dismissAction
+        self.allowedTaskTypes = allowedTaskTypes
     }
 
     var body: some View {
@@ -29,7 +31,7 @@ struct AddTaskView: View {
         }
         .task {
             if viewModel == nil, let container = diContainer {
-                let newViewModel = container.makeAddTaskViewModel()
+                let newViewModel = container.makeAddTaskViewModel(allowedTaskTypes: allowedTaskTypes)
                 newViewModel.dismissAction = dismissAction
                 viewModel = newViewModel
             }
@@ -46,7 +48,7 @@ struct AddTaskFormView: View {
             basicInfoSection
             scheduleSection
 
-            if viewModel.isRecurring {
+            if viewModel.taskType.requiresRecurrence {
                 recurrenceSection
             }
 
@@ -77,13 +79,19 @@ struct AddTaskFormView: View {
 
     private var taskTypeSection: some View {
         Section("Task Type") {
-            Picker("Type", selection: $viewModel.isRecurring) {
-                Label("Regular Task", systemImage: "checkmark.circle")
-                    .tag(false)
-                Label("Recurring Habit", systemImage: "repeat.circle")
-                    .tag(true)
+            Picker("Type", selection: $viewModel.taskType) {
+                ForEach(viewModel.allowedTaskTypes, id: \.self) { taskType in
+                    Label(taskType.displayName, systemImage: taskType.systemImage)
+                        .tag(taskType)
+                }
             }
-            .pickerStyle(.segmented)
+            .pickerStyle(.menu)
+
+            // Show description for selected task type
+            Text(viewModel.taskType.description)
+                .font(.caption)
+                .foregroundColor(.secondary)
+                .padding(.top, 4)
         }
     }
 
@@ -184,8 +192,8 @@ struct AddTaskFormView: View {
                 }
             }
 
-            if viewModel.isRecurring && viewModel.recurrenceRule == nil {
-                Label("Recurring tasks need a recurrence pattern", systemImage: "info.circle.fill")
+            if viewModel.taskType.requiresRecurrence && viewModel.recurrenceRule == nil {
+                Label("Recurring tasks and habits need a recurrence pattern", systemImage: "info.circle.fill")
                     .foregroundStyle(.orange)
                     .font(.caption)
             }

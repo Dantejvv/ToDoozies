@@ -21,7 +21,7 @@ final class EditTaskViewModel {
     var parsedDueDate: Date?
     var priority: Priority
     var selectedCategory: Category?
-    var isRecurring: Bool
+    var taskType: TaskType
     var recurrenceRule: RecurrenceRule?
 
     // MARK: - Validation State
@@ -51,21 +51,21 @@ final class EditTaskViewModel {
         taskDescription != (originalTask.taskDescription ?? "") ||
         priority != originalTask.priority ||
         selectedCategory?.id != originalTask.category?.id ||
-        isRecurring != originalTask.isRecurring ||
+        taskType != originalTask.taskType ||
         parsedDueDate != originalTask.dueDate ||
         recurrenceRule?.id != originalTask.recurrenceRule?.id
     }
 
     var canConvertToRecurring: Bool {
-        !originalTask.isRecurring && isRecurring
+        originalTask.taskType == .oneTime && (taskType == .recurring || taskType == .habit)
     }
 
     var canConvertToRegular: Bool {
-        originalTask.isRecurring && !isRecurring
+        (originalTask.taskType == .recurring || originalTask.taskType == .habit) && taskType == .oneTime
     }
 
     var isTypeChanging: Bool {
-        originalTask.isRecurring != isRecurring
+        originalTask.taskType != taskType
     }
 
     // MARK: - Initialization
@@ -86,7 +86,7 @@ final class EditTaskViewModel {
         self.taskDescription = task.taskDescription ?? ""
         self.priority = task.priority
         self.selectedCategory = task.category
-        self.isRecurring = task.isRecurring
+        self.taskType = task.taskType
         self.recurrenceRule = task.recurrenceRule
         self.parsedDueDate = task.dueDate
 
@@ -120,23 +120,25 @@ final class EditTaskViewModel {
             // Handle type changes
             if isTypeChanging {
                 if canConvertToRecurring && recurrenceRule != nil {
-                    // Convert to recurring task
-                    originalTask.isRecurring = true
+                    // Convert to recurring task or habit
+                    originalTask.taskType = taskType
                     originalTask.recurrenceRule = recurrenceRule
 
-                    // Create habit if needed
-                    try await createHabitFromTask(originalTask)
+                    // Create habit if converting to habit type
+                    if taskType == .habit {
+                        try await createHabitFromTask(originalTask)
+                    }
 
                 } else if canConvertToRegular {
-                    // Convert to regular task
-                    originalTask.isRecurring = false
+                    // Convert to one-time task
+                    originalTask.taskType = .oneTime
                     originalTask.recurrenceRule = nil
 
                     // Remove associated habit if it exists
                     try await removeHabitFromTask(originalTask)
                 }
-            } else if isRecurring {
-                // Update recurrence rule for existing recurring task
+            } else if taskType.requiresRecurrence {
+                // Update recurrence rule for existing recurring task or habit
                 originalTask.recurrenceRule = recurrenceRule
             }
 
@@ -185,14 +187,14 @@ final class EditTaskViewModel {
             validationErrors.append(.invalidDateFormat(input: dueDateText))
         }
 
-        // For non-recurring tasks, don't allow past dates (unless already completed)
-        if let date = parsedDueDate, !isRecurring && !originalTask.isCompleted && date < Date() {
+        // For one-time tasks, don't allow past dates (unless already completed)
+        if let date = parsedDueDate, taskType == .oneTime && !originalTask.isCompleted && date < Date() {
             validationErrors.append(.pastDateNotAllowed)
         }
 
         // Recurrence validation
-        if isRecurring && recurrenceRule == nil {
-            validationErrors.append(.recurrenceRequired)
+        if taskType.requiresRecurrence && recurrenceRule == nil {
+            validationErrors.append(.recurrenceRuleRequired)
         }
 
         // Type change validation

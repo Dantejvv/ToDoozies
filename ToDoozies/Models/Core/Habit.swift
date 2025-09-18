@@ -41,7 +41,7 @@ final class Habit: @unchecked Sendable {
         self.modifiedDate = Date()
         self.baseTask = baseTask
 
-        baseTask.isRecurring = true
+        baseTask.taskType = .habit
     }
 
     func markCompleted(on date: Date = Date()) {

@@ -121,12 +121,13 @@ final class DIContainer {
 
     // MARK: - Factory Methods
 
-    func makeAddTaskViewModel() -> AddTaskViewModel {
+    func makeAddTaskViewModel(allowedTaskTypes: [TaskType] = TaskType.allCases) -> AddTaskViewModel {
         return AddTaskViewModel(
             appState: appState,
             taskService: taskService,
             categoryService: categoryService,
-            attachmentService: attachmentService
+            attachmentService: attachmentService,
+            allowedTaskTypes: allowedTaskTypes
         )
     }
 

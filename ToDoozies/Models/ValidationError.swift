@@ -23,6 +23,8 @@ enum ValidationError: LocalizedError, Equatable {
     case categoryRequired
     case invalidDueDate
     case invalidRecurrence
+    case recurrenceRuleRequired
+    case invalidTaskType(allowed: [TaskType])
 
     // Habit-specific validation errors
     case invalidTargetCompletions
@@ -47,6 +49,11 @@ enum ValidationError: LocalizedError, Equatable {
             return "Due date is invalid"
         case .invalidRecurrence:
             return "Recurrence rule is invalid"
+        case .recurrenceRuleRequired:
+            return "Recurrence pattern is required for recurring tasks and habits"
+        case .invalidTaskType(let allowed):
+            let allowedNames = allowed.map { $0.displayName }.joined(separator: ", ")
+            return "Only the following task types are allowed: \(allowedNames)"
         case .custom(let message):
             return message
         }

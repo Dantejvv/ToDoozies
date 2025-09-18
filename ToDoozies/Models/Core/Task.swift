@@ -20,7 +20,7 @@ final class Task: @unchecked Sendable {
     var completedDate: Date?
     var createdDate: Date = Date()
     var modifiedDate: Date = Date()
-    var isRecurring: Bool = false
+    var taskType: TaskType = TaskType.oneTime
 
     @Relationship(deleteRule: .nullify, inverse: \Category.tasks)
     var category: Category?
@@ -53,7 +53,7 @@ final class Task: @unchecked Sendable {
         self.completedDate = nil
         self.createdDate = Date()
         self.modifiedDate = Date()
-        self.isRecurring = false
+        self.taskType = .oneTime
         self.subtasks = nil
         self.attachments = nil
     }
@@ -97,6 +97,20 @@ final class Task: @unchecked Sendable {
 
     var isCompleted: Bool {
         status.isCompleted
+    }
+
+    // MARK: - TaskType Convenience Properties
+
+    var isRecurring: Bool {
+        taskType == .recurring || taskType == .habit
+    }
+
+    var isHabit: Bool {
+        taskType == .habit
+    }
+
+    var isOneTime: Bool {
+        taskType == .oneTime
     }
 
     func addSubtask(title: String) {
@@ -180,6 +194,51 @@ enum TaskStatus: String, CaseIterable, Codable {
 
     var isCompleted: Bool {
         self == .complete
+    }
+}
+
+// MARK: - TaskType Enum
+enum TaskType: String, CaseIterable, Codable {
+    case oneTime = "oneTime"
+    case recurring = "recurring"
+    case habit = "habit"
+
+    var displayName: String {
+        switch self {
+        case .oneTime: return "One-Time Task"
+        case .recurring: return "Recurring Task"
+        case .habit: return "Habit"
+        }
+    }
+
+    var systemImage: String {
+        switch self {
+        case .oneTime: return "checkmark.circle"
+        case .recurring: return "repeat.circle"
+        case .habit: return "flame.circle"
+        }
+    }
+
+    var description: String {
+        switch self {
+        case .oneTime: return "Single occurrence with due date"
+        case .recurring: return "Repeating task instances with schedule"
+        case .habit: return "Streak-building activity with consistency focus"
+        }
+    }
+
+    var requiresRecurrence: Bool {
+        switch self {
+        case .oneTime: return false
+        case .recurring, .habit: return true
+        }
+    }
+
+    var supportsStreakTracking: Bool {
+        switch self {
+        case .oneTime, .recurring: return false
+        case .habit: return true
+        }
     }
 }
 

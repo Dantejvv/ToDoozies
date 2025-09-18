@@ -19,7 +19,7 @@ final class AddTaskViewModel {
     var parsedDueDate: Date?
     var priority: Priority = .medium
     var selectedCategory: Category?
-    var isRecurring: Bool = false
+    var taskType: TaskType = .oneTime
     var recurrenceRule: RecurrenceRule?
     var selectedAttachments: [Attachment] = []
 
@@ -43,17 +43,25 @@ final class AddTaskViewModel {
     private let attachmentService: AttachmentServiceProtocol
     private let appState: AppState
 
+    // MARK: - Configuration
+    let allowedTaskTypes: [TaskType]
+
     // MARK: - Initialization
     init(
         appState: AppState,
         taskService: TaskServiceProtocol,
         categoryService: CategoryServiceProtocol,
-        attachmentService: AttachmentServiceProtocol
+        attachmentService: AttachmentServiceProtocol,
+        allowedTaskTypes: [TaskType] = TaskType.allCases
     ) {
         self.appState = appState
         self.taskService = taskService
         self.categoryService = categoryService
         self.attachmentService = attachmentService
+        self.allowedTaskTypes = allowedTaskTypes
+
+        // Set default task type to first allowed type
+        self.taskType = allowedTaskTypes.first ?? .oneTime
 
         // Set default category to first available
         self.selectedCategory = appState.categories.first
@@ -81,7 +89,7 @@ final class AddTaskViewModel {
             }
 
             // If creating a habit, also create the habit record
-            if isRecurring {
+            if taskType == .habit {
                 try await createHabitFromTask(task)
             }
 
@@ -167,9 +175,19 @@ final class AddTaskViewModel {
             validationErrors.append(.invalidDateFormat(input: dueDateText))
         }
 
-        // For non-recurring tasks, don't allow past dates
-        if let date = parsedDueDate, !isRecurring && date < Date() {
+        // For one-time tasks, don't allow past dates
+        if let date = parsedDueDate, taskType == .oneTime && date < Date() {
             validationErrors.append(.pastDateNotAllowed)
+        }
+
+        // For recurring tasks and habits, require recurrence rule
+        if taskType.requiresRecurrence && recurrenceRule == nil {
+            validationErrors.append(.recurrenceRuleRequired)
+        }
+
+        // Validate that selected task type is allowed
+        if !allowedTaskTypes.contains(taskType) {
+            validationErrors.append(.invalidTaskType(allowed: allowedTaskTypes))
         }
     }
 
@@ -204,7 +222,7 @@ final class AddTaskViewModel {
         )
 
         task.category = selectedCategory
-        task.isRecurring = isRecurring
+        task.taskType = taskType
         task.recurrenceRule = recurrenceRule
 
         return task

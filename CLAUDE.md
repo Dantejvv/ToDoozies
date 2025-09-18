@@ -114,8 +114,17 @@ xcodebuild test -project ToDoozies.xcodeproj -scheme ToDoozies -destination 'pla
 - **Recurrence System**: Shared underlying `RecurrenceRule` system but different presentation and tracking focus
 
 #### **Implementation Status**
-- **Current State**: Basic recurring habits implemented (✅)
-- **Target State**: Three distinct task/habit types with appropriate UI/UX differentiation (🚧 PLANNED)
+- **Current State**: Three distinct task/habit types with full UI/UX differentiation (✅ IMPLEMENTED)
+- **Target State**: Complete three-tier system with proper separation of concerns (✅ COMPLETED)
+
+#### **Implementation Details (September 2025)**
+- **TaskType Enum**: Replaced `isRecurring: Bool` with enum supporting `oneTime`, `recurring`, `habit` with display names, system icons, and business logic properties (✅ IMPLEMENTED)
+- **Enhanced AddTaskView**: Three-option menu picker with task type descriptions and conditional recurrence section display (✅ IMPLEMENTED)
+- **UI Restrictions**: Tasks view only allows creation of one-time and recurring tasks (habits excluded), while Habits view uses dedicated AddHabitView (✅ IMPLEMENTED)
+- **Data Model Updates**: Task model updated with `taskType: TaskType` property and backward-compatible convenience properties (✅ IMPLEMENTED)
+- **Service Layer**: Enhanced TaskService with type-specific filtering methods and proper enum handling (✅ IMPLEMENTED)
+- **Validation System**: Comprehensive form validation with task type restrictions and recurrence rule requirements (✅ IMPLEMENTED)
+- **Navigation Integration**: Seamless integration with modern SwiftUI navigation system and proper parameter passing (✅ IMPLEMENTED)
 
 ### Data Model
 - Uses SwiftData with `@Model` classes integrated with CloudKit
@@ -293,6 +302,8 @@ docs/                               # Project documentation including feature sp
 - **Status**: ✅ FULLY IMPLEMENTED
 
 ### Recently Completed Features (September 2025)
+- **Three-Tier Task/Habit Type System**: Complete implementation of one-time tasks, recurring tasks, and habits with proper UI restrictions and data model separation (✅ IMPLEMENTED)
+- **Task Creation Restrictions**: Tasks view limited to one-time and recurring task creation only, with habits exclusively created via dedicated Habits view (✅ IMPLEMENTED)
 - **Navigation System Modernization**: Complete refactoring to use native SwiftUI navigation APIs with type-safe enum-based destinations (✅ IMPLEMENTED)
 - **NavigationCoordinator Removal**: Legacy navigation coordinator completely removed from entire codebase (✅ IMPLEMENTED)
 - **Picker Components System**: Complete implementation of CategoryPickerView and RecurrencePickerView (✅ IMPLEMENTED)
