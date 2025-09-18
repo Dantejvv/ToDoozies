@@ -9,16 +9,17 @@ import Foundation
 import SwiftUI
 import Observation
 
-// MARK: - Navigation Coordinator
+// MARK: - Legacy Navigation Coordinator
+// DEPRECATED: This pattern is being replaced by modern SwiftUI navigation in NavigationDestinations.swift
 
 @Observable
 final class NavigationCoordinator {
     // MARK: - Navigation State
     var selectedTab: AppTab = .today
-    var destination: AppDestination?
+    var destination: LegacyAppDestination?
 
     // MARK: - Navigation History
-    private var navigationHistory: [AppDestination] = []
+    private var navigationHistory: [LegacyAppDestination] = []
 
     init() {}
 
@@ -30,7 +31,7 @@ final class NavigationCoordinator {
 
     // MARK: - Destination Navigation
 
-    func navigate(to destination: AppDestination) {
+    func navigate(to destination: LegacyAppDestination) {
         self.destination = destination
         navigationHistory.append(destination)
     }
@@ -144,15 +145,16 @@ final class NavigationCoordinator {
         !navigationHistory.isEmpty
     }
 
-    var currentDestination: AppDestination? {
+    var currentDestination: LegacyAppDestination? {
         destination
     }
 }
 
 // MARK: - App Destination Enum
 
-// Note: This will need to be updated to use @CasePathable when Swift Navigation library is added
-enum AppDestination: Hashable, Identifiable {
+// DEPRECATED: Being replaced by modern NavigationDestinations.swift with native SwiftUI APIs
+// This legacy coordinator pattern is being phased out in favor of iOS 16+ navigation patterns
+enum LegacyAppDestination: Hashable, Identifiable {
     var id: String {
         switch self {
         case .addTask: return "addTask"
@@ -198,7 +200,7 @@ enum AppDestination: Hashable, Identifiable {
 
 // MARK: - Navigation Extensions
 
-extension AppDestination {
+extension LegacyAppDestination {
     var title: String {
         switch self {
         case .addTask:
@@ -274,7 +276,7 @@ extension View {
     }
 
     @ViewBuilder
-    private func destinationView(for destination: AppDestination, coordinator: NavigationCoordinator) -> some View {
+    private func destinationView(for destination: LegacyAppDestination, coordinator: NavigationCoordinator) -> some View {
         switch destination {
         case .addTask:
             AddTaskView()

@@ -10,6 +10,7 @@ import SwiftData
 
 struct TasksView: View {
     @Environment(\.diContainer) private var container
+    @Environment(\.taskNavigation) private var taskNavigation
     @Environment(\.editMode) private var editMode
     @State private var showingFilters = false
     @State private var searchText = ""
@@ -54,7 +55,8 @@ struct TasksView: View {
             .onChange(of: searchText) { _, newValue in
                 viewModel.updateSearchText(newValue)
             }
-            .navigationDestination(coordinator: container?.navigationCoordinator ?? NavigationCoordinator())
+            .taskNavigation(taskNavigation ?? TaskNavigationModel())
+            .appNavigation(container?.appNavigation ?? AppNavigationModel())
             .toolbar {
                 // Leading toolbar - Edit button
                 ToolbarItemGroup(placement: .navigationBarLeading) {
@@ -86,7 +88,7 @@ struct TasksView: View {
                         }
 
                         Button(action: {
-                            container?.navigationCoordinator.showAddTask()
+                            taskNavigation?.showAdd()
                         }) {
                             Image(systemName: "plus")
                         }
@@ -219,12 +221,12 @@ struct TasksView: View {
                                 viewModel.completeTask(task)
                             }
                         } onEdit: {
-                            container?.navigationCoordinator.showEditTask(task)
+                            taskNavigation?.showEdit(task)
                         }
                         .tag(task.id)  // Explicitly tag with the task ID
                         .onTapGesture {
                             if !isEditingTasks {
-                                container?.navigationCoordinator.showTaskDetail(task)
+                                taskNavigation?.showDetail(task)
                             }
                         }
                         .swipeActions(edge: .trailing) {
@@ -233,7 +235,7 @@ struct TasksView: View {
                             }
 
                             Button("Edit") {
-                                container?.navigationCoordinator.showEditTask(task)
+                                taskNavigation?.showEdit(task)
                             }
                             .tint(.blue)
                         }
@@ -271,7 +273,7 @@ struct TasksView: View {
 
             if !viewModel.hasActiveFilters {
                 Button("Add Task") {
-                    container?.navigationCoordinator.showAddTask()
+                    taskNavigation?.showAdd()
                 }
                 .buttonStyle(.borderedProminent)
             }
@@ -312,11 +314,11 @@ struct TasksView: View {
     private func taskContextMenu(for task: Task) -> some View {
         Group {
             Button("View Details") {
-                container?.navigationCoordinator.showTaskDetail(task)
+                taskNavigation?.showDetail(task)
             }
 
             Button("Edit") {
-                container?.navigationCoordinator.showEditTask(task)
+                taskNavigation?.showEdit(task)
             }
 
             Divider()
@@ -496,60 +498,20 @@ struct FiltersView: View {
     @Environment(\.diContainer) private var container
 
     var body: some View {
-        NavigationStack {
-            List {
-                Section("Priority") {
-                    ForEach([Priority.high, Priority.medium, Priority.low], id: \.self) { priority in
-                        Button {
-                            if container?.appState.selectedPriority == priority {
-                                viewModel.selectPriorityFilter(nil)
-                            } else {
-                                viewModel.selectPriorityFilter(priority)
-                            }
-                        } label: {
-                            HStack {
-                                Text(priority.displayName)
-                                Spacer()
-                                if container?.appState.selectedPriority == priority {
-                                    Image(systemName: "checkmark")
-                                        .foregroundColor(.accentColor)
-                                }
-                            }
-                        }
-                        .foregroundColor(.primary)
-                    }
-                }
-
-                Section("Category") {
-                    ForEach(viewModel.availableCategories) { category in
-                        Button {
-                            if container?.appState.selectedCategory?.id == category.id {
-                                viewModel.selectCategoryFilter(nil)
-                            } else {
-                                viewModel.selectCategoryFilter(category)
-                            }
-                        } label: {
-                            HStack {
-                                Text(category.name)
-                                Spacer()
-                                if container?.appState.selectedCategory?.id == category.id {
-                                    Image(systemName: "checkmark")
-                                        .foregroundColor(.accentColor)
-                                }
-                            }
-                        }
-                        .foregroundColor(.primary)
-                    }
-                }
-
-                Section("Status") {
+        List {
+            Section("Priority") {
+                ForEach([Priority.high, Priority.medium, Priority.low], id: \.self) { priority in
                     Button {
-                        viewModel.toggleIncompleteFilter()
+                        if container?.appState.selectedPriority == priority {
+                            viewModel.selectPriorityFilter(nil)
+                        } else {
+                            viewModel.selectPriorityFilter(priority)
+                        }
                     } label: {
                         HStack {
-                            Text("Show only incomplete")
+                            Text(priority.displayName)
                             Spacer()
-                            if container?.appState.showOnlyIncomplete == true {
+                            if container?.appState.selectedPriority == priority {
                                 Image(systemName: "checkmark")
                                     .foregroundColor(.accentColor)
                             }
@@ -557,23 +519,61 @@ struct FiltersView: View {
                     }
                     .foregroundColor(.primary)
                 }
+            }
 
-                if viewModel.hasActiveFilters {
-                    Section {
-                        Button("Clear All Filters") {
-                            viewModel.clearAllFilters()
+            Section("Category") {
+                ForEach(viewModel.availableCategories) { category in
+                    Button {
+                        if container?.appState.selectedCategory?.id == category.id {
+                            viewModel.selectCategoryFilter(nil)
+                        } else {
+                            viewModel.selectCategoryFilter(category)
                         }
-                        .foregroundColor(.red)
+                    } label: {
+                        HStack {
+                            Text(category.name)
+                            Spacer()
+                            if container?.appState.selectedCategory?.id == category.id {
+                                Image(systemName: "checkmark")
+                                    .foregroundColor(.accentColor)
+                            }
+                        }
                     }
+                    .foregroundColor(.primary)
                 }
             }
-            .navigationTitle("Filters")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .confirmationAction) {
-                    Button("Done") {
-                        dismiss()
+
+            Section("Status") {
+                Button {
+                    viewModel.toggleIncompleteFilter()
+                } label: {
+                    HStack {
+                        Text("Show only incomplete")
+                        Spacer()
+                        if container?.appState.showOnlyIncomplete == true {
+                            Image(systemName: "checkmark")
+                                .foregroundColor(.accentColor)
+                        }
                     }
+                }
+                .foregroundColor(.primary)
+            }
+
+            if viewModel.hasActiveFilters {
+                Section {
+                    Button("Clear All Filters") {
+                        viewModel.clearAllFilters()
+                    }
+                    .foregroundColor(.red)
+                }
+            }
+        }
+        .navigationTitle("Filters")
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .confirmationAction) {
+                Button("Done") {
+                    dismiss()
                 }
             }
         }

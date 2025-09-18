@@ -34,37 +34,35 @@ struct AddTaskFormView: View {
     @Bindable var viewModel: AddTaskViewModel
 
     var body: some View {
-        NavigationStack {
-            Form {
-                taskTypeSection
-                basicInfoSection
-                scheduleSection
+        Form {
+            taskTypeSection
+            basicInfoSection
+            scheduleSection
 
-                if viewModel.isRecurring {
-                    recurrenceSection
-                }
-
-                attachmentsSection
+            if viewModel.isRecurring {
+                recurrenceSection
             }
-            .navigationTitle("New Task")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar(content: {
-                ToolbarItem(placement: .confirmationAction) {
-                    Button("Save") {
-                        _Concurrency.Task { @MainActor in
-                            await viewModel.saveTask()
-                        }
+
+            attachmentsSection
+        }
+        .navigationTitle("New Task")
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar(content: {
+            ToolbarItem(placement: .confirmationAction) {
+                Button("Save") {
+                    _Concurrency.Task { @MainActor in
+                        await viewModel.saveTask()
                     }
-                    .disabled(!viewModel.isFormValid || viewModel.isLoading)
                 }
-            })
-            .disabled(viewModel.isLoading)
-            .sheet(isPresented: $viewModel.showingCategoryPicker) {
-                CategoryPickerView(selectedCategory: $viewModel.selectedCategory)
+                .disabled(!viewModel.isFormValid || viewModel.isLoading)
             }
-            .sheet(isPresented: $viewModel.showingRecurrenceSheet) {
-                RecurrencePickerView(recurrenceRule: $viewModel.recurrenceRule)
-            }
+        })
+        .disabled(viewModel.isLoading)
+        .sheet(isPresented: $viewModel.showingCategoryPicker) {
+            CategoryPickerView(selectedCategory: $viewModel.selectedCategory)
+        }
+        .sheet(isPresented: $viewModel.showingRecurrenceSheet) {
+            RecurrencePickerView(recurrenceRule: $viewModel.recurrenceRule)
         }
     }
 

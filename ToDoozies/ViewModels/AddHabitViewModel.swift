@@ -7,6 +7,7 @@
 
 import Foundation
 import Observation
+import SwiftUI
 
 @Observable
 final class AddHabitViewModel {
@@ -33,7 +34,9 @@ final class AddHabitViewModel {
     private let habitService: HabitServiceProtocol
     private let taskService: TaskServiceProtocol
     private let categoryService: CategoryServiceProtocol
-    private let navigationCoordinator: NavigationCoordinator
+
+    // MARK: - Dismissal Action
+    var dismissAction: (() -> Void)?
 
     // MARK: - Computed Properties
 
@@ -59,14 +62,12 @@ final class AddHabitViewModel {
         appState: AppState,
         habitService: HabitServiceProtocol,
         taskService: TaskServiceProtocol,
-        categoryService: CategoryServiceProtocol,
-        navigationCoordinator: NavigationCoordinator
+        categoryService: CategoryServiceProtocol
     ) {
         self.appState = appState
         self.habitService = habitService
         self.taskService = taskService
         self.categoryService = categoryService
-        self.navigationCoordinator = navigationCoordinator
     }
 
     // MARK: - Validation
@@ -125,8 +126,8 @@ final class AddHabitViewModel {
 
             try await habitService.createHabit(habit)
 
-            // Navigate back
-            navigationCoordinator.dismiss()
+            // Dismiss the sheet
+            dismissAction?()
 
         } catch {
             errorMessage = "Failed to create habit: \(error.localizedDescription)"
@@ -134,7 +135,7 @@ final class AddHabitViewModel {
     }
 
     func cancel() {
-        navigationCoordinator.dismiss()
+        dismissAction?()
     }
 
     // MARK: - Category Selection

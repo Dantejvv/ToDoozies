@@ -42,7 +42,12 @@ final class DIContainer {
     // MARK: - Core Dependencies
     let modelContext: ModelContext
     let appState: AppState
-    let navigationCoordinator: NavigationCoordinator
+    let navigationCoordinator: NavigationCoordinator // Legacy - will be removed
+
+    // MARK: - New Navigation Models
+    let taskNavigation: TaskNavigationModel
+    let habitNavigation: HabitNavigationModel
+    let appNavigation: AppNavigationModel
 
     // MARK: - Services
     private(set) var taskService: TaskServiceProtocol
@@ -81,7 +86,12 @@ final class DIContainer {
 
         // Initialize core dependencies
         self.appState = AppState()
-        self.navigationCoordinator = NavigationCoordinator()
+        self.navigationCoordinator = NavigationCoordinator() // Legacy
+
+        // Initialize new navigation models
+        self.taskNavigation = TaskNavigationModel()
+        self.habitNavigation = HabitNavigationModel()
+        self.appNavigation = AppNavigationModel()
 
         // Initialize services
         let taskService = TaskService(modelContext: modelContext, appState: appState)
@@ -138,8 +148,7 @@ final class DIContainer {
             appState: appState,
             habitService: habitService,
             taskService: taskService,
-            categoryService: categoryService,
-            navigationCoordinator: navigationCoordinator
+            categoryService: categoryService
         )
     }
 
@@ -280,10 +289,22 @@ final class DIContainer {
     }
 }
 
-// MARK: - Environment Key
+// MARK: - Environment Keys
 
 struct DIContainerKey: EnvironmentKey {
     static let defaultValue: DIContainer? = nil
+}
+
+struct TaskNavigationKey: EnvironmentKey {
+    static let defaultValue: TaskNavigationModel? = nil
+}
+
+struct HabitNavigationKey: EnvironmentKey {
+    static let defaultValue: HabitNavigationModel? = nil
+}
+
+struct AppNavigationKey: EnvironmentKey {
+    static let defaultValue: AppNavigationModel? = nil
 }
 
 extension EnvironmentValues {
@@ -291,13 +312,32 @@ extension EnvironmentValues {
         get { self[DIContainerKey.self] }
         set { self[DIContainerKey.self] = newValue }
     }
+
+    var taskNavigation: TaskNavigationModel? {
+        get { self[TaskNavigationKey.self] }
+        set { self[TaskNavigationKey.self] = newValue }
+    }
+
+    var habitNavigation: HabitNavigationModel? {
+        get { self[HabitNavigationKey.self] }
+        set { self[HabitNavigationKey.self] = newValue }
+    }
+
+    var appNavigation: AppNavigationModel? {
+        get { self[AppNavigationKey.self] }
+        set { self[AppNavigationKey.self] = newValue }
+    }
 }
 
 // MARK: - View Extensions
 
 extension View {
     func inject(_ container: DIContainer) -> some View {
-        self.environment(\.diContainer, container)
+        self
+            .environment(\.diContainer, container)
+            .environment(\.taskNavigation, container.taskNavigation)
+            .environment(\.habitNavigation, container.habitNavigation)
+            .environment(\.appNavigation, container.appNavigation)
     }
 }
 

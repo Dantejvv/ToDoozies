@@ -42,50 +42,48 @@ struct EditHabitFormView: View {
     @Bindable var viewModel: EditHabitViewModel
 
     var body: some View {
-        NavigationStack {
-            Form {
-                basicInfoSection
-                categorySection
-                targetSection
+        Form {
+            basicInfoSection
+            categorySection
+            targetSection
 
-                if !viewModel.validationErrors.isEmpty {
-                    validationErrorsSection
-                }
+            if !viewModel.validationErrors.isEmpty {
+                validationErrorsSection
             }
-            .navigationTitle("Edit Habit")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItemGroup(placement: .topBarTrailing) {
-                    Button("Save") {
-                        _Concurrency.Task {
-                            await viewModel.save()
-                        }
+        }
+        .navigationTitle("Edit Habit")
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItemGroup(placement: .topBarTrailing) {
+                Button("Save") {
+                    _Concurrency.Task {
+                        await viewModel.save()
                     }
-                    .disabled(!viewModel.canSave)
-                    .fontWeight(.semibold)
                 }
+                .disabled(!viewModel.canSave)
+                .fontWeight(.semibold)
             }
-            .disabled(viewModel.isLoading)
-            .overlay {
-                if viewModel.isLoading {
-                    ProgressView()
-                        .scaleEffect(1.2)
-                        .frame(maxWidth: .infinity, maxHeight: .infinity)
-                        .background(Color(.systemBackground).opacity(0.8))
-                }
+        }
+        .disabled(viewModel.isLoading)
+        .overlay {
+            if viewModel.isLoading {
+                ProgressView()
+                    .scaleEffect(1.2)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .background(Color(.systemBackground).opacity(0.8))
             }
-            .alert("Error", isPresented: .constant(viewModel.errorMessage != nil)) {
-                Button("OK") {
-                    viewModel.clearError()
-                }
-            } message: {
-                if let errorMessage = viewModel.errorMessage {
-                    Text(errorMessage)
-                }
+        }
+        .alert("Error", isPresented: .constant(viewModel.errorMessage != nil)) {
+            Button("OK") {
+                viewModel.clearError()
             }
-            .sheet(isPresented: $viewModel.showingCategoryPicker) {
-                CategoryPickerView(selectedCategory: $viewModel.selectedCategory)
+        } message: {
+            if let errorMessage = viewModel.errorMessage {
+                Text(errorMessage)
             }
+        }
+        .sheet(isPresented: $viewModel.showingCategoryPicker) {
+            CategoryPickerView(selectedCategory: $viewModel.selectedCategory)
         }
     }
 

@@ -10,6 +10,7 @@ import SwiftData
 
 struct AddHabitView: View {
     @Environment(\.diContainer) private var diContainer
+    @Environment(\.dismiss) private var dismiss
     @State private var viewModel: AddHabitViewModel?
 
     var body: some View {
@@ -23,7 +24,9 @@ struct AddHabitView: View {
         }
         .task {
             if viewModel == nil, let container = diContainer {
-                viewModel = container.makeAddHabitViewModel()
+                let vm = container.makeAddHabitViewModel()
+                vm.dismissAction = { dismiss() }
+                viewModel = vm
             }
         }
     }
@@ -62,27 +65,27 @@ struct AddHabitFormView: View {
                     .fontWeight(.semibold)
                 }
             }
-            .disabled(viewModel.isLoading)
-            .overlay {
-                if viewModel.isLoading {
-                    ProgressView()
-                        .scaleEffect(1.2)
-                        .frame(maxWidth: .infinity, maxHeight: .infinity)
-                        .background(Color(.systemBackground).opacity(0.8))
-                }
+        }
+        .disabled(viewModel.isLoading)
+        .overlay {
+            if viewModel.isLoading {
+                ProgressView()
+                    .scaleEffect(1.2)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .background(Color(.systemBackground).opacity(0.8))
             }
-            .alert("Error", isPresented: .constant(viewModel.errorMessage != nil)) {
-                Button("OK") {
-                    viewModel.clearError()
-                }
-            } message: {
-                if let errorMessage = viewModel.errorMessage {
-                    Text(errorMessage)
-                }
+        }
+        .alert("Error", isPresented: .constant(viewModel.errorMessage != nil)) {
+            Button("OK") {
+                viewModel.clearError()
             }
-            .sheet(isPresented: $viewModel.showingCategoryPicker) {
-                CategoryPickerView(selectedCategory: $viewModel.selectedCategory)
+        } message: {
+            if let errorMessage = viewModel.errorMessage {
+                Text(errorMessage)
             }
+        }
+        .sheet(isPresented: $viewModel.showingCategoryPicker) {
+            CategoryPickerView(selectedCategory: $viewModel.selectedCategory)
         }
     }
 

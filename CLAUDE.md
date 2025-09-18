@@ -77,7 +77,10 @@ ToDoozies/                           # Main app target
 │   ├── Export/                     # Export-related views
 │   └── Modifiers/                  # Custom view modifiers
 ├── ViewModels/                     # View model layer for UI state management
-├── Navigation/                     # Navigation coordinator and routing
+├── Navigation/                     # Modern SwiftUI navigation system
+│   ├── NavigationDestinations.swift # Enum-based destinations and @Observable models
+│   ├── NavigationViewBuilder.swift # View factory and navigation modifiers
+│   └── NavigationCoordinator.swift # Legacy coordinator (deprecated)
 ├── Features/                       # Feature modules
 │   ├── Tasks/                      # Task-related functionality
 │   ├── Habits/                     # Habit tracking features
@@ -163,6 +166,11 @@ docs/                               # Project documentation including feature sp
 - Factory pattern provides realistic test data across all scenarios
 - Relationship testing verifies data integrity and cascade behavior
 - Swift Testing framework properly configured for SwiftData compatibility
+- **Modern Navigation**: Uses native SwiftUI APIs (iOS 16+) with enum-based destinations and @Observable models
+- **No External Dependencies**: Navigation system built entirely with native SwiftUI - no third-party libraries required
+- **NavigationStack Pattern**: All navigation modifiers must be applied within NavigationStack containers
+- **Type-Safe Navigation**: Use enum destinations (`TaskDestination`, `HabitDestination`, `AppDestination`) for compile-time safety
+- **Environment Injection**: Navigation models available via environment keys (`\.taskNavigation`, `\.habitNavigation`, `\.appNavigation`)
 - **Accessibility-First Development**: All new UI components must include accessibility labels, hints, and actions
 - **AccessibilityHelpers.swift**: Use existing model extensions for consistent accessibility implementation
 - **VoiceOver Testing**: Test all new features with VoiceOver enabled during development
@@ -196,7 +204,20 @@ docs/                               # Project documentation including feature sp
 - **Accessibility**: Complete VoiceOver support with descriptive labels and interaction hints (✅ IMPLEMENTED)
 - **Design Consistency**: Follows established SwiftUI patterns and 8pt grid system (✅ IMPLEMENTED)
 
+### Navigation Architecture (September 2025)
+- **Modern SwiftUI Navigation**: Complete modernization using native iOS 16+ APIs (✅ IMPLEMENTED)
+- **Enum-Based Destinations**: Type-safe navigation with `TaskDestination`, `HabitDestination`, `AppDestination` (✅ IMPLEMENTED)
+- **@Observable Navigation Models**: Feature-specific navigation state management with `TaskNavigationModel`, `HabitNavigationModel`, `AppNavigationModel` (✅ IMPLEMENTED)
+- **NavigationStack Integration**: Proper `navigationDestination(item:)` usage within NavigationStack containers (✅ IMPLEMENTED)
+- **Sheet Presentation**: Modern item-binding sheet presentation with automatic dismissal (✅ IMPLEMENTED)
+- **Environment Injection**: Dedicated environment keys for navigation models with DIContainer integration (✅ IMPLEMENTED)
+- **Legacy Coordinator Deprecation**: Old NavigationCoordinator marked as deprecated in favor of modern patterns (✅ IMPLEMENTED)
+- **Navigation View Builder**: Centralized view factory system for destination rendering (✅ IMPLEMENTED)
+- **Background Mode Configuration**: Required CloudKit remote notification background mode in Info.plist (✅ IMPLEMENTED)
+- **Status**: ✅ FULLY IMPLEMENTED
+
 ### Recently Completed Features (September 2025)
+- **Navigation System Modernization**: Complete refactoring to use native SwiftUI navigation APIs with type-safe enum-based destinations (✅ IMPLEMENTED)
 - **Picker Components System**: Complete implementation of CategoryPickerView and RecurrencePickerView (✅ IMPLEMENTED)
 - **Text Size Settings Navigation**: Interactive button to open iOS system settings for Dynamic Type adjustment (✅ IMPLEMENTED)
 
@@ -246,13 +267,23 @@ docs/                               # Project documentation including feature sp
   - **Monthly Calendar**: Interactive tap-to-toggle completion dates with visual indicators
   - **Protection Days**: 2 protection days per month system with usage tracking and availability display
   - **Streak Visualization**: StreakBadge components with flame icons for current and best streaks
-- **Navigation Integration**: Seamless routing through NavigationCoordinator from HabitsView → HabitDetail → EditHabit
+- **Navigation Integration**: Seamless routing through modern enum-based navigation from HabitsView → HabitDetail → EditHabit
 - **Service Layer**: Enhanced HabitServiceProtocol with completion tracking, protection day usage, and CRUD operations
 - **Accessibility**: Complete VoiceOver support with descriptive labels, values, and interaction hints
 - **Data Integrity**: Robust delete confirmation with clear consequences explanation for habit and associated task data
 - **UI/UX Consistency**: Follows established design system with 8pt grid, card layouts, and consistent color schemes
 - **Validation System**: Shared ValidationError enum across all view models for consistent form validation
 - **Status**: ✅ FULLY IMPLEMENTED
+
+### Console Output & Debugging
+- **Navigation Warnings**: All navigationDestination misplacement warnings have been resolved (✅ FIXED)
+- **CloudKit Messages**: Expected console messages when no iCloud account is configured:
+  - `CloudKit: No iCloud account available. Using local storage only.` (NORMAL)
+  - `CoreData+CloudKit: Failed to set up CloudKit integration...` (NORMAL)
+  - `Could not validate account info cache.` (NORMAL)
+- **Simulator Warnings**: `load_eligibility_plist: Failed to open .../eligibility.plist` (IGNORE - simulator-only)
+- **Background Mode**: Required `remote-notification` background mode configured in Info.plist for CloudKit sync
+- **Build Success**: Project builds without errors and runs successfully on iOS 17.6+ simulators
 
 ## IMPORTANT: MUST READ
 - **DO NOT attempt runtime testing**: I will manually do the runtime testing by compiling and interacting with the app through the simulator.

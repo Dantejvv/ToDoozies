@@ -10,6 +10,8 @@ import SwiftData
 
 struct HabitsView: View {
     @Environment(\.diContainer) private var container
+    @Environment(\.habitNavigation) private var habitNavigation
+    @Environment(\.appNavigation) private var appNavigation
     @State private var showingAddHabit = false
 
     private var viewModel: HabitsViewModel {
@@ -61,7 +63,8 @@ struct HabitsView: View {
             .sheet(isPresented: $showingAddHabit) {
                 AddHabitView()
             }
-            .navigationDestination(coordinator: container?.navigationCoordinator ?? NavigationCoordinator())
+            .habitNavigation(habitNavigation ?? HabitNavigationModel())
+            .appNavigation(container?.appNavigation ?? AppNavigationModel())
         }
     }
 
@@ -143,7 +146,7 @@ struct HabitsView: View {
                         viewModel.completeHabit(habit)
                     }
                 } onTap: {
-                    container?.navigationCoordinator.showHabitDetail(habit)
+                    habitNavigation?.showDetail(habit)
                 }
                 .contextMenu {
                     habitContextMenu(for: habit)
@@ -214,7 +217,7 @@ struct HabitsView: View {
                         Spacer()
 
                         Button("View Details") {
-                            container?.navigationCoordinator.showHabitDetail(habit)
+                            habitNavigation?.showDetail(habit)
                         }
                         .font(.caption)
                         .foregroundColor(.accentColor)
@@ -224,7 +227,7 @@ struct HabitsView: View {
                     miniHeatmapView(for: habit)
                         .onTapGesture {
                             // Navigate to full calendar view
-                            container?.navigationCoordinator.selectTab(.calendar)
+                            appNavigation?.selectTab(.calendar)
                         }
                 }
                 .spacingPadding(.spacing4)
@@ -234,7 +237,7 @@ struct HabitsView: View {
             // Show more button if there are more habits
             if viewModel.displayedHabits.count > 3 {
                 Button("View All in Calendar") {
-                    container?.navigationCoordinator.selectTab(.calendar)
+                    appNavigation?.selectTab(.calendar)
                 }
                 .foregroundColor(.accentColor)
                 .font(.subheadline)
@@ -389,11 +392,11 @@ struct HabitsView: View {
     private func habitContextMenu(for habit: Habit) -> some View {
         Group {
             Button("View Details") {
-                container?.navigationCoordinator.showHabitDetail(habit)
+                habitNavigation?.showDetail(habit)
             }
 
             Button("Edit") {
-                container?.navigationCoordinator.showEditHabit(habit)
+                habitNavigation?.showEdit(habit)
             }
 
             if !habit.isCompletedToday {

@@ -10,6 +10,7 @@ import SwiftData
 
 struct TodayView: View {
     @Environment(\.diContainer) private var container
+    @Environment(\.taskNavigation) private var taskNavigation
     @Environment(\.accessibilityVoiceOverEnabled) private var voiceOverEnabled
 
     private var viewModel: TodayViewModel {
@@ -70,7 +71,7 @@ struct TodayView: View {
             .toolbar {
                 ToolbarItem(placement: .primaryAction) {
                     Button(action: {
-                        container?.navigationCoordinator.showAddTask()
+                        taskNavigation?.showAdd()
                     }) {
                         Image(systemName: "plus")
                     }
@@ -81,7 +82,8 @@ struct TodayView: View {
             .refreshable {
                 await viewModel.refresh()
             }
-            .navigationDestination(coordinator: container?.navigationCoordinator ?? NavigationCoordinator())
+            .taskNavigation(taskNavigation ?? TaskNavigationModel())
+            .appNavigation(container?.appNavigation ?? AppNavigationModel())
         }
     }
 
@@ -132,7 +134,7 @@ struct TodayView: View {
                 TaskRowView(task: task) {
                     viewModel.completeTask(task)
                 } onEdit: {
-                    container?.navigationCoordinator.showEditTask(task)
+                    taskNavigation?.showEdit(task)
                 }
                 .contextMenu {
                     taskContextMenu(for: task)
@@ -174,7 +176,7 @@ struct TodayView: View {
                 HabitTaskRowView(task: task) {
                     viewModel.completeTask(task)
                 } onEdit: {
-                    container?.navigationCoordinator.showEditTask(task)
+                    taskNavigation?.showEdit(task)
                 }
             }
         }
@@ -203,7 +205,7 @@ struct TodayView: View {
                     TaskRowView(task: task) {
                         viewModel.completeTask(task)
                     } onEdit: {
-                        container?.navigationCoordinator.showEditTask(task)
+                        taskNavigation?.showEdit(task)
                     }
                     .contextMenu {
                         taskContextMenu(for: task)
@@ -229,7 +231,7 @@ struct TodayView: View {
                 Spacer()
 
                 Button("View All") {
-                    container?.navigationCoordinator.selectTab(.tasks)
+                    container?.appNavigation.selectTab(.tasks)
                 }
                 .font(.caption)
                 .foregroundColor(.accentColor)
@@ -239,7 +241,7 @@ struct TodayView: View {
                 TaskRowView(task: task, isPreview: true) {
                     // Preview tasks can't be completed
                 } onEdit: {
-                    container?.navigationCoordinator.showEditTask(task)
+                    taskNavigation?.showEdit(task)
                 }
             }
         }
@@ -280,7 +282,7 @@ struct TodayView: View {
     private func taskContextMenu(for task: Task) -> some View {
         Group {
             Button("Edit") {
-                container?.navigationCoordinator.showEditTask(task)
+                taskNavigation?.showEdit(task)
             }
 
             if task.isOverdue {

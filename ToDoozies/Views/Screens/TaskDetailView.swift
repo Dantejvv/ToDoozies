@@ -541,40 +541,38 @@ struct AddSubtaskSheet: View {
     @Environment(\.dismiss) private var dismiss
 
     var body: some View {
-        NavigationStack {
-            Form(content: {
-                Section("New Subtask") {
-                    TextField("Subtask title", text: $viewModel.newSubtaskTitle)
-                        .onSubmit {
-                            if viewModel.canAddSubtask {
-                                _Concurrency.Task {
-                                    await viewModel.addSubtask()
-                                    dismiss()
-                                }
+        Form(content: {
+            Section("New Subtask") {
+                TextField("Subtask title", text: $viewModel.newSubtaskTitle)
+                    .onSubmit {
+                        if viewModel.canAddSubtask {
+                            _Concurrency.Task {
+                                await viewModel.addSubtask()
+                                dismiss()
                             }
                         }
+                    }
+            }
+        })
+        .navigationTitle("Add Subtask")
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar(content: {
+            ToolbarItem(placement: .cancellationAction) {
+                Button("Cancel") {
+                    dismiss()
                 }
-            })
-            .navigationTitle("Add Subtask")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar(content: {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") {
+            }
+
+            ToolbarItem(placement: .confirmationAction) {
+                Button("Add") {
+                    _Concurrency.Task {
+                        await viewModel.addSubtask()
                         dismiss()
                     }
                 }
-
-                ToolbarItem(placement: .confirmationAction) {
-                    Button("Add") {
-                        _Concurrency.Task {
-                            await viewModel.addSubtask()
-                            dismiss()
-                        }
-                    }
-                    .disabled(!viewModel.canAddSubtask || viewModel.isLoading)
-                }
-            })
-        }
+                .disabled(!viewModel.canAddSubtask || viewModel.isLoading)
+            }
+        })
     }
 }
 

@@ -10,6 +10,9 @@ import SwiftData
 
 struct ContentView: View {
     @Environment(\.diContainer) private var container
+    @Environment(\.taskNavigation) private var taskNavigation
+    @Environment(\.habitNavigation) private var habitNavigation
+    @Environment(\.appNavigation) private var appNavigation
     @Environment(\.accessibilityVoiceOverEnabled) private var voiceOverEnabled
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
@@ -37,8 +40,8 @@ struct ContentView: View {
 
     var body: some View {
         TabView(selection: Binding(
-            get: { navigationCoordinator.selectedTab },
-            set: { navigationCoordinator.selectTab($0) }
+            get: { appNavigation?.selectedTab ?? .today },
+            set: { appNavigation?.selectTab($0) }
         )) {
             // Today Tab
             TodayView()
@@ -102,7 +105,6 @@ struct ContentView: View {
                 .accessibilityLabel("App settings")
                 .accessibilityHint("Configure app preferences and sync settings")
         }
-        .sheet(coordinator: navigationCoordinator)
         .alert("Error", isPresented: Binding(
             get: { appState.error != nil },
             set: { _ in appState.clearError() }
@@ -251,6 +253,7 @@ struct SettingsView: View {
                     habits: appState.habits
                 )
             }
+            .appNavigation(container?.appNavigation ?? AppNavigationModel())
         }
     }
 

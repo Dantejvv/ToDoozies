@@ -36,58 +36,56 @@ struct EditTaskFormView: View {
     @Bindable var viewModel: EditTaskViewModel
 
     var body: some View {
-        NavigationStack {
-            Form {
-                // Type change warning section
-                if viewModel.isTypeChanging {
-                    typeChangeWarningSection
-                }
-
-                // Task type section
-                taskTypeSection
-
-                // Basic info section
-                basicInfoSection
-
-                // Schedule section
-                scheduleSection
-
-                // Recurrence section (if recurring)
-                if viewModel.isRecurring {
-                    recurrenceSection
-                }
-
-                // Attachments section (placeholder)
-                attachmentsSection
+        Form {
+            // Type change warning section
+            if viewModel.isTypeChanging {
+                typeChangeWarningSection
             }
-            .navigationTitle("Edit Task")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar(content: {
 
-                ToolbarItem(placement: .confirmationAction) {
-                    Button("Save") {
-                        _Concurrency.Task { @MainActor in
-                            await viewModel.saveTask()
-                        }
+            // Task type section
+            taskTypeSection
+
+            // Basic info section
+            basicInfoSection
+
+            // Schedule section
+            scheduleSection
+
+            // Recurrence section (if recurring)
+            if viewModel.isRecurring {
+                recurrenceSection
+            }
+
+            // Attachments section (placeholder)
+            attachmentsSection
+        }
+        .navigationTitle("Edit Task")
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar(content: {
+
+            ToolbarItem(placement: .confirmationAction) {
+                Button("Save") {
+                    _Concurrency.Task { @MainActor in
+                        await viewModel.saveTask()
                     }
-                    .disabled(!viewModel.isFormValid || viewModel.isLoading)
                 }
-            })
-            .disabled(viewModel.isLoading)
-            .alert("Discard Changes?", isPresented: $viewModel.showingDiscardAlert) {
-                Button("Discard", role: .destructive) {
-                    viewModel.discardChanges()
-                }
-                Button("Keep Editing", role: .cancel) { }
-            } message: {
-                Text("You have unsaved changes. Are you sure you want to discard them?")
+                .disabled(!viewModel.isFormValid || viewModel.isLoading)
             }
-            .sheet(isPresented: $viewModel.showingCategoryPicker) {
-                CategoryPickerView(selectedCategory: $viewModel.selectedCategory)
+        })
+        .disabled(viewModel.isLoading)
+        .alert("Discard Changes?", isPresented: $viewModel.showingDiscardAlert) {
+            Button("Discard", role: .destructive) {
+                viewModel.discardChanges()
             }
-            .sheet(isPresented: $viewModel.showingRecurrenceSheet) {
-                RecurrencePickerView(recurrenceRule: $viewModel.recurrenceRule)
-            }
+            Button("Keep Editing", role: .cancel) { }
+        } message: {
+            Text("You have unsaved changes. Are you sure you want to discard them?")
+        }
+        .sheet(isPresented: $viewModel.showingCategoryPicker) {
+            CategoryPickerView(selectedCategory: $viewModel.selectedCategory)
+        }
+        .sheet(isPresented: $viewModel.showingRecurrenceSheet) {
+            RecurrencePickerView(recurrenceRule: $viewModel.recurrenceRule)
         }
     }
 
