@@ -45,6 +45,78 @@ xcodebuild test -project ToDoozies.xcodeproj -scheme ToDoozies -destination 'pla
 - **Swift Testing**: Modern testing framework
 - **Model-View (MV)**: Architecture pattern
 
+### Task & Habit Type System (September 2025)
+
+#### **Task Types**
+
+**1. One-Time Tasks**
+- **Definition**: Single-occurrence tasks with a specific due date/time
+- **Examples**: "Buy groceries", "Call doctor", "Submit report by Friday 5pm"
+- **Characteristics**:
+  - Has a due date (optional time)
+  - Completed once and disappears from active list
+  - Can be overdue
+  - No repetition pattern
+  - Task-focused (getting things done)
+- **Data Model**: Single `Task` entity
+- **Shown in**: Tasks tab, TodayView (if due today), Calendar view
+
+**2. Recurring Tasks**
+- **Definition**: Tasks that repeat on a schedule but are task-oriented (not habit-building)
+- **Examples**: "Take out garbage cans every Thursday", "Pay rent on 1st of month", "Weekly team meeting every Monday 2pm"
+- **Characteristics**:
+  - Has a recurrence pattern (daily, weekly, monthly, yearly)
+  - Each occurrence is a separate task instance
+  - Can be completed individually per occurrence
+  - Can be overdue if missed
+  - Task-focused (getting things done, not building habits)
+  - Has specific due dates/times
+- **Data Model**: Base `Task` + `RecurrenceRule` → generates task instances
+- **Shown in**: Tasks tab, TodayView (today's occurrence), Calendar view
+
+**3. Habits**
+- **Definition**: Repeated activities focused on building consistency and streaks
+- **Examples**: "Take medication daily", "Go to gym (Tues, Wed, Fri, Sat)", "Read for 30 mins daily", "Drink 8 glasses water"
+- **Characteristics**:
+  - Has a recurrence pattern (daily, weekly schedule, etc.)
+  - Streak tracking (current streak, best streak)
+  - Protection days for maintaining streaks
+  - Habit-focused (building consistency and long-term behavior)
+  - No specific "due time" - just daily occurrence pattern
+  - Completion resets daily for tracking consistency
+- **Data Model**: `Task` + `Habit` entity + `RecurrenceRule` → streak tracking
+- **Shown in**: Habits tab, TodayView (today's habits), Calendar heatmap view
+
+#### **App Organization & Relationships**
+
+**Task Creation Screen**:
+- **Current**: `[Regular Task] [Recurring Habit]` toggle (2 options)
+- **New Design**: Three-option picker:
+  - `[One-Time Task]` - Single occurrence with due date
+  - `[Recurring Task]` - Repeating task instances with schedule
+  - `[Habit]` - Streak-building activity with consistency focus
+
+**Tab Organization**:
+1. **Today Tab** (read-only): Shows all three types for today's date
+2. **Tasks Tab**: One-time tasks + recurring task instances (task-focused)
+3. **Habits Tab**: Only habits with streak tracking and consistency metrics
+4. **Calendar Tab**: All types with different visualizations (tasks vs habit heatmaps)
+
+**Data Relationships**:
+- **One-Time Tasks**: Single `Task` entity with due date
+- **Recurring Tasks**: Base `Task` + `RecurrenceRule` → generates individual task instances over time
+- **Habits**: `Task` + `Habit` entity + `RecurrenceRule` → enables streak tracking and consistency metrics
+
+**Key Behavioral Differences**:
+- **Recurring Tasks**: Focus on completion of individual scheduled instances (like appointments)
+- **Habits**: Focus on building streaks and maintaining daily/weekly consistency patterns
+- **UI Treatment**: Different icons, completion styles, progress indicators, and tracking metrics
+- **Recurrence System**: Shared underlying `RecurrenceRule` system but different presentation and tracking focus
+
+#### **Implementation Status**
+- **Current State**: Basic recurring habits implemented (✅)
+- **Target State**: Three distinct task/habit types with appropriate UI/UX differentiation (🚧 PLANNED)
+
 ### Data Model
 - Uses SwiftData with `@Model` classes integrated with CloudKit
 - **Core Models**: Task, RecurrenceRule, Habit, Category, Subtask, Attachment
