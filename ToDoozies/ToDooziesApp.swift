@@ -37,7 +37,8 @@ struct ToDooziesApp: App {
             return try ModelContainer(for: schema, configurations: [configuration])
 
         } catch {
-            print("Failed to create CloudKit ModelContainer: \(error)")
+            print("CloudKit: Failed to create CloudKit ModelContainer: \(error)")
+            print("CloudKit: This is expected when no iCloud account is configured. Falling back to local storage.")
 
             // Fallback to local-only storage
             do {
@@ -50,7 +51,7 @@ struct ToDooziesApp: App {
                 return try ModelContainer(for: schema, configurations: [localConfiguration])
 
             } catch {
-                print("Failed to create local ModelContainer: \(error)")
+                print("CloudKit: Failed to create local ModelContainer: \(error)")
 
                 // Last resort - in-memory container
                 do {

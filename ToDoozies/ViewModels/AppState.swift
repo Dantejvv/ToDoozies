@@ -274,20 +274,20 @@ final class AppState {
     var syncStatusMessage: String {
         switch syncStatus {
         case .unknown:
-            return "Sync status unknown"
+            return "Checking iCloud status..."
         case .syncing:
-            return "Syncing..."
+            return "Syncing with iCloud..."
         case .synced:
             if let lastSync = lastSyncDate {
                 let formatter = RelativeDateTimeFormatter()
                 return "Last synced \(formatter.localizedString(for: lastSync, relativeTo: Date()))"
             } else {
-                return "Synced"
+                return "Synced with iCloud"
             }
         case .failed(let error):
             return "Sync failed: \(error)"
         case .disabled:
-            return "Sync disabled"
+            return "Local storage only - Sign in to iCloud to enable sync"
         }
     }
 }

@@ -30,6 +30,12 @@
 	<key>NSMicrophoneUsageDescription</key>
 	<string>Record voice notes and use speech-to-text for faster task creation.</string>
 
+	<!-- Background Modes for CloudKit Sync -->
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>remote-notification</string>
+	</array>
+
 	<!-- Launch Screen Configuration -->
 	<key>UILaunchScreen</key>
 	<dict>

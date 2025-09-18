@@ -91,20 +91,22 @@ final class CloudKitSyncService: ObservableObject {
                 case .couldNotDetermine:
                     self.appState.setSyncStatus(.unknown)
                     self.appState.setSyncEnabled(false)
+                    print("CloudKit: Could not determine account status. Using local storage only.")
 
                 case .available:
                     self.appState.setSyncEnabled(true)
+                    print("CloudKit: iCloud account available. Syncing enabled.")
                     await self.performSync()
 
                 case .restricted:
-                    self.appState.setError(.cloudKitAccountError)
                     self.appState.setSyncEnabled(false)
                     self.appState.setSyncStatus(.disabled)
+                    print("CloudKit: iCloud account is restricted. Using local storage only.")
 
                 case .noAccount:
-                    self.appState.setError(.cloudKitAccountError)
                     self.appState.setSyncEnabled(false)
                     self.appState.setSyncStatus(.disabled)
+                    print("CloudKit: No iCloud account available. Using local storage only.")
 
                 case .temporarilyUnavailable:
                     self.appState.setSyncStatus(.failed("Account temporarily unavailable"))
