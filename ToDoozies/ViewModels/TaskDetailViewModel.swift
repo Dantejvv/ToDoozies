@@ -33,7 +33,6 @@ final class TaskDetailViewModel {
     private let appState: AppState
     private let taskService: TaskServiceProtocol
     private let attachmentService: AttachmentServiceProtocol
-    private let navigationCoordinator: NavigationCoordinator
 
     // MARK: - Computed Properties
 
@@ -99,14 +98,12 @@ final class TaskDetailViewModel {
         task: Task,
         appState: AppState,
         taskService: TaskServiceProtocol,
-        attachmentService: AttachmentServiceProtocol,
-        navigationCoordinator: NavigationCoordinator
+        attachmentService: AttachmentServiceProtocol
     ) {
         self.task = task
         self.appState = appState
         self.taskService = taskService
         self.attachmentService = attachmentService
-        self.navigationCoordinator = navigationCoordinator
     }
 
     // MARK: - Task Actions
@@ -126,9 +123,7 @@ final class TaskDetailViewModel {
         }
     }
 
-    func editTask() {
-        navigationCoordinator.showEditTask(task)
-    }
+    // Edit navigation is now handled directly by the view
 
 
     func deleteTask() async {
@@ -137,7 +132,7 @@ final class TaskDetailViewModel {
 
         do {
             try await taskService.deleteTask(task)
-            navigationCoordinator.goBack()
+            // Navigation back is handled by the view
         } catch {
             errorMessage = "Failed to delete task: \(error.localizedDescription)"
         }

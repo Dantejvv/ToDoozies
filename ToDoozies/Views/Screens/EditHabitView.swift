@@ -10,6 +10,7 @@ import SwiftData
 
 struct EditHabitView: View {
     @Environment(\.diContainer) private var diContainer
+    @Environment(\.dismiss) private var dismiss
     @State private var viewModel: EditHabitViewModel?
 
     let habit: Habit
@@ -25,14 +26,15 @@ struct EditHabitView: View {
         }
         .task {
             if viewModel == nil, let container = diContainer {
-                viewModel = EditHabitViewModel(
+                let vm = EditHabitViewModel(
                     habit: habit,
                     appState: container.appState,
                     habitService: container.habitService,
                     taskService: container.taskService,
-                    categoryService: container.categoryService,
-                    navigationCoordinator: container.navigationCoordinator
+                    categoryService: container.categoryService
                 )
+                vm.dismissAction = { dismiss() }
+                viewModel = vm
             }
         }
     }
@@ -204,13 +206,13 @@ final class EditHabitViewModel {
     var isLoading: Bool = false
     var showingCategoryPicker: Bool = false
     var errorMessage: String?
+    var dismissAction: (() -> Void)?
 
     // MARK: - Services
     private let appState: AppState
     private let habitService: HabitServiceProtocol
     private let taskService: TaskServiceProtocol
     private let categoryService: CategoryServiceProtocol
-    private let navigationCoordinator: NavigationCoordinator
 
     // MARK: - Computed Properties
 
@@ -249,15 +251,13 @@ final class EditHabitViewModel {
         appState: AppState,
         habitService: HabitServiceProtocol,
         taskService: TaskServiceProtocol,
-        categoryService: CategoryServiceProtocol,
-        navigationCoordinator: NavigationCoordinator
+        categoryService: CategoryServiceProtocol
     ) {
         self.habit = habit
         self.appState = appState
         self.habitService = habitService
         self.taskService = taskService
         self.categoryService = categoryService
-        self.navigationCoordinator = navigationCoordinator
 
         // Initialize form fields with current values
         self.title = habit.baseTask?.title ?? ""
@@ -312,7 +312,7 @@ final class EditHabitViewModel {
             try await habitService.updateHabit(habit)
 
             // Navigate back
-            navigationCoordinator.dismiss()
+            dismissAction?()
 
         } catch {
             errorMessage = "Failed to update habit: \(error.localizedDescription)"
@@ -320,7 +320,7 @@ final class EditHabitViewModel {
     }
 
     func cancel() {
-        navigationCoordinator.dismiss()
+        dismissAction?()
     }
 
     // MARK: - Category Selection

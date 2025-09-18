@@ -42,7 +42,6 @@ final class DIContainer {
     // MARK: - Core Dependencies
     let modelContext: ModelContext
     let appState: AppState
-    let navigationCoordinator: NavigationCoordinator // Legacy - will be removed
 
     // MARK: - New Navigation Models
     let taskNavigation: TaskNavigationModel
@@ -86,7 +85,6 @@ final class DIContainer {
 
         // Initialize core dependencies
         self.appState = AppState()
-        self.navigationCoordinator = NavigationCoordinator() // Legacy
 
         // Initialize new navigation models
         self.taskNavigation = TaskNavigationModel()
@@ -128,8 +126,7 @@ final class DIContainer {
             appState: appState,
             taskService: taskService,
             categoryService: categoryService,
-            attachmentService: attachmentService,
-            navigationCoordinator: navigationCoordinator
+            attachmentService: attachmentService
         )
     }
 
@@ -138,8 +135,7 @@ final class DIContainer {
             task: task,
             appState: appState,
             taskService: taskService,
-            categoryService: categoryService,
-            navigationCoordinator: navigationCoordinator
+            categoryService: categoryService
         )
     }
 
@@ -157,8 +153,7 @@ final class DIContainer {
             task: task,
             appState: appState,
             taskService: taskService,
-            attachmentService: attachmentService,
-            navigationCoordinator: navigationCoordinator
+            attachmentService: attachmentService
         )
     }
 
@@ -166,16 +161,14 @@ final class DIContainer {
         return HabitDetailViewModel(
             habit: habit,
             appState: appState,
-            habitService: habitService,
-            navigationCoordinator: navigationCoordinator
+            habitService: habitService
         )
     }
 
     func makeSettingsViewModel() -> SettingsViewModel {
         return SettingsViewModel(
             appState: appState,
-            notificationService: notificationService,
-            navigationCoordinator: navigationCoordinator
+            notificationService: notificationService
         )
     }
 
@@ -442,5 +435,5 @@ final class NotificationService: NotificationServiceProtocol {
 
 
 class SettingsViewModel: ObservableObject {
-    init(appState: AppState, notificationService: NotificationServiceProtocol, navigationCoordinator: NavigationCoordinator) {}
+    init(appState: AppState, notificationService: NotificationServiceProtocol) {}
 }

@@ -10,6 +10,7 @@ import SwiftData
 
 struct HabitDetailView: View {
     @Environment(\.diContainer) private var diContainer
+    @Environment(\.habitNavigation) private var habitNavigationModel
     @State private var viewModel: HabitDetailViewModel?
 
     let habit: Habit
@@ -33,6 +34,7 @@ struct HabitDetailView: View {
 
 struct HabitDetailContentView: View {
     @Bindable var viewModel: HabitDetailViewModel
+    @Environment(\.habitNavigation) private var habitNavigationModel
 
     var body: some View {
         ScrollView {
@@ -72,7 +74,7 @@ struct HabitDetailContentView: View {
         .toolbar(content: {
             ToolbarItemGroup(placement: .primaryAction) {
                 Button("Edit") {
-                    viewModel.editHabit()
+                    habitNavigationModel?.showEdit(viewModel.habit)
                 }
 
                 Menu {
@@ -479,7 +481,7 @@ struct HabitDetailContentView: View {
 
             HStack(spacing: 12) {
                 Button("Edit Habit") {
-                    viewModel.editHabit()
+                    habitNavigationModel?.showEdit(viewModel.habit)
                 }
                 .buttonStyle(.bordered)
                 .frame(maxWidth: .infinity)

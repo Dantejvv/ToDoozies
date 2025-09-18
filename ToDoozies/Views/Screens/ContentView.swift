@@ -22,10 +22,6 @@ struct ContentView: View {
     // Theme management
     @AppStorage("selectedColorScheme") private var selectedColorScheme: String = "system"
 
-    private var navigationCoordinator: NavigationCoordinator {
-        container?.navigationCoordinator ?? NavigationCoordinator()
-    }
-
     private var appState: AppState {
         container?.appState ?? AppState()
     }

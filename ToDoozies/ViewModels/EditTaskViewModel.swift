@@ -36,12 +36,13 @@ final class EditTaskViewModel {
     var showingAttachmentPicker: Bool = false
     var showingCategoryPicker: Bool = false
     var showingDiscardAlert: Bool = false
+    var errorMessage: String?
+    var dismissAction: (() -> Void)?
 
     // MARK: - Services
     private let appState: AppState
     private let taskService: TaskServiceProtocol
     private let categoryService: CategoryServiceProtocol
-    private let navigationCoordinator: NavigationCoordinator
 
     // MARK: - Computed Properties
 
@@ -73,14 +74,12 @@ final class EditTaskViewModel {
         task: Task,
         appState: AppState,
         taskService: TaskServiceProtocol,
-        categoryService: CategoryServiceProtocol,
-        navigationCoordinator: NavigationCoordinator
+        categoryService: CategoryServiceProtocol
     ) {
         self.originalTask = task
         self.appState = appState
         self.taskService = taskService
         self.categoryService = categoryService
-        self.navigationCoordinator = navigationCoordinator
 
         // Initialize form fields with current task values
         self.title = task.title
@@ -145,10 +144,10 @@ final class EditTaskViewModel {
             try await taskService.updateTask(originalTask)
 
             // Navigate back
-            navigationCoordinator.dismissSheet()
+            dismissAction?()
 
         } catch {
-            appState.setError(.dataSavingFailed("Failed to update task: \(error.localizedDescription)"))
+            errorMessage = "Failed to update task: \(error.localizedDescription)"
         }
     }
 
@@ -156,12 +155,16 @@ final class EditTaskViewModel {
         if hasUnsavedChanges {
             showingDiscardAlert = true
         } else {
-            navigationCoordinator.dismissSheet()
+            dismissAction?()
         }
     }
 
     func discardChanges() {
-        navigationCoordinator.dismissSheet()
+        dismissAction?()
+    }
+
+    func clearError() {
+        errorMessage = nil
     }
 
     // MARK: - Validation

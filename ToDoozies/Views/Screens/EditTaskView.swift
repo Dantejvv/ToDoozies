@@ -11,6 +11,7 @@ import Foundation
 
 struct EditTaskView: View {
     @Environment(\.diContainer) private var diContainer
+    @Environment(\.dismiss) private var dismiss
     @State private var viewModel: EditTaskViewModel?
 
     let task: Task
@@ -26,7 +27,9 @@ struct EditTaskView: View {
         }
         .task {
             if viewModel == nil, let container = diContainer {
-                viewModel = container.makeEditTaskViewModel(task: task)
+                let vm = container.makeEditTaskViewModel(task: task)
+                vm.dismissAction = { dismiss() }
+                viewModel = vm
             }
         }
     }
@@ -36,43 +39,72 @@ struct EditTaskFormView: View {
     @Bindable var viewModel: EditTaskViewModel
 
     var body: some View {
-        Form {
-            // Type change warning section
-            if viewModel.isTypeChanging {
-                typeChangeWarningSection
+        NavigationStack {
+            Form {
+                // Type change warning section
+                if viewModel.isTypeChanging {
+                    typeChangeWarningSection
+                }
+
+                // Task type section
+                taskTypeSection
+
+                // Basic info section
+                basicInfoSection
+
+                // Schedule section
+                scheduleSection
+
+                // Recurrence section (if recurring)
+                if viewModel.isRecurring {
+                    recurrenceSection
+                }
+
+                // Attachments section (placeholder)
+                attachmentsSection
+
+                if !viewModel.validationErrors.isEmpty {
+                    validationErrorsSection
+                }
             }
-
-            // Task type section
-            taskTypeSection
-
-            // Basic info section
-            basicInfoSection
-
-            // Schedule section
-            scheduleSection
-
-            // Recurrence section (if recurring)
-            if viewModel.isRecurring {
-                recurrenceSection
-            }
-
-            // Attachments section (placeholder)
-            attachmentsSection
-        }
-        .navigationTitle("Edit Task")
-        .navigationBarTitleDisplayMode(.inline)
-        .toolbar(content: {
-
-            ToolbarItem(placement: .confirmationAction) {
-                Button("Save") {
-                    _Concurrency.Task { @MainActor in
-                        await viewModel.saveTask()
+            .navigationTitle("Edit Task")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItemGroup(placement: .topBarLeading) {
+                    Button("Cancel") {
+                        viewModel.cancel()
                     }
                 }
-                .disabled(!viewModel.isFormValid || viewModel.isLoading)
+
+                ToolbarItemGroup(placement: .topBarTrailing) {
+                    Button("Save") {
+                        _Concurrency.Task {
+                            await viewModel.saveTask()
+                        }
+                    }
+                    .disabled(!viewModel.isFormValid || viewModel.isLoading)
+                    .fontWeight(.semibold)
+                }
             }
-        })
+        }
         .disabled(viewModel.isLoading)
+        .overlay {
+            if viewModel.isLoading {
+                ProgressView()
+                    .scaleEffect(1.2)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .background(Color(.systemBackground).opacity(0.8))
+            }
+        }
+        .alert("Error", isPresented: .constant(viewModel.errorMessage != nil)) {
+            Button("OK") {
+                viewModel.clearError()
+            }
+        } message: {
+            if let errorMessage = viewModel.errorMessage {
+                Text(errorMessage)
+            }
+        }
         .alert("Discard Changes?", isPresented: $viewModel.showingDiscardAlert) {
             Button("Discard", role: .destructive) {
                 viewModel.discardChanges()
@@ -257,6 +289,21 @@ struct EditTaskFormView: View {
                 Label("Add Attachment", systemImage: "paperclip")
             }
             .disabled(true) // Placeholder for now
+        }
+    }
+
+    // MARK: - Validation Errors Section
+
+    private var validationErrorsSection: some View {
+        Section {
+            ForEach(viewModel.validationErrors, id: \.localizedDescription) { error in
+                Label(error.localizedDescription, systemImage: "exclamationmark.triangle")
+                    .foregroundColor(.red)
+                    .font(.caption)
+            }
+        } header: {
+            Text("Please fix the following issues:")
+                .foregroundColor(.red)
         }
     }
 

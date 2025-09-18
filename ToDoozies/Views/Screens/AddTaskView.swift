@@ -212,6 +212,21 @@ struct AddTaskFormView: View {
         }
     }
 
+    // MARK: - Validation Errors Section
+
+    private var validationErrorsSection: some View {
+        Section {
+            ForEach(viewModel.validationErrors, id: \.localizedDescription) { error in
+                Label(error.localizedDescription, systemImage: "exclamationmark.triangle")
+                    .foregroundColor(.red)
+                    .font(.caption)
+            }
+        } header: {
+            Text("Please fix the following issues:")
+                .foregroundColor(.red)
+        }
+    }
+
     // MARK: - Helper Methods
 
     private func priorityColor(for priority: Priority) -> Color {

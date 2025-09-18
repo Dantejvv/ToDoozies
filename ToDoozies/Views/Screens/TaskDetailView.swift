@@ -10,6 +10,7 @@ import SwiftData
 
 struct TaskDetailView: View {
     @Environment(\.diContainer) private var diContainer
+    @Environment(\.taskNavigation) private var taskNavigationModel
     @State private var viewModel: TaskDetailViewModel?
 
     let task: Task
@@ -33,6 +34,7 @@ struct TaskDetailView: View {
 
 struct TaskDetailContentView: View {
     @Bindable var viewModel: TaskDetailViewModel
+    @Environment(\.taskNavigation) private var taskNavigationModel
 
     var body: some View {
         ScrollView {
@@ -74,7 +76,7 @@ struct TaskDetailContentView: View {
         .toolbar(content: {
             ToolbarItemGroup(placement: .primaryAction) {
                 Button("Edit") {
-                    viewModel.editTask()
+                    taskNavigationModel?.showEdit(viewModel.task)
                 }
 
                 Menu {
@@ -541,38 +543,40 @@ struct AddSubtaskSheet: View {
     @Environment(\.dismiss) private var dismiss
 
     var body: some View {
-        Form(content: {
-            Section("New Subtask") {
-                TextField("Subtask title", text: $viewModel.newSubtaskTitle)
-                    .onSubmit {
-                        if viewModel.canAddSubtask {
-                            _Concurrency.Task {
-                                await viewModel.addSubtask()
-                                dismiss()
+        NavigationStack {
+            Form(content: {
+                Section("New Subtask") {
+                    TextField("Subtask title", text: $viewModel.newSubtaskTitle)
+                        .onSubmit {
+                            if viewModel.canAddSubtask {
+                                _Concurrency.Task {
+                                    await viewModel.addSubtask()
+                                    dismiss()
+                                }
                             }
                         }
-                    }
-            }
-        })
-        .navigationTitle("Add Subtask")
-        .navigationBarTitleDisplayMode(.inline)
-        .toolbar(content: {
-            ToolbarItem(placement: .cancellationAction) {
-                Button("Cancel") {
-                    dismiss()
                 }
-            }
-
-            ToolbarItem(placement: .confirmationAction) {
-                Button("Add") {
-                    _Concurrency.Task {
-                        await viewModel.addSubtask()
+            })
+            .navigationTitle("Add Subtask")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar(content: {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Cancel") {
                         dismiss()
                     }
                 }
-                .disabled(!viewModel.canAddSubtask || viewModel.isLoading)
-            }
-        })
+
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Add") {
+                        _Concurrency.Task {
+                            await viewModel.addSubtask()
+                            dismiss()
+                        }
+                    }
+                    .disabled(!viewModel.canAddSubtask || viewModel.isLoading)
+                }
+            })
+        }
     }
 }
 

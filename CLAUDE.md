@@ -79,8 +79,7 @@ ToDoozies/                           # Main app target
 ├── ViewModels/                     # View model layer for UI state management
 ├── Navigation/                     # Modern SwiftUI navigation system
 │   ├── NavigationDestinations.swift # Enum-based destinations and @Observable models
-│   ├── NavigationViewBuilder.swift # View factory and navigation modifiers
-│   └── NavigationCoordinator.swift # Legacy coordinator (deprecated)
+│   └── NavigationViewBuilder.swift # View factory and navigation modifiers
 ├── Features/                       # Feature modules
 │   ├── Tasks/                      # Task-related functionality
 │   ├── Habits/                     # Habit tracking features
@@ -166,7 +165,7 @@ docs/                               # Project documentation including feature sp
 - Factory pattern provides realistic test data across all scenarios
 - Relationship testing verifies data integrity and cascade behavior
 - Swift Testing framework properly configured for SwiftData compatibility
-- **Modern Navigation**: Uses native SwiftUI APIs (iOS 16+) with enum-based destinations and @Observable models
+- **Modern Navigation**: Uses native SwiftUI APIs (iOS 16+) with enum-based destinations and @Observable models - legacy NavigationCoordinator completely removed
 - **No External Dependencies**: Navigation system built entirely with native SwiftUI - no third-party libraries required
 - **NavigationStack Pattern**: All navigation modifiers must be applied within NavigationStack containers
 - **Type-Safe Navigation**: Use enum destinations (`TaskDestination`, `HabitDestination`, `AppDestination`) for compile-time safety
@@ -211,13 +210,14 @@ docs/                               # Project documentation including feature sp
 - **NavigationStack Integration**: Proper `navigationDestination(item:)` usage within NavigationStack containers (✅ IMPLEMENTED)
 - **Sheet Presentation**: Modern item-binding sheet presentation with automatic dismissal (✅ IMPLEMENTED)
 - **Environment Injection**: Dedicated environment keys for navigation models with DIContainer integration (✅ IMPLEMENTED)
-- **Legacy Coordinator Deprecation**: Old NavigationCoordinator marked as deprecated in favor of modern patterns (✅ IMPLEMENTED)
+- **Legacy Coordinator Removal**: NavigationCoordinator completely removed from codebase - fully modernized (✅ IMPLEMENTED)
 - **Navigation View Builder**: Centralized view factory system for destination rendering (✅ IMPLEMENTED)
 - **Background Mode Configuration**: Required CloudKit remote notification background mode in Info.plist (✅ IMPLEMENTED)
 - **Status**: ✅ FULLY IMPLEMENTED
 
 ### Recently Completed Features (September 2025)
 - **Navigation System Modernization**: Complete refactoring to use native SwiftUI navigation APIs with type-safe enum-based destinations (✅ IMPLEMENTED)
+- **NavigationCoordinator Removal**: Legacy navigation coordinator completely removed from entire codebase (✅ IMPLEMENTED)
 - **Picker Components System**: Complete implementation of CategoryPickerView and RecurrencePickerView (✅ IMPLEMENTED)
 - **Text Size Settings Navigation**: Interactive button to open iOS system settings for Dynamic Type adjustment (✅ IMPLEMENTED)
 

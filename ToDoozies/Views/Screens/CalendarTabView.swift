@@ -10,6 +10,8 @@ import SwiftData
 
 struct CalendarTabView: View {
     @Environment(\.diContainer) private var container
+    @Environment(\.appNavigation) private var appNavigation
+    @Environment(\.habitNavigation) private var habitNavigationModel
     @State private var selectedViewMode: CalendarViewMode = .heatmap
     @State private var selectedRange: CalendarRange = .month
     @State private var selectedHabit: Habit?
@@ -269,8 +271,8 @@ struct CalendarTabView: View {
 
             if availableHabits.isEmpty {
                 Button("Create Your First Habit") {
-                    container?.navigationCoordinator.selectTab(.habits)
-                    container?.navigationCoordinator.showAddHabit()
+                    appNavigation?.selectTab(.habits)
+                    habitNavigationModel?.showAdd()
                 }
                 .buttonStyle(.borderedProminent)
             }

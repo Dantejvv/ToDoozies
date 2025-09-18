@@ -34,12 +34,13 @@ final class AddTaskViewModel {
     var showingRecurrenceSheet: Bool = false
     var showingAttachmentPicker: Bool = false
     var showingCategoryPicker: Bool = false
+    var errorMessage: String?
+    var dismissAction: (() -> Void)?
 
     // MARK: - Services
     private let taskService: TaskServiceProtocol
     private let categoryService: CategoryServiceProtocol
     private let attachmentService: AttachmentServiceProtocol
-    private let navigationCoordinator: NavigationCoordinator
     private let appState: AppState
 
     // MARK: - Initialization
@@ -47,14 +48,12 @@ final class AddTaskViewModel {
         appState: AppState,
         taskService: TaskServiceProtocol,
         categoryService: CategoryServiceProtocol,
-        attachmentService: AttachmentServiceProtocol,
-        navigationCoordinator: NavigationCoordinator
+        attachmentService: AttachmentServiceProtocol
     ) {
         self.appState = appState
         self.taskService = taskService
         self.categoryService = categoryService
         self.attachmentService = attachmentService
-        self.navigationCoordinator = navigationCoordinator
 
         // Set default category to first available
         self.selectedCategory = appState.categories.first
@@ -87,15 +86,19 @@ final class AddTaskViewModel {
             }
 
             // Navigate back
-            navigationCoordinator.dismissSheet()
+            dismissAction?()
 
         } catch {
-            appState.setError(.dataSavingFailed("Failed to create task: \(error.localizedDescription)"))
+            errorMessage = "Failed to create task: \(error.localizedDescription)"
         }
     }
 
     func cancel() {
-        navigationCoordinator.dismissSheet()
+        dismissAction?()
+    }
+
+    func clearError() {
+        errorMessage = nil
     }
 
     // MARK: - Attachment Management
@@ -106,7 +109,7 @@ final class AddTaskViewModel {
             case .success(let urls):
                 await addAttachments(from: urls)
             case .failure(let error):
-                appState.setError(.dataSavingFailed("Failed to select files: \(error.localizedDescription)"))
+                errorMessage = "Failed to select files: \(error.localizedDescription)"
             }
         }
     }
@@ -122,7 +125,7 @@ final class AddTaskViewModel {
                 let attachment = try await attachmentService.createAttachment(from: url, for: tempTask)
                 selectedAttachments.append(attachment)
             } catch {
-                appState.setError(.dataSavingFailed("Failed to add attachment: \(error.localizedDescription)"))
+                errorMessage = "Failed to add attachment: \(error.localizedDescription)"
                 break
             }
         }

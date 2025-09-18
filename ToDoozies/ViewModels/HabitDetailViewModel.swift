@@ -26,7 +26,6 @@ final class HabitDetailViewModel {
     // MARK: - Services
     private let appState: AppState
     private let habitService: HabitServiceProtocol
-    private let navigationCoordinator: NavigationCoordinator
 
     // MARK: - Computed Properties
 
@@ -156,13 +155,11 @@ final class HabitDetailViewModel {
     init(
         habit: Habit,
         appState: AppState,
-        habitService: HabitServiceProtocol,
-        navigationCoordinator: NavigationCoordinator
+        habitService: HabitServiceProtocol
     ) {
         self.habit = habit
         self.appState = appState
         self.habitService = habitService
-        self.navigationCoordinator = navigationCoordinator
     }
 
     // MARK: - Habit Actions
@@ -216,10 +213,7 @@ final class HabitDetailViewModel {
         }
     }
 
-    func editHabit() {
-        // TODO: Navigate to EditHabitView when implemented
-        navigationCoordinator.showEditHabit(habit)
-    }
+    // Edit navigation is now handled directly by the view
 
     func deleteHabit() async {
         isLoading = true
@@ -227,7 +221,7 @@ final class HabitDetailViewModel {
 
         do {
             try await habitService.deleteHabit(habit)
-            navigationCoordinator.goBack()
+            // Navigation back is handled by the view
         } catch {
             errorMessage = "Failed to delete habit: \(error.localizedDescription)"
         }
