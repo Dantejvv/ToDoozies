@@ -10,7 +10,6 @@ import SwiftData
 
 struct TodayView: View {
     @Environment(\.diContainer) private var container
-    @Environment(\.taskNavigation) private var taskNavigation
     @Environment(\.accessibilityVoiceOverEnabled) private var voiceOverEnabled
 
     private var viewModel: TodayViewModel {
@@ -68,22 +67,9 @@ struct TodayView: View {
             .accessibilityHint("Swipe to navigate through your daily tasks and habits")
             .navigationTitle("Today")
             .navigationBarTitleDisplayMode(.large)
-            .toolbar {
-                ToolbarItem(placement: .primaryAction) {
-                    Button(action: {
-                        taskNavigation?.showAdd()
-                    }) {
-                        Image(systemName: "plus")
-                    }
-                    .accessibilityLabel("Add new task")
-                    .accessibilityHint("Create a new task or habit")
-                }
-            }
             .refreshable {
                 await viewModel.refresh()
             }
-            .taskNavigation(taskNavigation ?? TaskNavigationModel())
-            .appNavigation(container?.appNavigation ?? AppNavigationModel())
         }
     }
 
@@ -131,14 +117,7 @@ struct TodayView: View {
             )
 
             ForEach(viewModel.overdueTasks) { task in
-                TaskRowView(task: task) {
-                    viewModel.completeTask(task)
-                } onEdit: {
-                    taskNavigation?.showEdit(task)
-                }
-                .contextMenu {
-                    taskContextMenu(for: task)
-                }
+                ReadOnlyTaskRowView(task: task)
             }
         }
         .spacingPadding(.spacing4)
@@ -173,11 +152,7 @@ struct TodayView: View {
 
             // Recurring tasks
             ForEach(viewModel.recurringTasks) { task in
-                HabitTaskRowView(task: task) {
-                    viewModel.completeTask(task)
-                } onEdit: {
-                    taskNavigation?.showEdit(task)
-                }
+                ReadOnlyHabitTaskRowView(task: task)
             }
         }
         .spacingPadding(.spacing4)
@@ -197,19 +172,12 @@ struct TodayView: View {
             if viewModel.todayTasks.isEmpty {
                 emptyStateView(
                     title: "No tasks for today",
-                    subtitle: "Add a task to get started",
+                    subtitle: "You're all caught up!",
                     systemImage: "checkmark.circle"
                 )
             } else {
                 ForEach(viewModel.todayTasks) { task in
-                    TaskRowView(task: task) {
-                        viewModel.completeTask(task)
-                    } onEdit: {
-                        taskNavigation?.showEdit(task)
-                    }
-                    .contextMenu {
-                        taskContextMenu(for: task)
-                    }
+                    ReadOnlyTaskRowView(task: task)
                 }
             }
         }
@@ -238,11 +206,7 @@ struct TodayView: View {
             }
 
             ForEach(viewModel.tomorrowTasksPreview) { task in
-                TaskRowView(task: task, isPreview: true) {
-                    // Preview tasks can't be completed
-                } onEdit: {
-                    taskNavigation?.showEdit(task)
-                }
+                ReadOnlyTaskRowView(task: task, isPreview: true)
             }
         }
         .spacingPadding(.spacing4)
@@ -279,26 +243,6 @@ struct TodayView: View {
         .padding(.vertical, 24)
     }
 
-    private func taskContextMenu(for task: Task) -> some View {
-        Group {
-            Button("Edit") {
-                taskNavigation?.showEdit(task)
-            }
-
-            if task.isOverdue {
-                Button("Reschedule to Tomorrow") {
-                    let tomorrow = Calendar.current.date(byAdding: .day, value: 1, to: Date()) ?? Date()
-                    viewModel.rescheduleOverdueTask(task, to: tomorrow)
-                }
-            }
-
-            Divider()
-
-            Button("Delete", role: .destructive) {
-                viewModel.deleteTask(task)
-            }
-        }
-    }
 
     private var todayDateText: String {
         let formatter = DateFormatter()
@@ -332,27 +276,18 @@ struct TodayView: View {
     }
 }
 
-// MARK: - Task Row View
+// MARK: - Read-Only Task Row View
 
-struct TaskRowView: View {
+struct ReadOnlyTaskRowView: View {
     let task: Task
     var isPreview: Bool = false
-    let onComplete: () -> Void
-    let onEdit: () -> Void
 
     var body: some View {
         HStack(spacing: .spacing3) {
-            // Completion button
-            CompletionButton(
-                isCompleted: task.isCompleted,
-                style: .task,
-                accessibilityLabel: task.isCompleted ? "Mark incomplete" : "Mark complete"
-            ) {
-                if !isPreview {
-                    onComplete()
-                }
-            }
-            .disabled(isPreview)
+            // Completion status indicator (read-only)
+            Image(systemName: task.isCompleted ? "checkmark.circle.fill" : "circle")
+                .foregroundColor(task.isCompleted ? .green : .secondary)
+                .font(.title3)
 
             // Task content
             VStack(alignment: .leading, spacing: .spacing1) {
@@ -394,26 +329,11 @@ struct TaskRowView: View {
             }
 
             Spacer()
-
-            Button(action: onEdit) {
-                Image(systemName: "ellipsis")
-                    .foregroundColor(.secondary)
-            }
-            .buttonStyle(PlainButtonStyle())
-            .accessibilityLabel("Task options")
-            .accessibilityHint("Double tap to view task options and details")
         }
         .verticalSpacingPadding(.spacing2)
         .accessibilityElement(children: .combine)
         .accessibilityLabel(task.accessibilityLabel)
         .accessibilityValue(task.accessibilityValue)
-        .accessibilityHint(task.accessibilityHint)
-        .accessibilityAction(named: "Complete Task") {
-            onComplete()
-        }
-        .accessibilityAction(named: "Edit Task") {
-            onEdit()
-        }
     }
 
     private func priorityBadge(_ priority: Priority) -> some View {
@@ -421,23 +341,17 @@ struct TaskRowView: View {
     }
 }
 
-// MARK: - Habit Task Row View
+// MARK: - Read-Only Habit Task Row View
 
-struct HabitTaskRowView: View {
+struct ReadOnlyHabitTaskRowView: View {
     let task: Task
-    let onComplete: () -> Void
-    let onEdit: () -> Void
 
     var body: some View {
         HStack(spacing: .spacing3) {
-            // Completion button with flame icon for habits
-            CompletionButton(
-                isCompleted: task.isCompleted,
-                style: .habit,
-                accessibilityLabel: task.isCompleted ? "Mark incomplete" : "Mark complete"
-            ) {
-                onComplete()
-            }
+            // Completion status indicator with flame icon for habits (read-only)
+            Image(systemName: task.isCompleted ? "flame.fill" : "flame")
+                .foregroundColor(task.isCompleted ? .orange : .secondary)
+                .font(.title3)
 
             // Task content
             VStack(alignment: .leading, spacing: .spacing1) {
@@ -448,21 +362,18 @@ struct HabitTaskRowView: View {
                     .foregroundColor(task.isCompleted ? .secondary : .primary)
 
                 // Show streak info if available
-                // TODO: Get streak from habit
-                Text("🔥 5 day streak")
+                // TODO: Get actual streak from habit model
+                Text("🔥 Daily habit")
                     .font(.caption)
                     .foregroundColor(.orange)
             }
 
             Spacer()
-
-            Button(action: onEdit) {
-                Image(systemName: "ellipsis")
-                    .foregroundColor(.secondary)
-            }
-            .buttonStyle(PlainButtonStyle())
         }
         .verticalSpacingPadding(.spacing2)
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel(task.accessibilityLabel)
+        .accessibilityValue(task.accessibilityValue)
     }
 }
 

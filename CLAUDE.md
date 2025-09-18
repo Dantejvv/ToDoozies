@@ -165,11 +165,15 @@ docs/                               # Project documentation including feature sp
 - Factory pattern provides realistic test data across all scenarios
 - Relationship testing verifies data integrity and cascade behavior
 - Swift Testing framework properly configured for SwiftData compatibility
-- **Modern Navigation**: Uses native SwiftUI APIs (iOS 16+) with enum-based destinations and @Observable models - legacy NavigationCoordinator completely removed
+- **Modern Hybrid Navigation**: Uses native SwiftUI APIs (iOS 16+) with platform-appropriate patterns - legacy NavigationCoordinator completely removed
 - **No External Dependencies**: Navigation system built entirely with native SwiftUI - no third-party libraries required
 - **NavigationStack Pattern**: All navigation modifiers must be applied within NavigationStack containers
 - **Type-Safe Navigation**: Use enum destinations (`TaskDestination`, `HabitDestination`, `AppDestination`) for compile-time safety
 - **Environment Injection**: Navigation models available via environment keys (`\.taskNavigation`, `\.habitNavigation`, `\.appNavigation`)
+- **Navigation Pattern Selection**:
+  - **Modal Sheets**: For creation flows (AddTaskView, AddHabitView) - uses direct sheet presentation with NavigationStack wrapper
+  - **Hierarchical Navigation**: For list→detail→edit flows - uses navigationDestination() with enum-based routing
+  - **Platform Consistency**: Follows iOS Human Interface Guidelines for modal vs push navigation
 - **Accessibility-First Development**: All new UI components must include accessibility labels, hints, and actions
 - **AccessibilityHelpers.swift**: Use existing model extensions for consistent accessibility implementation
 - **VoiceOver Testing**: Test all new features with VoiceOver enabled during development
@@ -204,15 +208,16 @@ docs/                               # Project documentation including feature sp
 - **Design Consistency**: Follows established SwiftUI patterns and 8pt grid system (✅ IMPLEMENTED)
 
 ### Navigation Architecture (September 2025)
-- **Modern SwiftUI Navigation**: Complete modernization using native iOS 16+ APIs (✅ IMPLEMENTED)
+- **Modern Hybrid Navigation**: Best-practice approach using appropriate navigation patterns for different flows (✅ IMPLEMENTED)
 - **Enum-Based Destinations**: Type-safe navigation with `TaskDestination`, `HabitDestination`, `AppDestination` (✅ IMPLEMENTED)
 - **@Observable Navigation Models**: Feature-specific navigation state management with `TaskNavigationModel`, `HabitNavigationModel`, `AppNavigationModel` (✅ IMPLEMENTED)
-- **NavigationStack Integration**: Proper `navigationDestination(item:)` usage within NavigationStack containers (✅ IMPLEMENTED)
-- **Sheet Presentation**: Modern item-binding sheet presentation with automatic dismissal (✅ IMPLEMENTED)
+- **NavigationStack Integration**: Proper `navigationDestination(item:)` usage for hierarchical navigation (detail/edit flows) (✅ IMPLEMENTED)
+- **Hybrid Sheet Presentation**: Direct sheet presentation for creation flows, modern navigation for hierarchical flows (✅ IMPLEMENTED)
+- **Platform-Appropriate Patterns**: Modal sheets for temporary creation flows, navigationDestination for list→detail→edit flows (✅ IMPLEMENTED)
 - **Environment Injection**: Dedicated environment keys for navigation models with DIContainer integration (✅ IMPLEMENTED)
 - **Legacy Coordinator Removal**: NavigationCoordinator completely removed from codebase - fully modernized (✅ IMPLEMENTED)
 - **Navigation View Builder**: Centralized view factory system for destination rendering (✅ IMPLEMENTED)
-- **Background Mode Configuration**: Required CloudKit remote notification background mode in Info.plist (✅ IMPLEMENTED)
+- **Task Creation Fix**: Resolved dual navigation system causing double loading animations (✅ IMPLEMENTED)
 - **Status**: ✅ FULLY IMPLEMENTED
 
 ### Recently Completed Features (September 2025)
@@ -220,6 +225,8 @@ docs/                               # Project documentation including feature sp
 - **NavigationCoordinator Removal**: Legacy navigation coordinator completely removed from entire codebase (✅ IMPLEMENTED)
 - **Picker Components System**: Complete implementation of CategoryPickerView and RecurrencePickerView (✅ IMPLEMENTED)
 - **Text Size Settings Navigation**: Interactive button to open iOS system settings for Dynamic Type adjustment (✅ IMPLEMENTED)
+- **Task Creation Navigation Fix**: Resolved dual navigation system bug causing double loading animations in task creation flow (✅ IMPLEMENTED)
+- **TodayView Read-Only Mode**: Converted TodayView to display-only, removing all task/habit interaction capabilities (✅ IMPLEMENTED)
 
 ### Offline Mode UI Feedback
 - **NetworkMonitor Service**: Real-time connectivity detection using Apple's Network framework (✅ IMPLEMENTED)
@@ -273,6 +280,26 @@ docs/                               # Project documentation including feature sp
 - **Data Integrity**: Robust delete confirmation with clear consequences explanation for habit and associated task data
 - **UI/UX Consistency**: Follows established design system with 8pt grid, card layouts, and consistent color schemes
 - **Validation System**: Shared ValidationError enum across all view models for consistent form validation
+- **Status**: ✅ FULLY IMPLEMENTED
+
+### TodayView Dashboard (September 2025)
+- **Read-Only Display Mode**: TodayView converted to pure information display without interaction capabilities (✅ IMPLEMENTED)
+- **Core Display Features**:
+  - **Today's Tasks**: Shows all tasks scheduled for today with completion status indicators (✅ IMPLEMENTED)
+  - **Overdue Tasks**: Displays overdue tasks with warning indicators and timestamps (✅ IMPLEMENTED)
+  - **Daily Habits**: Shows recurring habits/tasks with progress tracking and flame icons (✅ IMPLEMENTED)
+  - **Tomorrow Preview**: Limited preview of upcoming tasks for next day planning (✅ IMPLEMENTED)
+  - **Daily Summary**: Greeting text, date display, and overall completion statistics (✅ IMPLEMENTED)
+- **Read-Only Components**:
+  - **ReadOnlyTaskRowView**: Task display with read-only completion status indicators (✅ IMPLEMENTED)
+  - **ReadOnlyHabitTaskRowView**: Habit display with read-only flame icons and streak information (✅ IMPLEMENTED)
+- **Removed Interactive Elements**:
+  - ❌ Add Task button removed from toolbar
+  - ❌ Task completion toggle functionality removed
+  - ❌ Task editing and context menu options removed
+  - ❌ Habit interaction and completion tracking removed
+  - ❌ Navigation to task creation/editing flows removed
+- **Design Philosophy**: Pure information dashboard focusing on awareness without action, directing users to dedicated Tasks/Habits tabs for interactions
 - **Status**: ✅ FULLY IMPLEMENTED
 
 ### Console Output & Debugging

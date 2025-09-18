@@ -12,6 +12,11 @@ import Foundation
 struct AddTaskView: View {
     @Environment(\.diContainer) private var diContainer
     @State private var viewModel: AddTaskViewModel?
+    let dismissAction: (() -> Void)?
+
+    init(dismissAction: (() -> Void)? = nil) {
+        self.dismissAction = dismissAction
+    }
 
     var body: some View {
         Group {
@@ -24,7 +29,9 @@ struct AddTaskView: View {
         }
         .task {
             if viewModel == nil, let container = diContainer {
-                viewModel = container.makeAddTaskViewModel()
+                let newViewModel = container.makeAddTaskViewModel()
+                newViewModel.dismissAction = dismissAction
+                viewModel = newViewModel
             }
         }
     }

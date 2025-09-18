@@ -17,6 +17,7 @@ struct TasksView: View {
     @State private var selectedTasks = Set<UUID>()
     @State private var showingBatchDeleteConfirmation = false
     @State private var isEditingTasks = false
+    @State private var showingAddTask = false
 
     private var viewModel: TasksViewModel {
         container?.tasksViewModel ?? TasksViewModel(
@@ -50,6 +51,18 @@ struct TasksView: View {
             }
             .sheet(isPresented: $showingFilters) {
                 FiltersView(viewModel: viewModel)
+            }
+            .sheet(isPresented: $showingAddTask) {
+                NavigationStack {
+                    AddTaskView(dismissAction: { showingAddTask = false })
+                        .toolbar {
+                            ToolbarItem(placement: .cancellationAction) {
+                                Button("Cancel") {
+                                    showingAddTask = false
+                                }
+                            }
+                        }
+                }
             }
             .searchable(text: $searchText, prompt: "Search tasks...")
             .onChange(of: searchText) { _, newValue in
@@ -88,7 +101,7 @@ struct TasksView: View {
                         }
 
                         Button(action: {
-                            taskNavigation?.showAdd()
+                            showingAddTask = true
                         }) {
                             Image(systemName: "plus")
                         }
@@ -273,7 +286,7 @@ struct TasksView: View {
 
             if !viewModel.hasActiveFilters {
                 Button("Add Task") {
-                    taskNavigation?.showAdd()
+                    showingAddTask = true
                 }
                 .buttonStyle(.borderedProminent)
             }
